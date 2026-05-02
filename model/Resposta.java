@@ -66,8 +66,6 @@ public class Resposta {
         this.tempoResposta = tempoResposta;
     }
 
-    // toString
-
     @Override
     public String toString() {
         return "Resposta{" +

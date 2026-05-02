@@ -12,18 +12,18 @@ public class Alternativa {
     public Alternativa() {}
  
     public Alternativa(int id, String texto, boolean estaCorreta) {
-        this.id       = id;
-        this.texto    = texto;
+        this.id = id;
+        this.texto = texto;
         this.estaCorreta = estaCorreta;
-        this.errada    = false;
+        this.errada = false;
     }
  
     public Alternativa(int id, String texto, String imagem, boolean estaCorreta, boolean errada) {
-        this.id       = id;
-        this.texto    = texto;
-        this.imagem   = imagem;
+        this.id = id;
+        this.texto = texto;
+        this.imagem = imagem;
         this.estaCorreta = estaCorreta;
-        this.errada    = errada;
+        this.errada = errada;
     }
 
     // Valida se a alternativa é correta ou não.

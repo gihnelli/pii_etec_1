@@ -55,11 +55,7 @@ public class Questao {
 
     // Verifica se a questão está completa e válida para ser utilizada em uma partida.
     public boolean isValida() {
-        return enunciado != null && !enunciado.isBlank()
-                && tipo != null
-                && nivelDificuldade != null
-                && !alternativas.isEmpty()
-                && getAlternativaCorreta() != null;
+        return enunciado != null && !enunciado.isBlank() && tipo != null && nivelDificuldade != null && !alternativas.isEmpty() && getAlternativaCorreta() != null;
     }
 
     // Getters e Setters

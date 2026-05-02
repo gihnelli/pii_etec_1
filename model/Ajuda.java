@@ -11,8 +11,8 @@ public class Ajuda {
     public Ajuda() {}
 
     public Ajuda(int id, TipoAjuda tipoAjuda, int quantidadeDisponivel) {
-        this.id                   = id;
-        this.tipoAjuda            = tipoAjuda;
+        this.id = id;
+        this.tipoAjuda = tipoAjuda;
         this.quantidadeDisponivel = quantidadeDisponivel;
     }
 
@@ -23,8 +23,7 @@ public class Ajuda {
             throw new IllegalStateException("Ajuda do tipo " + tipoAjuda + " não está mais disponível.");
         }
         this.quantidadeDisponivel--;
-        System.out.println("Ajuda utilizada: " + tipoAjuda
-                + " | Restantes: " + quantidadeDisponivel);
+        System.out.println("Ajuda utilizada: " + tipoAjuda + " | Restantes: " + quantidadeDisponivel);
     }
 
     //Verifica se tem ajuda disponível
