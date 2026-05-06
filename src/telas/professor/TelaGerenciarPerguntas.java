@@ -1,4 +1,4 @@
-package src.telas.professor;
+package telas.professor;
 
 public class TelaGerenciarPerguntas {
     

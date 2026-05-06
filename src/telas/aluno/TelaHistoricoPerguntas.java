@@ -1,4 +1,4 @@
-package src.telas.aluno;
+package telas.aluno;
 
 public class TelaHistoricoPerguntas {
     

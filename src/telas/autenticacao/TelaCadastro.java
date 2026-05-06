@@ -1,4 +1,4 @@
-package src.telas.autenticacao;
+package telas.autenticacao;
 
 public class TelaCadastro {
     
