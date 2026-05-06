@@ -18,7 +18,7 @@ public class Ajuda {
 
     // Métodos de comportamento
     // Utiliza uma ajuda durante a partida + reduz quantidade disponível
-    public void utilizarPartida(Partida partida) {
+    public void utilizarNaPartida(Partida partida) {
         if (!verificarDisponibilidade()) {
             throw new IllegalStateException("Ajuda do tipo " + tipoAjuda + " não está mais disponível.");
         }
