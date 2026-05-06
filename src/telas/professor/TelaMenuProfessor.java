@@ -133,63 +133,56 @@ public class TelaMenuProfessor extends JFrame {
     }
 
     private static class PainelFundo extends JPanel {
+        private Image imagemFundo;
+
+        public PainelFundo() {
+            try {
+                // Carrega a imagem de fundo menu.png
+                imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
+            }
+        }
 
         @Override
         protected void paintComponent(Graphics grafico) {
             super.paintComponent(grafico);
+            Graphics2D g2 = (Graphics2D) grafico.create();
+            
+            // Habilita interpolação de alta qualidade
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            Graphics2D desenho = (Graphics2D) grafico;
-            desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            if (imagemFundo != null) {
+                int larguraPainel = getWidth();
+                int alturaPainel = getHeight();
+                int larguraImagem = imagemFundo.getWidth(this);
+                int alturaImagem = imagemFundo.getHeight(this);
 
-            desenho.setColor(new Color(223, 239, 252));
-            desenho.fillRect(0, 0, getWidth(), getHeight());
+                if (larguraImagem > 0 && alturaImagem > 0) {
+                    // Calcula a escala para cobrir todo o painel mantendo a proporção (tipo "cover")
+                    double escalaX = (double) larguraPainel / larguraImagem;
+                    double escalaY = (double) alturaPainel / alturaImagem;
+                    double escala = Math.max(escalaX, escalaY);
 
-            desenharPadraoLaboratorio(desenho);
-        }
+                    int novaLargura = (int) (larguraImagem * escala);
+                    int novaAltura = (int) (alturaImagem * escala);
 
-        private void desenharPadraoLaboratorio(Graphics2D desenho) {
-            for (int y = 20; y < getHeight(); y += 95) {
-                for (int x = 15; x < getWidth(); x += 110) {
-                    desenharMolecula(desenho, x, y);
-                    desenharAtomo(desenho, x + 45, y + 48);
-        }
+                    // Centraliza a imagem no painel
+                    int x = (larguraPainel - novaLargura) / 2;
+                    int y = (alturaPainel - novaAltura) / 2;
+
+                    g2.drawImage(imagemFundo, x, y, novaLargura, novaAltura, this);
+                } else {
+                    g2.drawImage(imagemFundo, 0, 0, larguraPainel, alturaPainel, this);
+                }
+            } else {
+                g2.setColor(new Color(223, 239, 252));
+                g2.fillRect(0, 0, getWidth(), getHeight());
             }
-        }
-
-        private void desenharMolecula(Graphics2D desenho, int x, int y) {
-            desenho.setStroke(new BasicStroke(2));
-            desenho.setColor(new Color(80, 100, 120));
-
-            desenho.drawLine(x + 18, y + 18, x + 35, y + 8);
-            desenho.drawLine(x + 18, y + 18, x + 35, y + 32);
-            desenho.drawLine(x + 18, y + 18, x + 5, y + 8);
-
-            desenho.setColor(new Color(160, 205, 245));
-            desenho.fillOval(x + 8, y + 8, 20, 20);
-            desenho.fillOval(x + 32, y + 2, 12, 12);
-            desenho.fillOval(x + 32, y + 28, 12, 12);
-            desenho.fillOval(x, y + 2, 12, 12);
-
-            desenho.setColor(new Color(80, 100, 120));
-            desenho.drawOval(x + 8, y + 8, 20, 20);
-            desenho.drawOval(x + 32, y + 2, 12, 12);
-            desenho.drawOval(x + 32, y + 28, 12, 12);
-            desenho.drawOval(x, y + 2, 12, 12);
-        }
-
-        private void desenharAtomo(Graphics2D desenho, int x, int y) {
-            desenho.setStroke(new BasicStroke(2));
-            desenho.setColor(new Color(80, 100, 120));
-
-            desenho.drawOval(x, y + 10, 48, 18);
-            desenho.drawOval(x + 10, y, 28, 38);
-            desenho.drawLine(x + 8, y + 34, x + 42, y + 4);
-
-            desenho.setColor(new Color(160, 205, 245));
-            desenho.fillOval(x + 20, y + 15, 10, 10);
-
-            desenho.setColor(new Color(80, 100, 120));
-            desenho.drawOval(x + 20, y + 15, 10, 10);
+            
+            g2.dispose();
         }
     }
 
