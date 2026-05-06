@@ -1,5 +1,5 @@
 package model;
-import model.enums.TipoUsuario;
+import model.tipos.TipoUsuario;
  
 public abstract class Usuario {
     private int id;
@@ -12,11 +12,11 @@ public abstract class Usuario {
     public Usuario() {}
  
     public Usuario(int id, String nome, String email, String senha, TipoUsuario tipo) {
-        this.id    = id;
-        this.nome  = nome;
+        this.id = id;
+        this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.tipo  = tipo;
+        this.tipo = tipo;
     }
 
     // Métodos de comportamento
@@ -30,12 +30,10 @@ public abstract class Usuario {
  
     //Logout
     public void sair() {
-        // Lógica de encerramento de sessão será acionada pelo controle.
         System.out.println("Usuário " + nome + " saiu do sistema.");
     }
 
     // Getters e Setters
- 
     public int getId() {
         return id;
     }
