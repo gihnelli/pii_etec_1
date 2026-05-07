@@ -1,5 +1,5 @@
-package src.model;
-import src.model.tipos.TipoAjuda;
+package model;
+import model.tipos.TipoAjuda;
 
 public class Ajuda {
 

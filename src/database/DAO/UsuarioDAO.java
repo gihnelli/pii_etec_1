@@ -1,12 +1,12 @@
-package src.database.DAO;
-import src.database.Conexao;
-import src.model.Aluno;
-import src.model.Professor;
-import src.model.Usuario;
-import src.model.tipos.TipoUsuario;
+package database.DAO;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Aluno;
+import model.Professor;
+import model.Usuario;
+import model.tipos.TipoUsuario;
 
 public class UsuarioDAO {
 

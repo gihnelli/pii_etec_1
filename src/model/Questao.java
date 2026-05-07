@@ -1,9 +1,9 @@
-package src.model;
+package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import src.model.tipos.NivelDificuldade;
-import src.model.tipos.TipoQuestao;
+import model.tipos.NivelDificuldade;
+import model.tipos.TipoQuestao;
 
 public class Questao {
 

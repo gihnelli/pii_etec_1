@@ -1,5 +1,5 @@
-package src.model;
-import src.model.tipos.NivelDificuldade;
+package model;
+import model.tipos.NivelDificuldade;
 
 public class Desempenho {
 

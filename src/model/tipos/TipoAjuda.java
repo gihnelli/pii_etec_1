@@ -1,4 +1,4 @@
-package src.model.tipos;
+package model.tipos;
  
 //Define os tipos de ajuda disponíveis durante o jogo
 public enum TipoAjuda {

@@ -1,8 +1,8 @@
-package src.model;
+package model;
 import java.util.ArrayList;
 import java.util.List;
 
-import src.model.tipos.TipoUsuario;
+import model.tipos.TipoUsuario;
 
 public class Aluno extends Usuario {
  

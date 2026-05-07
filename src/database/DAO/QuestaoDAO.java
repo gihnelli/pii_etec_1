@@ -1,12 +1,11 @@
-package src.database.DAO;
-import src.database.Conexao;
-import src.model.Alternativa;
-import src.model.Questao;
-import src.model.tipos.NivelDificuldade;
-import src.model.tipos.TipoQuestao;
+package database.DAO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Alternativa;
+import model.Questao;
+import model.tipos.NivelDificuldade;
+import model.tipos.TipoQuestao;
 
 public class QuestaoDAO {
 

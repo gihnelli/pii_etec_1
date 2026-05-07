@@ -1,4 +1,4 @@
-package src.model;
+package model;
 
 /// Representa a resposta dada por um aluno a uma questão durante uma partida.
 public class Resposta {

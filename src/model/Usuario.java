@@ -1,5 +1,5 @@
-package src.model;
-import src.model.tipos.TipoUsuario;
+package model;
+import model.tipos.TipoUsuario;
  
 public abstract class Usuario {
     private int id;

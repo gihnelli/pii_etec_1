@@ -1,5 +1,5 @@
-package src;
-import src.model.tipos.NivelDificuldade;
+package utilitarios;
+import model.tipos.NivelDificuldade;
 
 public class AumentaDificuldade {
     private static final int Limite_Aumentar = 3;

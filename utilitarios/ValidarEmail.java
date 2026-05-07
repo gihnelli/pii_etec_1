@@ -1,4 +1,4 @@
-package src;
+package utilitarios;
 public class ValidarEmail{
     // Emails aceitos
     private static final String Dominio_Aluno = "@aluno.cps.sp.gov.br";

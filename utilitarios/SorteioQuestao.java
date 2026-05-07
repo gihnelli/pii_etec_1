@@ -1,12 +1,12 @@
-package src;
+package utilitarios;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import src.model.Questao;
-import src.model.tipos.NivelDificuldade;
-
+import model.Questao;
+import model.tipos.NivelDificuldade;
 public class SorteioQuestao{
     private SorteioQuestao(){}
 
