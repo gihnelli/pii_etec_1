@@ -60,20 +60,32 @@ public class TelaJogo extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        // Barra Superior: Ícones de Ajuda e Sair
-        JPanel painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 15));
+        // Barra Superior: Ícones de Perfil e Sair (Usando imagens reais)
+        JPanel painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
         painelIcones.setOpaque(false);
-        painelIcones.setBounds(780, 10, 180, 80);
+        painelIcones.setBounds(800, 10, 180, 80);
 
-        JButton botaoAjuda = criarBotaoIcone("?!", new Color(47, 76, 113));
-        botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.addActionListener(e -> abrirPerfil());
         
-        JButton botaoSair = criarBotaoIcone("➡", new Color(47, 76, 113));
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
         botaoSair.addActionListener(e -> confirmarSaida());
 
-        painelIcones.add(botaoAjuda);
+        painelIcones.add(botaoPerfil);
         painelIcones.add(botaoSair);
         painelFundo.add(painelIcones);
+
+        // Botão de Ajuda (Fica separado ou junto)
+        JButton botaoAjuda = new JButton("?!");
+        botaoAjuda.setBounds(20, 20, 50, 50);
+        botaoAjuda.setFont(new Font("Arial", Font.BOLD, 24));
+        botaoAjuda.setForeground(Color.WHITE);
+        botaoAjuda.setBackground(new Color(47, 76, 113));
+        botaoAjuda.setFocusPainted(false);
+        botaoAjuda.setBorderPainted(false);
+        botaoAjuda.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
+        painelFundo.add(botaoAjuda);
 
         // Área Central Dinâmica
         painelConteudo = new JPanel();
@@ -81,6 +93,28 @@ public class TelaJogo extends JFrame {
         painelConteudo.setOpaque(false);
         painelConteudo.setBounds(50, 100, 900, 580);
         painelFundo.add(painelConteudo);
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private void abrirPerfil() {
+        JOptionPane.showMessageDialog(this, "Perfil do jogador...");
     }
 
     private JButton criarBotaoIcone(String texto, Color cor) {

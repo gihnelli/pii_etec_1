@@ -31,27 +31,16 @@ public class TelaMenuAluno extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        JLabel botaoPerfil = new JLabel("👤", SwingConstants.CENTER);
-        botaoPerfil.setBounds(10, 12, 35, 35);
-        botaoPerfil.setFont(new Font("Arial", Font.PLAIN, 25));
-        botaoPerfil.setForeground(Color.WHITE);
-        botaoPerfil.setOpaque(true);
-        botaoPerfil.setBackground(new Color(36, 73, 130));
+        // Botão Perfil (Canto Superior Esquerdo)
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.setBounds(20, 20, 45, 45);
+        botaoPerfil.addActionListener(e -> abrirPerfil());
         painelFundo.add(botaoPerfil);
 
-        JLabel botaoSair = new JLabel("↪", SwingConstants.CENTER);
-        botaoSair.setBounds(493, 12, 35, 35);
-        botaoSair.setFont(new Font("Arial", Font.BOLD, 28));
-        botaoSair.setForeground(Color.WHITE);
-        botaoSair.setOpaque(true);
-        botaoSair.setBackground(new Color(36, 73, 130));
-        botaoSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        botaoSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evento) {
-                sairDaConta();
-            }
-        });
+        // Botão Sair (Canto Superior Direito)
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.setBounds(475, 20, 45, 45);
+        botaoSair.addActionListener(e -> sairDaConta());
         painelFundo.add(botaoSair);
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
@@ -69,6 +58,28 @@ public class TelaMenuAluno extends JFrame {
         botaoDesempenho.setBounds(148, 272, 240, 38);
         botaoDesempenho.addActionListener((ActionEvent evento) -> abrirTelaDesempenho());
         painelFundo.add(botaoDesempenho);
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private void abrirPerfil() {
+        JOptionPane.showMessageDialog(this, "Abrindo perfil do aluno...");
     }
 
     private JButton criarBotaoMenu(String texto) {

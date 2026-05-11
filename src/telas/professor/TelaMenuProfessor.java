@@ -24,27 +24,16 @@ public class TelaMenuProfessor extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        JLabel botaoPerfil = new JLabel("●", SwingConstants.CENTER);
-        botaoPerfil.setBounds(17, 18, 40, 40);
-        botaoPerfil.setFont(new Font("Arial", Font.BOLD, 30));
-        botaoPerfil.setForeground(Color.WHITE);
-        botaoPerfil.setOpaque(true);
-        botaoPerfil.setBackground(new Color(36, 73, 130));
+        // Botão Perfil (Canto Superior Esquerdo)
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.setBounds(20, 20, 45, 45);
+        botaoPerfil.addActionListener(e -> abrirPerfil());
         painelFundo.add(botaoPerfil);
 
-        JLabel botaoSair = new JLabel("↪", SwingConstants.CENTER);
-        botaoSair.setBounds(581, 18, 40, 40);
-        botaoSair.setFont(new Font("Arial", Font.BOLD, 30));
-        botaoSair.setForeground(Color.WHITE);
-        botaoSair.setOpaque(true);
-        botaoSair.setBackground(new Color(36, 73, 130));
-        botaoSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        botaoSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evento) {
-                sairDaConta();
-            }
-        });
+        // Botão Sair (Canto Superior Direito)
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.setBounds(575, 20, 45, 45);
+        botaoSair.addActionListener(e -> sairDaConta());
         painelFundo.add(botaoSair);
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
@@ -54,14 +43,46 @@ public class TelaMenuProfessor extends JFrame {
         painelFundo.add(titulo);
 
         BotaoArredondado botaoGerenciarPerguntas = new BotaoArredondado("Gerenciar perguntas");
-        botaoGerenciarPerguntas.setBounds(170, 263, 300, 45);
+        botaoGerenciarPerguntas.setBounds(170, 240, 300, 45);
         botaoGerenciarPerguntas.addActionListener((ActionEvent evento) -> abrirGerenciarPerguntas());
         painelFundo.add(botaoGerenciarPerguntas);
 
-        BotaoArredondado botaoRelatorios = new BotaoArredondado("Desempenho dos alunos");
-        botaoRelatorios.setBounds(170, 315, 300, 45);
+        BotaoArredondado botaoRelatorios = new BotaoArredondado("Relatórios");
+        botaoRelatorios.setBounds(170, 295, 300, 45);
         botaoRelatorios.addActionListener((ActionEvent evento) -> abrirRelatorios());
         painelFundo.add(botaoRelatorios);
+
+        BotaoArredondado botaoCadastrarAluno = new BotaoArredondado("Cadastrar Aluno");
+        botaoCadastrarAluno.setBounds(170, 350, 300, 45);
+        botaoCadastrarAluno.addActionListener((ActionEvent evento) -> abrirCadastrarAluno());
+        painelFundo.add(botaoCadastrarAluno);
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private void abrirPerfil() {
+        JOptionPane.showMessageDialog(this, "Abrindo perfil do professor...");
+    }
+
+    private void abrirCadastrarAluno() {
+        new telas.autenticacao.TelaCadastro().setVisible(true);
+        dispose();
     }
 
     private void abrirGerenciarPerguntas() {
@@ -78,16 +99,8 @@ public class TelaMenuProfessor extends JFrame {
     }
 
     private void abrirRelatorios() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberta a tela de relatórios.",
-                "Desempenho dos alunos",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        // Quando a tela estiver pronta, use:
-        // new TelaRelatorios().setVisible(true);
-        // dispose();
+        new TelaDesempenho().setVisible(true);
+        dispose();
     }
 
     private void sairDaConta() {

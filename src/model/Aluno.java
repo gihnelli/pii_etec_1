@@ -33,6 +33,13 @@ public class Aluno extends Usuario {
         historicoPartidas.add(novaPartida);
         return novaPartida;
     }
+
+    // Adiciona uma partida existente ao histórico do aluno.
+    public void adicionarPartida(Partida partida) {
+        if (partida != null) {
+            this.historicoPartidas.add(partida);
+        }
+    }
  
     //Retorna o histórico de partidas do aluno.
     public List<Partida> verHistorico() {
