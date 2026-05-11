@@ -58,7 +58,7 @@ public class TelaMenuProfessor extends JFrame {
         botaoGerenciarPerguntas.addActionListener((ActionEvent evento) -> abrirGerenciarPerguntas());
         painelFundo.add(botaoGerenciarPerguntas);
 
-        BotaoArredondado botaoRelatorios = new BotaoArredondado("Relatórios");
+        BotaoArredondado botaoRelatorios = new BotaoArredondado("Desempenho dos alunos");
         botaoRelatorios.setBounds(170, 315, 300, 45);
         botaoRelatorios.addActionListener((ActionEvent evento) -> abrirRelatorios());
         painelFundo.add(botaoRelatorios);
@@ -81,7 +81,7 @@ public class TelaMenuProfessor extends JFrame {
         JOptionPane.showMessageDialog(
                 this,
                 "Aqui será aberta a tela de relatórios.",
-                "Relatórios",
+                "Desempenho dos alunos",
                 JOptionPane.INFORMATION_MESSAGE
         );
 

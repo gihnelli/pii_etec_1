@@ -62,11 +62,6 @@ public class TelaMenuAluno extends JFrame {
         botaoDesempenho.setBounds(148, 272, 240, 38);
         botaoDesempenho.addActionListener((ActionEvent evento) -> abrirTelaDesempenho());
         painelFundo.add(botaoDesempenho);
-
-        JButton botaoHistorico = criarBotaoMenu("Histórico de perguntas");
-        botaoHistorico.setBounds(148, 319, 240, 38);
-        botaoHistorico.addActionListener((ActionEvent evento) -> abrirTelaHistoricoPerguntas());
-        painelFundo.add(botaoHistorico);
     }
 
     private JButton criarBotaoMenu(String texto) {
@@ -103,19 +98,6 @@ public class TelaMenuAluno extends JFrame {
 
         // Quando a TelaDesempenhoAluno estiver pronta, use:
         // new TelaDesempenhoAluno().setVisible(true);
-        // dispose();
-    }
-
-    private void abrirTelaHistoricoPerguntas() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberto o histórico de perguntas.",
-                "Histórico de perguntas",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        // Quando a TelaHistoricoPerguntas estiver pronta, use:
-        // new TelaHistoricoPerguntas().setVisible(true);
         // dispose();
     }
 
