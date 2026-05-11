@@ -3,6 +3,8 @@ package telas.autenticacao;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
+import telas.aluno.TelaMenuAluno;
+import telas.professor.TelaMenuProfessor;
 
 public class TelaLogin extends JFrame {
 
@@ -291,19 +293,13 @@ public class TelaLogin extends JFrame {
     }
 
     private void abrirTelaDoAluno() {
-        // Quando a tela do aluno estiver pronta, use:
-        // new telas.aluno.TelaMenuAluno().setVisible(true);
-        // dispose();
-
-        JOptionPane.showMessageDialog(this, "Aqui será aberta a tela inicial do aluno.");
+        new TelaMenuAluno().setVisible(true);
+        dispose();
     }
 
     private void abrirTelaDoProfessor() {
-        // Quando a tela do professor estiver pronta, use:
-        // new telas.professor.TelaMenuProfessor().setVisible(true);
-        // dispose();
-
-        JOptionPane.showMessageDialog(this, "Aqui será aberta a tela inicial do professor.");
+        new TelaMenuProfessor().setVisible(true);
+        dispose();
     }
 
     public static void main(String[] args) {

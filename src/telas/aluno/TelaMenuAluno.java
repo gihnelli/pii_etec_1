@@ -2,7 +2,14 @@ package telas.aluno;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
+import model.Alternativa;
+import model.Partida;
+import model.Questao;
+import model.tipos.TipoQuestao;
+import telas.jogo.TelaJogo;
 
 public class TelaMenuAluno extends JFrame {
 
@@ -76,16 +83,26 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaJogo() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberta a tela do jogo.",
-                "Jogar",
-                JOptionPane.INFORMATION_MESSAGE
-        );
+        // Criando uma partida e questões de exemplo para o teste
+        model.Aluno alunoExemplo = new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345");
+        Partida partida = new Partida(alunoExemplo);
+        List<Questao> lista = new ArrayList<>();
+        
+        // Questão 1: Alternativa
+        Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Química");
+        q1.setImagemEnunciado("imagens/Béquer.jpg");
+        q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
+        q1.adicionarAlternativa(new Alternativa(2, "Pipeta Volumétrica", true));
+        q1.adicionarAlternativa(new Alternativa(3, "Tubo de Ensaio", false));
+        q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
+        lista.add(q1);
 
-        // Quando a TelaJogo estiver pronta, use:
-        // new TelaJogo().setVisible(true);
-        // dispose();
+        // Questão 2: Associação
+        Questao q2 = new Questao(2, "Combine os materiais aos sistemas correspondentes", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Química");
+        lista.add(q2);
+
+        new TelaJogo(partida, lista).setVisible(true);
+        dispose();
     }
 
     private void abrirTelaDesempenho() {
