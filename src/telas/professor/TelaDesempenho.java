@@ -1,31 +1,46 @@
 package telas.professor;
 
 import java.awt.*;
-import java.awt.print.*;
+import java.io.File;
+import java.io.IOException;
+import java.text.Normalizer;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
 import model.Alternativa;
 import model.Aluno;
 import model.Partida;
 import model.Questao;
 import model.Resposta;
 
-/**
- * Tela de Desempenho para o Professor.
- * Agora gera gráficos dinâmicos baseados em dados reais e exporta PDFs autênticos.
- */
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDFont;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+
 public class TelaDesempenho extends JFrame {
 
     private JPanel painelPrincipal;
     private CardLayout navegador;
     private List<Aluno> listaAlunos;
-    
-    // Cores do Projeto
-    private final Color AZUL_ESCURO = new Color(47, 76, 113);
+
+    private final Color AZUL_ESCURO = new Color(34, 62, 107);
     private final Color AZUL_CLARO = new Color(160, 205, 245);
-    private final Color AZUL_MEDIO = new Color(70, 130, 200);
+    private final Color AZUL_MEDIO = new Color(70, 130, 230);
+    private final Color CINZA_CLARO = new Color(210, 210, 210);
+    private final Color BRANCO_GELO = new Color(238, 242, 248);
+
+    private static final PDFont FONTE_NORMAL =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+
+    private static final PDFont FONTE_NEGRITO =
+            new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
     public TelaDesempenho(List<Aluno> alunos) {
         this.listaAlunos = alunos;
@@ -33,13 +48,12 @@ public class TelaDesempenho extends JFrame {
         montarEstrutura();
     }
 
-    // Construtor padrão para testes
     public TelaDesempenho() {
         this(gerarDadosExemplo());
     }
 
     private void configurarJanela() {
-        setTitle("LabQuest - Gestão de Desempenho");
+        setTitle("Tela - Desempenho");
         setSize(1000, 750);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -51,514 +65,873 @@ public class TelaDesempenho extends JFrame {
         painelPrincipal = new JPanel(navegador);
         setContentPane(painelPrincipal);
 
-        painelPrincipal.add(criarVisaoGeral(), "GERAL");
-        painelPrincipal.add(criarVisaoListaAlunos(), "LISTA");
+        painelPrincipal.add(criarTelaGeralDaTurma(), "GERAL");
+        painelPrincipal.add(criarTelaListaDeAlunos(), "LISTA");
+
+        navegador.show(painelPrincipal, "GERAL");
     }
 
-    // --- CÁLCULOS DE DADOS REAIS ---
-    
-    private double[] calcularEstatisticasTurma() {
-        int totalAcertos = 0;
-        int totalRespostas = 0;
-
-        for (Aluno a : listaAlunos) {
-            for (Partida p : a.getHistoricoPartidas()) {
-                totalAcertos += p.getTotalAcertos();
-                totalRespostas += p.getRespostas().size();
-            }
-        }
-
-        if (totalRespostas == 0) return new double[]{0, 0};
-        double percAcertos = (totalAcertos * 100.0) / totalRespostas;
-        return new double[]{percAcertos, 100.0 - percAcertos};
-    }
-
-    private double[] calcularEstatisticasAluno(Aluno aluno) {
-        int acertos = 0, total = 0;
-        for (Partida p : aluno.getHistoricoPartidas()) {
-            acertos += p.getTotalAcertos();
-            total += p.getRespostas().size();
-        }
-        if (total == 0) return new double[]{0, 0};
-        double perc = (acertos * 100.0) / total;
-        return new double[]{perc, 100.0 - perc};
-    }
-
-    // --- VISÃO 1: GRÁFICO GERAL ---
-    private JPanel criarVisaoGeral() {
+    private JPanel criarTelaGeralDaTurma() {
         PainelFundo painel = new PainelFundo();
         painel.setLayout(null);
-        adicionarIconesNavegacao(painel);
 
-        double[] stats = calcularEstatisticasTurma();
+        adicionarIcones(painel, false);
 
-        PainelArredondado painelGrafico = new PainelArredondado(30);
-        painelGrafico.setBounds(30, 130, 480, 550);
+        Estatisticas estatisticasTurma = calcularEstatisticasTurma();
+
+        PainelArredondado painelGrafico = new PainelArredondado(22);
+        painelGrafico.setBounds(18, 80, 480, 540);
         painelGrafico.setBackground(AZUL_ESCURO);
-        painelGrafico.setLayout(new BorderLayout());
-        
-        JLabel lblTit = new JLabel("Desempenho Geral da Turma", SwingConstants.CENTER);
-        lblTit.setFont(new Font("Arial", Font.BOLD, 24));
-        lblTit.setForeground(Color.WHITE);
-        lblTit.setBorder(new EmptyBorder(20, 0, 0, 0));
-        painelGrafico.add(lblTit, BorderLayout.NORTH);
-
-        GraficoPizza grafico = new GraficoPizza(stats[0], stats[1]);
-        painelGrafico.add(grafico, BorderLayout.CENTER);
+        painelGrafico.setLayout(null);
         painel.add(painelGrafico);
 
-        BotaoMenu btnLista = new BotaoMenu("Ver Lista de Alunos");
-        btnLista.setBounds(540, 380, 410, 75);
-        btnLista.addActionListener(e -> navegador.show(painelPrincipal, "LISTA"));
-        painel.add(btnLista);
+        JLabel titulo = new JLabel("Desempenho da turma", SwingConstants.CENTER);
+        titulo.setBounds(0, 18, 480, 40);
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
+        titulo.setForeground(Color.WHITE);
+        painelGrafico.add(titulo);
 
-        PainelArredondado pPdf = new PainelArredondado(20);
-        pPdf.setBounds(540, 485, 410, 110);
-        pPdf.setBackground(AZUL_ESCURO);
-        pPdf.setLayout(null);
-        
-        JLabel lPdf = new JLabel("Exportar Relatório Geral", SwingConstants.CENTER);
-        lPdf.setBounds(0, 10, 410, 30);
-        lPdf.setFont(new Font("Arial", Font.BOLD, 18));
-        lPdf.setForeground(Color.WHITE);
-        pPdf.add(lPdf);
+        GraficoPizza grafico = new GraficoPizza(
+                estatisticasTurma.percentualAcertos,
+                estatisticasTurma.percentualErros,
+                true
+        );
+        grafico.setBounds(20, 70, 440, 390);
+        painelGrafico.add(grafico);
 
-        JButton bPdf = new JButton("Gerar PDF da Turma");
-        bPdf.setBounds(20, 50, 370, 45);
-        bPdf.setFont(new Font("Arial", Font.BOLD, 18));
-        bPdf.addActionListener(e -> exportarParaPDF("GERAL", "Relatorio_Geral_Turma"));
-        pPdf.add(bPdf);
-        painel.add(pPdf);
+        JLabel resumo = new JLabel(
+                "Total: " + estatisticasTurma.totalRespostas
+                        + " respostas | "
+                        + estatisticasTurma.totalAcertos + " acertos | "
+                        + estatisticasTurma.totalErros + " erros",
+                SwingConstants.CENTER
+        );
+        resumo.setBounds(0, 475, 480, 35);
+        resumo.setFont(new Font("Arial", Font.BOLD, 14));
+        resumo.setForeground(Color.WHITE);
+        painelGrafico.add(resumo);
+
+        BotaoMenu botaoLista = new BotaoMenu("Lista de alunos");
+        botaoLista.setBounds(535, 310, 420, 70);
+        botaoLista.addActionListener(evento -> navegador.show(painelPrincipal, "LISTA"));
+        painel.add(botaoLista);
+
+        PainelArredondado painelRelatorio = new PainelArredondado(18);
+        painelRelatorio.setBounds(535, 420, 420, 115);
+        painelRelatorio.setBackground(AZUL_ESCURO);
+        painelRelatorio.setLayout(null);
+        painel.add(painelRelatorio);
+
+        JLabel textoRelatorio = new JLabel("Gerar relatório", SwingConstants.CENTER);
+        textoRelatorio.setBounds(0, 8, 420, 35);
+        textoRelatorio.setFont(new Font("Arial", Font.BOLD, 20));
+        textoRelatorio.setForeground(Color.WHITE);
+        painelRelatorio.add(textoRelatorio);
+
+        JButton botaoPdf = new JButton("Baixar PDF");
+        botaoPdf.setBounds(26, 54, 368, 44);
+        botaoPdf.setFont(new Font("Arial", Font.BOLD, 18));
+        botaoPdf.setForeground(AZUL_ESCURO);
+        botaoPdf.setBackground(BRANCO_GELO);
+        botaoPdf.setFocusPainted(false);
+        botaoPdf.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        botaoPdf.addActionListener(evento -> gerarPdfDaTurma());
+        painelRelatorio.add(botaoPdf);
 
         return painel;
     }
 
-    // --- VISÃO 2: LISTA DE ALUNOS ---
-    private JPanel criarVisaoListaAlunos() {
+    private JPanel criarTelaListaDeAlunos() {
         PainelFundo painel = new PainelFundo();
         painel.setLayout(null);
-        adicionarIconesNavegacao(painel);
 
-        PainelArredondado cab = new PainelArredondado(25);
-        cab.setBounds(350, 35, 300, 50);
-        cab.setBackground(AZUL_ESCURO);
-        cab.setLayout(new BorderLayout());
-        JLabel t = new JLabel("Alunos Cadastrados", SwingConstants.CENTER);
-        t.setFont(new Font("Arial", Font.BOLD, 22));
-        t.setForeground(Color.WHITE);
-        cab.add(t);
-        painel.add(cab);
+        adicionarIcones(painel, true);
 
-        JPanel cont = new JPanel();
-        cont.setLayout(new BoxLayout(cont, BoxLayout.Y_AXIS));
-        cont.setOpaque(false);
+        PainelArredondado tituloLista = new PainelArredondado(18);
+        tituloLista.setBounds(350, 28, 300, 42);
+        tituloLista.setBackground(AZUL_ESCURO);
+        tituloLista.setLayout(new BorderLayout());
+        painel.add(tituloLista);
+
+        JLabel textoTitulo = new JLabel("Lista de alunos", SwingConstants.CENTER);
+        textoTitulo.setFont(new Font("Arial", Font.BOLD, 18));
+        textoTitulo.setForeground(Color.WHITE);
+        tituloLista.add(textoTitulo, BorderLayout.CENTER);
+
+        JPanel painelLista = new JPanel();
+        painelLista.setLayout(new BoxLayout(painelLista, BoxLayout.Y_AXIS));
+        painelLista.setOpaque(false);
 
         for (Aluno aluno : listaAlunos) {
-            cont.add(new ItemListaAluno(aluno));
-            cont.add(Box.createVerticalStrut(10));
+            ItemAluno item = new ItemAluno(aluno);
+            painelLista.add(item);
+            painelLista.add(Box.createVerticalStrut(8));
         }
 
-        JScrollPane scroll = new JScrollPane(cont);
-        scroll.setBounds(30, 110, 930, 580);
-        scroll.setOpaque(false);
-        scroll.getViewport().setOpaque(false);
-        scroll.setBorder(null);
-        painel.add(scroll);
+        JScrollPane barraRolagem = new JScrollPane(painelLista);
+        barraRolagem.setBounds(24, 90, 940, 600);
+        barraRolagem.setBorder(null);
+        barraRolagem.setOpaque(false);
+        barraRolagem.getViewport().setOpaque(false);
+        barraRolagem.getVerticalScrollBar().setUnitIncrement(18);
+        painel.add(barraRolagem);
 
         return painel;
     }
 
-    // --- GERAÇÃO REAL DE PDF (Via API de Impressão) ---
-    private void exportarParaPDF(Object alvo, String nomeArquivo) {
-        PrinterJob job = PrinterJob.getPrinterJob();
-        job.setJobName(nomeArquivo);
+    private void adicionarIcones(JPanel painel, boolean voltarParaTelaGeral) {
+        JLabel iconePerfil = new JLabel("●", SwingConstants.CENTER);
+        iconePerfil.setBounds(18, 18, 52, 52);
+        iconePerfil.setFont(new Font("Arial", Font.BOLD, 30));
+        iconePerfil.setForeground(Color.WHITE);
+        iconePerfil.setOpaque(true);
+        iconePerfil.setBackground(AZUL_ESCURO);
+        painel.add(iconePerfil);
 
-        job.setPrintable(new RelatorioPrintable(alvo));
+        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
+        iconeSair.setBounds(920, 18, 52, 52);
+        iconeSair.setFont(new Font("Arial", Font.BOLD, 32));
+        iconeSair.setForeground(Color.WHITE);
+        iconeSair.setOpaque(true);
+        iconeSair.setBackground(AZUL_ESCURO);
+        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        boolean ok = job.printDialog();
-        if (ok) {
-            try {
-                job.print();
-                JOptionPane.showMessageDialog(this, "Relatório PDF gerado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-            } catch (PrinterException ex) {
-                JOptionPane.showMessageDialog(this, "Erro ao gerar PDF: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    /**
-     * Classe responsável por desenhar o conteúdo do PDF de forma vetorial.
-     */
-    private class RelatorioPrintable implements Printable {
-        private Object alvo;
-
-        public RelatorioPrintable(Object alvo) {
-            this.alvo = alvo;
-        }
-
-        @Override
-        public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-            if (pageIndex > 0) return NO_SUCH_PAGE;
-
-            Graphics2D g2d = (Graphics2D) graphics;
-            g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            // Cabeçalho
-            g2d.setColor(AZUL_ESCURO);
-            g2d.fillRect(0, 0, (int) pageFormat.getImageableWidth(), 60);
-            
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 22));
-            g2d.drawString("LabQuest - Relatório de Desempenho", 20, 40);
-
-            g2d.setColor(Color.BLACK);
-            g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-            String data = "Gerado em: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-            g2d.drawString(data, (int) pageFormat.getImageableWidth() - 200, 80);
-
-            if (alvo instanceof Aluno aluno) {
-                desenharRelatorioAluno(g2d, aluno, pageFormat);
-            } else {
-                desenharRelatorioGeral(g2d, pageFormat);
-            }
-
-            return PAGE_EXISTS;
-        }
-
-        private void desenharRelatorioAluno(Graphics2D g2d, Aluno aluno, PageFormat pf) {
-            g2d.setFont(new Font("Arial", Font.BOLD, 18));
-            g2d.drawString("Aluno: " + aluno.getNome(), 20, 110);
-            g2d.setFont(new Font("Arial", Font.PLAIN, 14));
-            g2d.drawString("Turma: " + aluno.getTurma(), 20, 130);
-            g2d.drawString("Email: " + aluno.getEmail(), 20, 150);
-
-            double[] stats = calcularEstatisticasAluno(aluno);
-            
-            // Desenhar Gráfico no PDF
-            int chartSize = 200;
-            int cx = 350;
-            int cy = 100;
-            desenharGraficoVetor(g2d, cx, cy, chartSize, stats[0], stats[1]);
-
-            // Tabela de Partidas
-            int y = 280;
-            g2d.setFont(new Font("Arial", Font.BOLD, 14));
-            g2d.drawString("Histórico de Partidas", 20, y);
-            y += 25;
-            
-            g2d.drawLine(20, y, (int) pf.getImageableWidth() - 20, y);
-            y += 20;
-            g2d.drawString("Data/Hora", 25, y);
-            g2d.drawString("Pontuação", 200, y);
-            g2d.drawString("Acertos", 300, y);
-            g2d.drawString("Erros", 400, y);
-            y += 10;
-            g2d.drawLine(20, y, (int) pf.getImageableWidth() - 20, y);
-            y += 20;
-
-            g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-            for (Partida p : aluno.getHistoricoPartidas()) {
-                if (y > pf.getImageableHeight() - 50) break;
-                String dt = p.getDataHoraInicio().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
-                g2d.drawString(dt, 25, y);
-                g2d.drawString(String.valueOf(p.getPontuacao()), 200, y);
-                g2d.drawString(String.valueOf(p.getTotalAcertos()), 300, y);
-                g2d.drawString(String.valueOf(p.getTotalErros()), 400, y);
-                y += 20;
-            }
-        }
-
-        private void desenharRelatorioGeral(Graphics2D g2d, PageFormat pf) {
-            g2d.setFont(new Font("Arial", Font.BOLD, 18));
-            g2d.drawString("Resumo Geral da Turma", 20, 110);
-
-            double[] stats = calcularEstatisticasTurma();
-            desenharGraficoVetor(g2d, 350, 100, 200, stats[0], stats[1]);
-
-            int y = 300;
-            g2d.setFont(new Font("Arial", Font.BOLD, 14));
-            g2d.drawString("Ranking de Alunos", 20, y);
-            y += 25;
-            
-            g2d.drawLine(20, y, (int) pf.getImageableWidth() - 20, y);
-            y += 20;
-            g2d.drawString("Nome", 25, y);
-            g2d.drawString("Turma", 250, y);
-            g2d.drawString("Média Acertos", 400, y);
-            y += 10;
-            g2d.drawLine(20, y, (int) pf.getImageableWidth() - 20, y);
-            y += 20;
-
-            g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-            for (Aluno a : listaAlunos) {
-                if (y > pf.getImageableHeight() - 50) break;
-                double[] s = calcularEstatisticasAluno(a);
-                g2d.drawString(a.getNome(), 25, y);
-                g2d.drawString(a.getTurma(), 250, y);
-                g2d.drawString(String.format("%.1f%%", s[0]), 400, y);
-                y += 20;
-            }
-        }
-
-        private void desenharGraficoVetor(Graphics2D g2d, int x, int y, int size, double acertos, double erros) {
-            int angA = (int) Math.round(acertos * 3.6);
-            int angE = 360 - angA;
-
-            // Sombra
-            g2d.setColor(new Color(0, 0, 0, 50));
-            g2d.fillOval(x + 5, y + 5, size, size);
-
-            g2d.setColor(AZUL_CLARO);
-            g2d.fillArc(x, y, size, size, 90, -angA);
-            g2d.setColor(AZUL_MEDIO);
-            g2d.fillArc(x, y, size, size, 90 - angA, -angE);
-
-            // Legenda
-            g2d.setFont(new Font("Arial", Font.BOLD, 10));
-            g2d.setColor(Color.BLACK);
-            g2d.fillRect(x + size + 20, y + 40, 15, 15);
-            g2d.drawString(String.format("Acertos (%.1f%%)", acertos), x + size + 40, y + 52);
-            
-            g2d.setColor(AZUL_MEDIO);
-            g2d.fillRect(x + size + 20, y + 65, 15, 15);
-            g2d.setColor(Color.BLACK);
-            g2d.drawString(String.format("Erros (%.1f%%)", erros), x + size + 40, y + 77);
-        }
-    }
-
-    private void adicionarIconesNavegacao(JPanel painel) {
-        JButton btnPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-        btnPerfil.setBounds(20, 20, 45, 45);
-        painel.add(btnPerfil);
-
-        JButton btnSair = criarBotaoIconeReal("imagens/Sair.png");
-        btnSair.setBounds(920, 20, 45, 45);
-        btnSair.addActionListener(e -> {
-            if (painel.getLayout() instanceof CardLayout) {
-                 dispose();
-            } else {
-                navegador.show(painelPrincipal, "GERAL");
+        iconeSair.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evento) {
+                if (voltarParaTelaGeral) {
+                    navegador.show(painelPrincipal, "GERAL");
+                } else {
+                    dispose();
+                }
             }
         });
-        painel.add(btnSair);
+
+        painel.add(iconeSair);
     }
 
-    private JButton criarBotaoIconeReal(String caminho) {
-        JButton btn = new JButton();
+    private Estatisticas calcularEstatisticasTurma() {
+        Estatisticas total = new Estatisticas();
+
+        for (Aluno aluno : listaAlunos) {
+            Estatisticas estatisticasAluno = calcularEstatisticasAluno(aluno);
+
+            total.totalAcertos += estatisticasAluno.totalAcertos;
+            total.totalErros += estatisticasAluno.totalErros;
+            total.totalRespostas += estatisticasAluno.totalRespostas;
+            total.pontuacaoTotal += estatisticasAluno.pontuacaoTotal;
+            total.totalPartidas += estatisticasAluno.totalPartidas;
+        }
+
+        total.calcularPercentuais();
+        return total;
+    }
+
+    private Estatisticas calcularEstatisticasAluno(Aluno aluno) {
+        Estatisticas estatisticas = new Estatisticas();
+
+        if (aluno.getHistoricoPartidas() == null) {
+            return estatisticas;
+        }
+
+        for (Partida partida : aluno.getHistoricoPartidas()) {
+            if (partida == null) {
+                continue;
+            }
+
+            int acertos = partida.getTotalAcertos();
+            int erros = partida.getTotalErros();
+
+            int totalRespostas = acertos + erros;
+
+            if (totalRespostas == 0 && partida.getRespostas() != null) {
+                totalRespostas = partida.getRespostas().size();
+                erros = Math.max(0, totalRespostas - acertos);
+            }
+
+            estatisticas.totalAcertos += acertos;
+            estatisticas.totalErros += erros;
+            estatisticas.totalRespostas += totalRespostas;
+            estatisticas.pontuacaoTotal += partida.getPontuacao();
+            estatisticas.totalPartidas++;
+        }
+
+        estatisticas.calcularPercentuais();
+        return estatisticas;
+    }
+
+    private void gerarPdfDaTurma() {
+        File pastaRelatorios = criarPastaRelatorios();
+        File arquivo = new File(pastaRelatorios, "Relatorio_Turma.pdf");
+
+        try (PDDocument documento = new PDDocument()) {
+            PDPage pagina = new PDPage(PDRectangle.A4);
+            documento.addPage(pagina);
+
+            try (PDPageContentStream conteudo = new PDPageContentStream(documento, pagina)) {
+                desenharRelatorioTurma(conteudo);
+            }
+
+            documento.save(arquivo);
+            mostrarPdfGerado(arquivo);
+
+        } catch (IOException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao gerar PDF da turma: " + erro.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void gerarPdfDoAluno(Aluno aluno) {
+        File pastaRelatorios = criarPastaRelatorios();
+        String nomeArquivo = "Relatorio_" + limparNomeArquivo(aluno.getNome()) + ".pdf";
+        File arquivo = new File(pastaRelatorios, nomeArquivo);
+
+        try (PDDocument documento = new PDDocument()) {
+            PDPage pagina = new PDPage(PDRectangle.A4);
+            documento.addPage(pagina);
+
+            try (PDPageContentStream conteudo = new PDPageContentStream(documento, pagina)) {
+                desenharRelatorioAluno(conteudo, aluno);
+            }
+
+            documento.save(arquivo);
+            mostrarPdfGerado(arquivo);
+
+        } catch (IOException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao gerar PDF do aluno: " + erro.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private File criarPastaRelatorios() {
+        File pasta = new File("relatorios");
+
+        if (!pasta.exists()) {
+            pasta.mkdirs();
+        }
+
+        return pasta;
+    }
+
+    private void mostrarPdfGerado(File arquivo) {
+        JOptionPane.showMessageDialog(
+                this,
+                "PDF gerado com sucesso em:\n" + arquivo.getAbsolutePath(),
+                "PDF gerado",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
         try {
-            ImageIcon icon = new ImageIcon(caminho);
-            Image img = icon.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
-            btn.setIcon(new ImageIcon(img));
-        } catch (Exception e) {}
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(arquivo);
+            }
+        } catch (IOException erro) {
+            System.out.println("PDF gerado, mas não foi possível abrir automaticamente.");
+        }
     }
 
-    // --- COMPONENTES ---
+    private void desenharRelatorioTurma(PDPageContentStream conteudo) throws IOException {
+        Estatisticas estatisticas = calcularEstatisticasTurma();
 
-    private class ItemListaAluno extends JPanel {
-        private boolean exp = false;
-        private JPanel pInfo;
+        desenharCabecalhoPdf(conteudo, "LabQuest - Relatorio de desempenho da turma");
 
-        public ItemListaAluno(Aluno aluno) {
+        escreverTexto(conteudo, "Resumo geral da turma", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
+
+        escreverTexto(conteudo, "Total de alunos: " + listaAlunos.size(), FONTE_NORMAL, 12, 50, 705, Color.BLACK);
+        escreverTexto(conteudo, "Total de partidas: " + estatisticas.totalPartidas, FONTE_NORMAL, 12, 50, 687, Color.BLACK);
+        escreverTexto(conteudo, "Total de respostas: " + estatisticas.totalRespostas, FONTE_NORMAL, 12, 50, 669, Color.BLACK);
+        escreverTexto(conteudo, "Acertos: " + estatisticas.totalAcertos + " (" + formatarPercentual(estatisticas.percentualAcertos) + ")", FONTE_NORMAL, 12, 50, 651, Color.BLACK);
+        escreverTexto(conteudo, "Erros: " + estatisticas.totalErros + " (" + formatarPercentual(estatisticas.percentualErros) + ")", FONTE_NORMAL, 12, 50, 633, Color.BLACK);
+
+        desenharBarraDesempenhoPdf(
+                conteudo,
+                50,
+                585,
+                480,
+                28,
+                estatisticas.percentualAcertos,
+                estatisticas.percentualErros
+        );
+
+        escreverTexto(conteudo, "Lista de alunos", FONTE_NEGRITO, 15, 50, 540, AZUL_ESCURO);
+
+        float y = 515;
+
+        desenharLinhaTabela(conteudo, y, true);
+        escreverTexto(conteudo, "Aluno", FONTE_NEGRITO, 10, 55, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Turma", FONTE_NEGRITO, 10, 250, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Acertos", FONTE_NEGRITO, 10, 330, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Erros", FONTE_NEGRITO, 10, 410, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Aproveitamento", FONTE_NEGRITO, 10, 480, y + 8, Color.WHITE);
+
+        y -= 24;
+
+        for (Aluno aluno : listaAlunos) {
+            if (y < 70) {
+                break;
+            }
+
+            Estatisticas e = calcularEstatisticasAluno(aluno);
+
+            desenharLinhaTabela(conteudo, y, false);
+            escreverTexto(conteudo, limitarTexto(aluno.getNome(), 28), FONTE_NORMAL, 9, 55, y + 8, Color.BLACK);
+            escreverTexto(conteudo, aluno.getTurma(), FONTE_NORMAL, 9, 250, y + 8, Color.BLACK);
+            escreverTexto(conteudo, String.valueOf(e.totalAcertos), FONTE_NORMAL, 9, 330, y + 8, Color.BLACK);
+            escreverTexto(conteudo, String.valueOf(e.totalErros), FONTE_NORMAL, 9, 410, y + 8, Color.BLACK);
+            escreverTexto(conteudo, formatarPercentual(e.percentualAcertos), FONTE_NORMAL, 9, 480, y + 8, Color.BLACK);
+
+            y -= 24;
+        }
+    }
+
+    private void desenharRelatorioAluno(PDPageContentStream conteudo, Aluno aluno) throws IOException {
+        Estatisticas estatisticas = calcularEstatisticasAluno(aluno);
+
+        desenharCabecalhoPdf(conteudo, "LabQuest - Relatorio individual do aluno");
+
+        escreverTexto(conteudo, "Dados do aluno", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
+        escreverTexto(conteudo, "Nome: " + aluno.getNome(), FONTE_NORMAL, 12, 50, 705, Color.BLACK);
+        escreverTexto(conteudo, "Turma: " + aluno.getTurma(), FONTE_NORMAL, 12, 50, 687, Color.BLACK);
+        escreverTexto(conteudo, "E-mail: " + aluno.getEmail(), FONTE_NORMAL, 12, 50, 669, Color.BLACK);
+
+        escreverTexto(conteudo, "Resumo de desempenho", FONTE_NEGRITO, 15, 50, 630, AZUL_ESCURO);
+        escreverTexto(conteudo, "Partidas: " + estatisticas.totalPartidas, FONTE_NORMAL, 12, 50, 608, Color.BLACK);
+        escreverTexto(conteudo, "Pontuacao total: " + estatisticas.pontuacaoTotal, FONTE_NORMAL, 12, 50, 590, Color.BLACK);
+        escreverTexto(conteudo, "Respostas: " + estatisticas.totalRespostas, FONTE_NORMAL, 12, 50, 572, Color.BLACK);
+        escreverTexto(conteudo, "Acertos: " + estatisticas.totalAcertos + " (" + formatarPercentual(estatisticas.percentualAcertos) + ")", FONTE_NORMAL, 12, 50, 554, Color.BLACK);
+        escreverTexto(conteudo, "Erros: " + estatisticas.totalErros + " (" + formatarPercentual(estatisticas.percentualErros) + ")", FONTE_NORMAL, 12, 50, 536, Color.BLACK);
+
+        desenharBarraDesempenhoPdf(
+                conteudo,
+                50,
+                492,
+                480,
+                28,
+                estatisticas.percentualAcertos,
+                estatisticas.percentualErros
+        );
+
+        escreverTexto(conteudo, "Historico de partidas", FONTE_NEGRITO, 15, 50, 445, AZUL_ESCURO);
+
+        float y = 420;
+
+        desenharLinhaTabela(conteudo, y, true);
+        escreverTexto(conteudo, "Data/Hora", FONTE_NEGRITO, 10, 55, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Pontuacao", FONTE_NEGRITO, 10, 200, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Acertos", FONTE_NEGRITO, 10, 300, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Erros", FONTE_NEGRITO, 10, 390, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Total", FONTE_NEGRITO, 10, 470, y + 8, Color.WHITE);
+
+        y -= 24;
+
+        if (aluno.getHistoricoPartidas() != null) {
+            DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            for (Partida partida : aluno.getHistoricoPartidas()) {
+                if (y < 70) {
+                    break;
+                }
+
+                int acertos = partida.getTotalAcertos();
+                int erros = partida.getTotalErros();
+                int total = acertos + erros;
+
+                if (total == 0 && partida.getRespostas() != null) {
+                    total = partida.getRespostas().size();
+                    erros = Math.max(0, total - acertos);
+                }
+
+                String data = "-";
+
+                if (partida.getDataHoraInicio() != null) {
+                    data = partida.getDataHoraInicio().format(formatoData);
+                }
+
+                desenharLinhaTabela(conteudo, y, false);
+                escreverTexto(conteudo, data, FONTE_NORMAL, 9, 55, y + 8, Color.BLACK);
+                escreverTexto(conteudo, String.valueOf(partida.getPontuacao()), FONTE_NORMAL, 9, 200, y + 8, Color.BLACK);
+                escreverTexto(conteudo, String.valueOf(acertos), FONTE_NORMAL, 9, 300, y + 8, Color.BLACK);
+                escreverTexto(conteudo, String.valueOf(erros), FONTE_NORMAL, 9, 390, y + 8, Color.BLACK);
+                escreverTexto(conteudo, String.valueOf(total), FONTE_NORMAL, 9, 470, y + 8, Color.BLACK);
+
+                y -= 24;
+            }
+        }
+    }
+
+    private void desenharCabecalhoPdf(PDPageContentStream conteudo, String titulo) throws IOException {
+        conteudo.setNonStrokingColor(AZUL_ESCURO);
+        conteudo.addRect(0, 790, 595, 52);
+        conteudo.fill();
+
+        escreverTexto(conteudo, titulo, FONTE_NEGRITO, 18, 40, 810, Color.WHITE);
+        escreverTexto(
+                conteudo,
+                "Gerado automaticamente pelo sistema LabQuest",
+                FONTE_NORMAL,
+                10,
+                40,
+                795,
+                Color.WHITE
+        );
+    }
+
+    private void desenharBarraDesempenhoPdf(
+            PDPageContentStream conteudo,
+            float x,
+            float y,
+            float largura,
+            float altura,
+            double percentualAcertos,
+            double percentualErros
+    ) throws IOException {
+        float larguraAcertos = (float) (largura * percentualAcertos / 100.0);
+        float larguraErros = largura - larguraAcertos;
+
+        conteudo.setNonStrokingColor(AZUL_CLARO);
+        conteudo.addRect(x, y, larguraAcertos, altura);
+        conteudo.fill();
+
+        conteudo.setNonStrokingColor(AZUL_MEDIO);
+        conteudo.addRect(x + larguraAcertos, y, larguraErros, altura);
+        conteudo.fill();
+
+        conteudo.setStrokingColor(AZUL_ESCURO);
+        conteudo.addRect(x, y, largura, altura);
+        conteudo.stroke();
+
+        escreverTexto(conteudo, "Acertos: " + formatarPercentual(percentualAcertos), FONTE_NEGRITO, 10, x, y - 18, Color.BLACK);
+        escreverTexto(conteudo, "Erros: " + formatarPercentual(percentualErros), FONTE_NEGRITO, 10, x + 180, y - 18, Color.BLACK);
+    }
+
+    private void desenharLinhaTabela(PDPageContentStream conteudo, float y, boolean cabecalho) throws IOException {
+        if (cabecalho) {
+            conteudo.setNonStrokingColor(AZUL_ESCURO);
+        } else {
+            conteudo.setNonStrokingColor(new Color(235, 235, 235));
+        }
+
+        conteudo.addRect(50, y, 500, 22);
+        conteudo.fill();
+    }
+
+    private void escreverTexto(
+            PDPageContentStream conteudo,
+            String texto,
+            PDFont fonte,
+            float tamanho,
+            float x,
+            float y,
+            Color cor
+    ) throws IOException {
+        conteudo.beginText();
+        conteudo.setFont(fonte, tamanho);
+        conteudo.setNonStrokingColor(cor);
+        conteudo.newLineAtOffset(x, y);
+        conteudo.showText(prepararTextoPdf(texto));
+        conteudo.endText();
+    }
+
+    private String prepararTextoPdf(String texto) {
+        if (texto == null) {
+            return "";
+        }
+
+        String textoTratado = texto
+                .replace("\n", " ")
+                .replace("\r", " ")
+                .replace("“", "\"")
+                .replace("”", "\"")
+                .replace("–", "-")
+                .replace("—", "-");
+
+        String semAcentos = Normalizer.normalize(textoTratado, Normalizer.Form.NFD)
+                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+        return semAcentos.replaceAll("[^\\x20-\\x7E]", "");
+    }
+
+    private String formatarPercentual(double valor) {
+        return String.format("%.1f%%", valor);
+    }
+
+    private String limitarTexto(String texto, int limite) {
+        if (texto == null) {
+            return "";
+        }
+
+        if (texto.length() <= limite) {
+            return texto;
+        }
+
+        return texto.substring(0, limite - 3) + "...";
+    }
+
+    private String limparNomeArquivo(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return "aluno";
+        }
+
+        String semAcento = Normalizer.normalize(texto, Normalizer.Form.NFD)
+                .replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+
+        return semAcento.replaceAll("[^a-zA-Z0-9_-]", "_");
+    }
+
+    private class ItemAluno extends JPanel {
+
+        private boolean aberto = false;
+        private JPanel painelDetalhes;
+        private JLabel seta;
+
+        public ItemAluno(Aluno aluno) {
             setLayout(new BorderLayout());
             setOpaque(false);
-            setMaximumSize(new Dimension(900, 400));
+            setPreferredSize(new Dimension(900, 42));
+            setMaximumSize(new Dimension(900, 42));
 
-            PainelArredondado h = new PainelArredondado(20);
-            h.setPreferredSize(new Dimension(900, 55));
-            h.setBackground(new Color(235, 235, 235));
-            h.setLayout(new BorderLayout());
-            h.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            PainelArredondado linhaAluno = new PainelArredondado(18);
+            linhaAluno.setBackground(CINZA_CLARO);
+            linhaAluno.setPreferredSize(new Dimension(900, 38));
+            linhaAluno.setLayout(new BorderLayout());
+            linhaAluno.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            JLabel n = new JLabel(aluno.getNome() + " (" + aluno.getTurma() + ")");
-            n.setFont(new Font("Arial", Font.BOLD, 18));
-            n.setBorder(new EmptyBorder(0, 20, 0, 0));
-            h.add(n, BorderLayout.WEST);
+            JLabel nomeAluno = new JLabel(aluno.getNome());
+            nomeAluno.setFont(new Font("Arial", Font.BOLD, 15));
+            nomeAluno.setForeground(AZUL_ESCURO);
+            nomeAluno.setBorder(new EmptyBorder(0, 20, 0, 0));
+            linhaAluno.add(nomeAluno, BorderLayout.WEST);
 
-            JLabel s = new JLabel("<  ");
-            s.setFont(new Font("Arial", Font.BOLD, 20));
-            h.add(s, BorderLayout.EAST);
-            add(h, BorderLayout.NORTH);
+            seta = new JLabel("<  ");
+            seta.setFont(new Font("Arial", Font.BOLD, 16));
+            seta.setForeground(AZUL_ESCURO);
+            linhaAluno.add(seta, BorderLayout.EAST);
 
-            pInfo = new PainelArredondado(20);
-            pInfo.setPreferredSize(new Dimension(900, 320));
-            pInfo.setBackground(new Color(210, 210, 210));
-            pInfo.setLayout(null);
-            pInfo.setVisible(false);
+            add(linhaAluno, BorderLayout.NORTH);
 
-            double[] stats = calcularEstatisticasAluno(aluno);
-            
-            PainelArredondado pG = new PainelArredondado(20);
-            pG.setBounds(20, 20, 450, 280);
-            pG.setBackground(AZUL_ESCURO);
-            pG.setLayout(new BorderLayout());
-            pG.add(new JLabel("Desempenho Individual", SwingConstants.CENTER) {{ 
-                setForeground(Color.WHITE); setFont(new Font("Arial", Font.BOLD, 18)); 
-            }}, BorderLayout.NORTH);
-            pG.add(new GraficoPizza(stats[0], stats[1]), BorderLayout.CENTER);
-            pInfo.add(pG);
+            painelDetalhes = criarPainelDetalhesAluno(aluno);
+            painelDetalhes.setVisible(false);
+            add(painelDetalhes, BorderLayout.CENTER);
 
-            JButton bPdf = new JButton("Gerar PDF do Aluno");
-            bPdf.setBounds(500, 130, 250, 50);
-            bPdf.addActionListener(e -> exportarParaPDF(aluno, "Relatorio_" + aluno.getNome()));
-            pInfo.add(bPdf);
-
-            add(pInfo, BorderLayout.CENTER);
-
-            h.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseClicked(java.awt.event.MouseEvent e) {
-                    exp = !exp;
-                    pInfo.setVisible(exp);
-                    s.setText(exp ? "v  " : "<  ");
-                    revalidate();
+            linhaAluno.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evento) {
+                    alternarDetalhes();
                 }
             });
+        }
+
+        private JPanel criarPainelDetalhesAluno(Aluno aluno) {
+            JPanel painel = new JPanel(null);
+            painel.setOpaque(false);
+            painel.setPreferredSize(new Dimension(900, 310));
+
+            Estatisticas estatisticas = calcularEstatisticasAluno(aluno);
+
+            PainelArredondado painelGrafico = new PainelArredondado(20);
+            painelGrafico.setBounds(15, 8, 460, 285);
+            painelGrafico.setBackground(AZUL_ESCURO);
+            painelGrafico.setLayout(null);
+            painel.add(painelGrafico);
+
+            JLabel titulo = new JLabel("Desempenho do mês", SwingConstants.CENTER);
+            titulo.setBounds(0, 10, 460, 35);
+            titulo.setFont(new Font("Arial", Font.BOLD, 20));
+            titulo.setForeground(Color.WHITE);
+            painelGrafico.add(titulo);
+
+            GraficoPizza grafico = new GraficoPizza(
+                    estatisticas.percentualAcertos,
+                    estatisticas.percentualErros,
+                    false
+            );
+            grafico.setBounds(20, 45, 420, 205);
+            painelGrafico.add(grafico);
+
+            JLabel resumo = new JLabel(
+                    estatisticas.totalAcertos + " acertos | "
+                            + estatisticas.totalErros + " erros | "
+                            + estatisticas.pontuacaoTotal + " pontos",
+                    SwingConstants.CENTER
+            );
+            resumo.setBounds(0, 250, 460, 25);
+            resumo.setFont(new Font("Arial", Font.BOLD, 13));
+            resumo.setForeground(Color.WHITE);
+            painelGrafico.add(resumo);
+
+            JButton botaoPdfAluno = new JButton("Gerar PDF do aluno");
+            botaoPdfAluno.setBounds(560, 120, 250, 55);
+            botaoPdfAluno.setFont(new Font("Arial", Font.BOLD, 18));
+            botaoPdfAluno.setBackground(AZUL_ESCURO);
+            botaoPdfAluno.setForeground(Color.WHITE);
+            botaoPdfAluno.setFocusPainted(false);
+            botaoPdfAluno.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            botaoPdfAluno.addActionListener(evento -> gerarPdfDoAluno(aluno));
+            painel.add(botaoPdfAluno);
+
+            return painel;
+        }
+
+        private void alternarDetalhes() {
+            aberto = !aberto;
+            painelDetalhes.setVisible(aberto);
+            seta.setText(aberto ? "v  " : "<  ");
+
+            if (aberto) {
+                setPreferredSize(new Dimension(900, 355));
+                setMaximumSize(new Dimension(900, 355));
+            } else {
+                setPreferredSize(new Dimension(900, 42));
+                setMaximumSize(new Dimension(900, 42));
+            }
+
+            revalidate();
+            repaint();
         }
     }
 
     private class GraficoPizza extends JPanel {
-        private double acertos, erros;
-        public GraficoPizza(double a, double e) { 
-            this.acertos = a; 
-            this.erros = e; 
-            setOpaque(false); 
+
+        private final double percentualAcertos;
+        private final double percentualErros;
+        private final boolean grande;
+
+        public GraficoPizza(double percentualAcertos, double percentualErros, boolean grande) {
+            this.percentualAcertos = percentualAcertos;
+            this.percentualErros = percentualErros;
+            this.grande = grande;
+            setOpaque(false);
         }
 
         @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        protected void paintComponent(Graphics grafico) {
+            super.paintComponent(grafico);
 
-            int size = Math.min(getWidth(), getHeight()) - 150;
-            int x = (getWidth() - size) / 2 - 50; // Deslocado para dar espaço à legenda
-            int y = (getHeight() - size) / 2;
+            Graphics2D desenho = (Graphics2D) grafico.create();
+            desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            int angA = (int) Math.round(acertos * 3.6);
-            int angE = 360 - angA;
+            int margem = grande ? 110 : 70;
+            int tamanho = Math.min(getWidth(), getHeight()) - margem;
 
-            // Gradiente para o gráfico
-            RadialGradientPaint gAcerto = new RadialGradientPaint(
-                new Point(x + size/2, y + size/2), size,
-                new float[]{0.0f, 1.0f},
-                new Color[]{AZUL_CLARO.brighter(), AZUL_CLARO}
+            if (tamanho < 80) {
+                tamanho = 80;
+            }
+
+            int x = (getWidth() - tamanho) / 2;
+            int y = (getHeight() - tamanho) / 2;
+
+            int anguloAcertos = (int) Math.round(percentualAcertos * 3.6);
+            int anguloErros = 360 - anguloAcertos;
+
+            desenho.setColor(AZUL_CLARO);
+            desenho.fillArc(x, y, tamanho, tamanho, 90, -anguloAcertos);
+
+            desenho.setColor(AZUL_MEDIO);
+            desenho.fillArc(x, y, tamanho, tamanho, 90 - anguloAcertos, -anguloErros);
+
+            desenho.setColor(Color.WHITE);
+            desenho.setFont(new Font("Arial", Font.BOLD, grande ? 13 : 10));
+
+            desenharTextoDoGrafico(
+                    desenho,
+                    x,
+                    y,
+                    tamanho,
+                    90 - (anguloAcertos / 2),
+                    "Acertou",
+                    formatarPercentual(percentualAcertos)
             );
-            
-            // Desenhar fatias
-            g2.setPaint(gAcerto);
-            g2.fillArc(x, y, size, size, 90, -angA);
-            
-            g2.setColor(AZUL_MEDIO);
-            g2.fillArc(x, y, size, size, 90 - angA, -angE);
 
-            // Borda branca entre fatias
-            g2.setColor(Color.WHITE);
-            g2.setStroke(new BasicStroke(2));
-            g2.drawOval(x, y, size, size);
-            
-            // Linha divisória
-            double rad = Math.toRadians(90 - angA);
-            g2.drawLine(x + size/2, y + size/2, 
-                        (int)(x + size/2 + (size/2) * Math.cos(rad)), 
-                        (int)(y + size/2 - (size/2) * Math.sin(rad)));
+            desenharTextoDoGrafico(
+                    desenho,
+                    x,
+                    y,
+                    tamanho,
+                    90 - anguloAcertos - (anguloErros / 2),
+                    "Errou",
+                    formatarPercentual(percentualErros)
+            );
 
-            // Legenda Lateral
-            int lx = x + size + 40;
-            int ly = y + size/2 - 30;
-
-            desenharItemLegenda(g2, lx, ly, AZUL_CLARO, String.format("Acertos: %.1f%%", acertos));
-            desenharItemLegenda(g2, lx, ly + 40, AZUL_MEDIO, String.format("Erros: %.1f%%", erros));
-
-            g2.dispose();
+            desenho.dispose();
         }
 
-        private void desenharItemLegenda(Graphics2D g2, int x, int y, Color cor, String texto) {
-            g2.setColor(cor);
-            g2.fillRoundRect(x, y, 20, 20, 5, 5);
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("Arial", Font.BOLD, 14));
-            g2.drawString(texto, x + 30, y + 15);
+        private void desenharTextoDoGrafico(
+                Graphics2D desenho,
+                int x,
+                int y,
+                int tamanho,
+                int angulo,
+                String linha1,
+                String linha2
+        ) {
+            double radiano = Math.toRadians(angulo);
+            int raio = tamanho / 2 + (grande ? 42 : 28);
+
+            int posicaoX = (int) (x + tamanho / 2 + raio * Math.cos(radiano));
+            int posicaoY = (int) (y + tamanho / 2 - raio * Math.sin(radiano));
+
+            FontMetrics medidas = desenho.getFontMetrics();
+
+            int largura1 = medidas.stringWidth(linha1);
+            int largura2 = medidas.stringWidth(linha2);
+
+            desenho.drawString(linha1, posicaoX - largura1 / 2, posicaoY);
+            desenho.drawString(linha2, posicaoX - largura2 / 2, posicaoY + medidas.getHeight());
         }
     }
 
-    private static List<Aluno> gerarDadosExemplo() {
-        List<Aluno> lista = new ArrayList<>();
-        Questao qFake = new Questao(); // Questão dummy para validar respostas
-        
-        for (int i = 1; i <= 5; i++) {
-            Aluno a = new Aluno(i, "Aluno " + i, "aluno"+i+"@aluno.cps.sp.gov.br", "123", "3º A", "123456789");
-            Partida p = new Partida(a);
-            for(int j=0; j<10; j++) {
-                Resposta r = new Resposta();
-                r.setQuestao(qFake);
-                
-                Alternativa alt = new Alternativa();
-                alt.setECorreta(Math.random() > 0.3);
-                r.setAlternativaEscolhida(alt);
-                
-                p.adicionarResposta(r);
+    private static class Estatisticas {
+        int totalAcertos;
+        int totalErros;
+        int totalRespostas;
+        int pontuacaoTotal;
+        int totalPartidas;
+        double percentualAcertos;
+        double percentualErros;
+
+        void calcularPercentuais() {
+            if (totalRespostas <= 0) {
+                percentualAcertos = 0;
+                percentualErros = 0;
+                return;
             }
-            a.adicionarPartida(p);
-            lista.add(a);
+
+            percentualAcertos = (totalAcertos * 100.0) / totalRespostas;
+            percentualErros = 100.0 - percentualAcertos;
         }
-        return lista;
     }
 
     private static class BotaoMenu extends JButton {
+
         public BotaoMenu(String texto) {
             super(texto);
-            setFont(new Font("Arial", Font.BOLD, 26));
+            setFont(new Font("Arial", Font.BOLD, 24));
             setForeground(Color.WHITE);
-            setBackground(new Color(47, 76, 113));
+            setBackground(new Color(34, 62, 107));
             setFocusPainted(false);
             setBorderPainted(false);
             setContentAreaFilled(false);
             setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
+
         @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-            super.paintComponent(g);
-            g2.dispose();
+        protected void paintComponent(Graphics grafico) {
+            Graphics2D desenho = (Graphics2D) grafico.create();
+            desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            desenho.setColor(getBackground());
+            desenho.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+
+            super.paintComponent(grafico);
+            desenho.dispose();
         }
     }
 
     private static class PainelArredondado extends JPanel {
-        private int raio;
-        public PainelArredondado(int raio) { this.raio = raio; setOpaque(false); }
+
+        private final int raio;
+
+        public PainelArredondado(int raio) {
+            this.raio = raio;
+            setOpaque(false);
+        }
+
         @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), raio, raio);
-            g2.dispose();
+        protected void paintComponent(Graphics grafico) {
+            Graphics2D desenho = (Graphics2D) grafico.create();
+            desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            desenho.setColor(getBackground());
+            desenho.fillRoundRect(0, 0, getWidth(), getHeight(), raio, raio);
+
+            desenho.dispose();
         }
     }
 
     private static class PainelFundo extends JPanel {
-        private Image img;
-        public PainelFundo() { try { img = new ImageIcon("imagens/menu.png").getImage(); } catch(Exception e){} }
+
+        private Image imagemFundo;
+
+        public PainelFundo() {
+            imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+        }
+
         @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (img != null) {
-                double esc = Math.max((double)getWidth()/img.getWidth(null), (double)getHeight()/img.getHeight(null));
-                int nw = (int)(img.getWidth(null)*esc), nh = (int)(img.getHeight(null)*esc);
-                g.drawImage(img, (getWidth()-nw)/2, (getHeight()-nh)/2, nw, nh, null);
+        protected void paintComponent(Graphics grafico) {
+            super.paintComponent(grafico);
+
+            if (imagemFundo != null && imagemFundo.getWidth(null) > 0) {
+                double escala = Math.max(
+                        (double) getWidth() / imagemFundo.getWidth(null),
+                        (double) getHeight() / imagemFundo.getHeight(null)
+                );
+
+                int novaLargura = (int) (imagemFundo.getWidth(null) * escala);
+                int novaAltura = (int) (imagemFundo.getHeight(null) * escala);
+
+                grafico.drawImage(
+                        imagemFundo,
+                        (getWidth() - novaLargura) / 2,
+                        (getHeight() - novaAltura) / 2,
+                        novaLargura,
+                        novaAltura,
+                        null
+                );
+            } else {
+                grafico.setColor(new Color(223, 239, 252));
+                grafico.fillRect(0, 0, getWidth(), getHeight());
             }
         }
     }
 
+    private static List<Aluno> gerarDadosExemplo() {
+        List<Aluno> alunos = new ArrayList<>();
+        Questao questaoTeste = new Questao();
+
+        for (int i = 1; i <= 13; i++) {
+            Aluno aluno = new Aluno(
+                    i,
+                    "Aluno " + i,
+                    "aluno" + i + "@aluno.cps.sp.gov.br",
+                    "123",
+                    "1º Química",
+                    "000" + i
+            );
+
+            Partida partida = new Partida(aluno);
+
+            int quantidadeAcertos = 4 + (i % 6);
+
+            for (int j = 0; j < 10; j++) {
+                Resposta resposta = new Resposta();
+                resposta.setQuestao(questaoTeste);
+
+                Alternativa alternativa = new Alternativa();
+                alternativa.setECorreta(j < quantidadeAcertos);
+
+                resposta.setAlternativaEscolhida(alternativa);
+                partida.adicionarResposta(resposta);
+            }
+
+            aluno.adicionarPartida(partida);
+            alunos.add(aluno);
+        }
+
+        return alunos;
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new TelaDesempenho().setVisible(true));
+        SwingUtilities.invokeLater(() -> {
+            TelaDesempenho tela = new TelaDesempenho();
+            tela.setVisible(true);
+        });
     }
 }
