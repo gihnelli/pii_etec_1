@@ -137,9 +137,7 @@ public class TelaDesempenhoAluno extends JFrame {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evento) {
                 dispose();
-
-                // Para voltar ao menu do aluno quando quiser:
-                // new TelaMenuAluno().setVisible(true);
+            new TelaMenuAluno().setVisible(true);
             }
         });
 
@@ -185,7 +183,6 @@ public class TelaDesempenhoAluno extends JFrame {
             String nomeAluno = aluno != null ? aluno.getNome() : "Aluno";
             String nomeArquivo = "Relatorio_" + limparNomeArquivo(nomeAluno) + ".pdf";
 
-            // Salva direto na raiz do projeto, sem criar pasta relatorios
             arquivo = new File(nomeArquivo);
 
             try (PDDocument documento = new PDDocument()) {
@@ -616,7 +613,6 @@ public class TelaDesempenhoAluno extends JFrame {
                 "Aluno 1",
                 "aluno1@aluno.cps.sp.gov.br",
                 "123",
-                "1º Química",
                 "0001"
         );
 

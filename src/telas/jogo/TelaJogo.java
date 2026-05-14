@@ -10,11 +10,6 @@ import model.Partida;
 import model.Questao;
 import model.tipos.TipoQuestao;
 
-/**
- * Tela principal do jogo LabQuest.
- * Gerencia a exibição de questões de múltipla escolha e associação,
- * além do sistema de ajuda e progressão da partida.
- */
 public class TelaJogo extends JFrame {
 
     private Partida partida;
@@ -26,13 +21,11 @@ public class TelaJogo extends JFrame {
     private JPanel painelConteudo;
     private List<BotaoAlternativa> botoesAlternativas;
     
-    // Controle do Sistema de Ajuda
     private boolean ajuda5050Usada = false;
     private boolean chanceExtraUsada = false;
     private boolean pularUsada = false;
     private boolean chanceExtraAtiva = false;
 
-    // Controle do Modo Associação
     private BotaoAssociacao selecionadoEsquerda = null;
     private BotaoAssociacao selecionadoDireita = null;
     private int paresResolvidos = 0;
@@ -60,7 +53,6 @@ public class TelaJogo extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        // Barra Superior: Ícones de Perfil e Sair (Usando imagens reais)
         JPanel painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
         painelIcones.setOpaque(false);
         painelIcones.setBounds(800, 10, 180, 80);
@@ -75,7 +67,6 @@ public class TelaJogo extends JFrame {
         painelIcones.add(botaoSair);
         painelFundo.add(painelIcones);
 
-        // Botão de Ajuda (Fica separado ou junto)
         JButton botaoAjuda = new JButton("?!");
         botaoAjuda.setBounds(20, 20, 50, 50);
         botaoAjuda.setFont(new Font("Arial", Font.BOLD, 24));
@@ -87,7 +78,6 @@ public class TelaJogo extends JFrame {
         botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
         painelFundo.add(botaoAjuda);
 
-        // Área Central Dinâmica
         painelConteudo = new JPanel();
         painelConteudo.setLayout(null);
         painelConteudo.setOpaque(false);
@@ -99,7 +89,6 @@ public class TelaJogo extends JFrame {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
-            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
             Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
             btn.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -108,7 +97,7 @@ public class TelaJogo extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setMargin(new Insets(0, 0, 0, 0)); 
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
@@ -153,7 +142,6 @@ public class TelaJogo extends JFrame {
     }
 
     private void montarInterfaceAlternativa(Questao questao) {
-        // Painel da Pergunta (Fundo Azul Escuro Arredondado)
         PainelArredondado painelPergunta = new PainelArredondado(30);
         painelPergunta.setLayout(null);
         painelPergunta.setBounds(50, 10, 800, 320);
@@ -181,7 +169,6 @@ public class TelaJogo extends JFrame {
         }
         painelPergunta.add(labelImagemQuestao);
 
-        // Botões de Alternativas (Azul Claro Arredondado)
         botoesAlternativas.clear();
         List<Alternativa> alternativas = questao.getAlternativas();
         int y = 350;
@@ -198,7 +185,6 @@ public class TelaJogo extends JFrame {
     }
 
     private void montarInterfaceAssociacao(Questao questao) {
-        // Cabeçalho de Instrução
         PainelArredondado painelInstrucao = new PainelArredondado(20);
         painelInstrucao.setLayout(new BorderLayout());
         painelInstrucao.setBounds(100, 5, 700, 70);
@@ -210,7 +196,6 @@ public class TelaJogo extends JFrame {
         painelInstrucao.add(lblMsg);
         painelConteudo.add(painelInstrucao);
 
-        // Dados Fixos para Demonstração (Podem vir do banco de dados futuramente)
         String[][] pares = {
             {"Bureta", "Titulação", "imagens/Bureta.jpg"},
             {"Condensador", "Destilação", "imagens/BicoDeBunsen.jpg"},
@@ -229,13 +214,11 @@ public class TelaJogo extends JFrame {
             final int idxEsq = ordemEsq.get(i);
             final int idxDir = ordemDir.get(i);
             
-            // Lado Esquerdo: Material (Com Imagem)
             BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
             btnEsq.setBounds(50, y, 230, 110);
             btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
             painelConteudo.add(btnEsq);
 
-            // Lado Direito: Sistema (Apenas Texto)
             BotaoAssociacao btnDir = new BotaoAssociacao(pares[idxDir][1], null, false);
             btnDir.setBounds(620, y, 230, 110);
             btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, pares[idxDir][1]));
@@ -260,10 +243,8 @@ public class TelaJogo extends JFrame {
             selecionadoDireita.setIdPar(idCorreto);
         }
 
-        // Se ambos os lados forem selecionados, valida o par
         if (selecionadoEsquerda != null && selecionadoDireita != null) {
             if (selecionadoEsquerda.getIdPar().equals(selecionadoDireita.getIdPar())) {
-                // Acerto
                 selecionadoEsquerda.setResolvido(true);
                 selecionadoDireita.setResolvido(true);
                 selecionadoEsquerda.setBackground(new Color(46, 204, 113));
@@ -276,7 +257,6 @@ public class TelaJogo extends JFrame {
                     t.start();
                 }
             } else {
-                // Erro
                 selecionadoEsquerda.setBackground(new Color(231, 76, 60));
                 selecionadoDireita.setBackground(new Color(231, 76, 60));
                 Timer t = new Timer(500, e -> {
@@ -313,7 +293,6 @@ public class TelaJogo extends JFrame {
         titulo.setForeground(Color.WHITE);
         dialog.add(titulo);
 
-        // Botões de Ajuda
         JButton btn5050 = criarBotaoAjuda("50/50", 50, 85, !ajuda5050Usada);
         btn5050.addActionListener(e -> { usar5050(); dialog.dispose(); });
         
@@ -412,8 +391,6 @@ public class TelaJogo extends JFrame {
         JOptionPane.showMessageDialog(this, "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(), "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
         dispose();
     }
-
-    // --- Componentes Visuais Customizados ---
 
     private static class PainelArredondado extends JPanel {
         private int raio;
@@ -519,15 +496,11 @@ public class TelaJogo extends JFrame {
         }
     }
 
-    // --- Ponto de Entrada para Testes ---
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             model.Aluno a = new model.Aluno(1, "Demo", "a@a.com", "1", "1A", "1");
             Partida p = new Partida(a);
             List<Questao> lista = new ArrayList<>();
-            
-            // Exemplo 1: Múltipla Escolha
             Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Q");
             q1.setImagemEnunciado("imagens/Béquer.jpg");
             q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
@@ -536,7 +509,6 @@ public class TelaJogo extends JFrame {
             q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
             lista.add(q1);
 
-            // Exemplo 2: Associação
             Questao q2 = new Questao(2, "Combine os materiais aos sistemas", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Q");
             lista.add(q2);
 

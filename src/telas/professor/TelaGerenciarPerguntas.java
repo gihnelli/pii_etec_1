@@ -666,8 +666,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
-            // Se quiser voltar ao menu do professor depois:
-            // new TelaMenuProfessor().setVisible(true);
+            new TelaMenuProfessor().setVisible(true);
         }
     }
 

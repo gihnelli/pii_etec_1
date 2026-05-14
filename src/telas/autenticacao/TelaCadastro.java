@@ -4,10 +4,6 @@ import java.awt.*;
 import javax.swing.*;
 import telas.professor.TelaMenuProfessor;
 
-/**
- * Tela de Cadastro de Aluno, acessível apenas pelo Professor.
- * Segue o protótipo com painel central cinza e campos arredondados.
- */
 public class TelaCadastro extends JFrame {
 
     private JTextField campoNome;
@@ -32,32 +28,26 @@ public class TelaCadastro extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        // Painel Central (Cinza Claro Arredondado)
         PainelArredondado painelCentral = new PainelArredondado(30);
         painelCentral.setLayout(null);
         painelCentral.setBounds(100, 150, 760, 380);
         painelCentral.setBackground(new Color(220, 220, 220, 230)); // Cinza com leve transparência
         painelFundo.add(painelCentral);
 
-        // Campo Nome
         campoNome = criarCampoArredondado("Nome:", 30, 30, 700, 55);
         painelCentral.add(campoNome);
 
-        // Campo E-mail
         campoEmail = criarCampoArredondado("E-mail:", 30, 105, 700, 55);
         painelCentral.add(campoEmail);
 
-        // Campo Senha (CPF)
         campoSenha = criarCampoSenhaArredondado("Senha (CPF):", 30, 180, 700, 55);
         painelCentral.add(campoSenha);
 
-        // Botão Cancelar (Avermelhado/Rosa)
         JButton botaoCancelar = criarBotaoCustomizado("Cancelar", new Color(210, 170, 170), new Color(120, 60, 60));
         botaoCancelar.setBounds(200, 280, 180, 60);
         botaoCancelar.addActionListener(e -> voltarAoMenu());
         painelCentral.add(botaoCancelar);
 
-        // Botão Adicionar (Esverdeado)
         JButton botaoAdicionar = criarBotaoCustomizado("Adicionar", new Color(180, 210, 180), new Color(40, 90, 40));
         botaoAdicionar.setBounds(400, 280, 180, 60);
         botaoAdicionar.addActionListener(e -> cadastrarAluno());
@@ -92,7 +82,6 @@ public class TelaCadastro extends JFrame {
         btn.setContentAreaFilled(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        // Sobrescreve a renderização para ser arredondado
         btn.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
             @Override
             public void paint(Graphics g, JComponent c) {
@@ -122,7 +111,6 @@ public class TelaCadastro extends JFrame {
             return;
         }
 
-        // Validação de e-mail institucional de aluno
         if (!email.matches("^[a-zA-Z0-9._%+-]+@aluno\\.cps\\.sp\\.gov\\.br$")) {
             JOptionPane.showMessageDialog(
                 this, 
@@ -133,7 +121,6 @@ public class TelaCadastro extends JFrame {
             return;
         }
 
-        // Validação de Senha (CPF - Somente 11 números)
         if (!senha.matches("^\\d{11}$")) {
             JOptionPane.showMessageDialog(
                 this, 
@@ -144,12 +131,9 @@ public class TelaCadastro extends JFrame {
             return;
         }
 
-        // Lógica de salvamento simulada
         JOptionPane.showMessageDialog(this, "Aluno " + nome + " cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         voltarAoMenu();
     }
-
-    // Classes Customizadas para UI (Reutilizando padrão do projeto)
     
     private static class PainelArredondado extends JPanel {
         private int raio;

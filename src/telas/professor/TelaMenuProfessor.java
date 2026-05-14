@@ -24,13 +24,11 @@ public class TelaMenuProfessor extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        // Botão Perfil (Canto Superior Esquerdo)
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
         botaoPerfil.setBounds(20, 20, 45, 45);
         botaoPerfil.addActionListener(e -> abrirPerfil());
         painelFundo.add(botaoPerfil);
 
-        // Botão Sair (Canto Superior Direito)
         JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
         botaoSair.setBounds(575, 20, 45, 45);
         botaoSair.addActionListener(e -> sairDaConta());
@@ -93,9 +91,8 @@ public class TelaMenuProfessor extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        // Quando a tela estiver pronta, use:
-        // new TelaGerenciarPerguntas().setVisible(true);
-        // dispose();
+        new TelaGerenciarPerguntas().setVisible(true);
+        dispose();
     }
 
     private void abrirRelatorios() {
@@ -114,8 +111,8 @@ public class TelaMenuProfessor extends JFrame {
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
 
-            // Quando quiser voltar para o login, use:
-            // new telas.autenticacao.TelaLogin().setVisible(true);
+        
+        new telas.autenticacao.TelaLogin().setVisible(true);
         }
     }
 
@@ -150,7 +147,6 @@ public class TelaMenuProfessor extends JFrame {
 
         public PainelFundo() {
             try {
-                // Carrega a imagem de fundo menu.png
                 imagemFundo = new ImageIcon("imagens/menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
@@ -162,7 +158,6 @@ public class TelaMenuProfessor extends JFrame {
             super.paintComponent(grafico);
             Graphics2D g2 = (Graphics2D) grafico.create();
             
-            // Habilita interpolação de alta qualidade
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -174,7 +169,6 @@ public class TelaMenuProfessor extends JFrame {
                 int alturaImagem = imagemFundo.getHeight(this);
 
                 if (larguraImagem > 0 && alturaImagem > 0) {
-                    // Calcula a escala para cobrir todo o painel mantendo a proporção (tipo "cover")
                     double escalaX = (double) larguraPainel / larguraImagem;
                     double escalaY = (double) alturaPainel / alturaImagem;
                     double escala = Math.max(escalaX, escalaY);
@@ -182,7 +176,6 @@ public class TelaMenuProfessor extends JFrame {
                     int novaLargura = (int) (larguraImagem * escala);
                     int novaAltura = (int) (alturaImagem * escala);
 
-                    // Centraliza a imagem no painel
                     int x = (larguraPainel - novaLargura) / 2;
                     int y = (alturaPainel - novaAltura) / 2;
 

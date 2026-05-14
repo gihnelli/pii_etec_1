@@ -31,13 +31,11 @@ public class TelaMenuAluno extends JFrame {
         painelFundo.setLayout(null);
         setContentPane(painelFundo);
 
-        // Botão Perfil (Canto Superior Esquerdo)
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
         botaoPerfil.setBounds(20, 20, 45, 45);
         botaoPerfil.addActionListener(e -> abrirPerfil());
         painelFundo.add(botaoPerfil);
 
-        // Botão Sair (Canto Superior Direito)
         JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
         botaoSair.setBounds(475, 20, 45, 45);
         botaoSair.addActionListener(e -> sairDaConta());
@@ -64,7 +62,6 @@ public class TelaMenuAluno extends JFrame {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
-            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
             Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
             btn.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -73,7 +70,7 @@ public class TelaMenuAluno extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
@@ -94,12 +91,10 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaJogo() {
-        // Criando uma partida e questões de exemplo para o teste
         model.Aluno alunoExemplo = new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345");
         Partida partida = new Partida(alunoExemplo);
         List<Questao> lista = new ArrayList<>();
-        
-        // Questão 1: Alternativa
+
         Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Química");
         q1.setImagemEnunciado("imagens/Béquer.jpg");
         q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
@@ -108,7 +103,6 @@ public class TelaMenuAluno extends JFrame {
         q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
         lista.add(q1);
 
-        // Questão 2: Associação
         Questao q2 = new Questao(2, "Combine os materiais aos sistemas correspondentes", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Química");
         lista.add(q2);
 
@@ -124,9 +118,8 @@ public class TelaMenuAluno extends JFrame {
                 JOptionPane.INFORMATION_MESSAGE
         );
 
-        // Quando a TelaDesempenhoAluno estiver pronta, use:
-        // new TelaDesempenhoAluno().setVisible(true);
-        // dispose();
+        new TelaDesempenhoAluno().setVisible(true);
+        dispose();
     }
 
     private void sairDaConta() {
@@ -139,9 +132,7 @@ public class TelaMenuAluno extends JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
-
-            // Quando quiser voltar para o login, use:
-            // new telas.autenticacao.TelaLogin().setVisible(true);
+        new telas.autenticacao.TelaLogin().setVisible(true);
         }
     }
 
@@ -150,7 +141,6 @@ public class TelaMenuAluno extends JFrame {
 
         public PainelFundo() {
             try {
-                // Carrega a imagem de fundo menu.png
                 imagemFundo = new ImageIcon("imagens/menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
@@ -162,7 +152,6 @@ public class TelaMenuAluno extends JFrame {
             super.paintComponent(grafico);
             Graphics2D g2 = (Graphics2D) grafico.create();
             
-            // Habilita interpolação de alta qualidade
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -174,15 +163,12 @@ public class TelaMenuAluno extends JFrame {
                 int alturaImagem = imagemFundo.getHeight(this);
 
                 if (larguraImagem > 0 && alturaImagem > 0) {
-                    // Calcula a escala para cobrir todo o painel mantendo a proporção (tipo "cover")
                     double escalaX = (double) larguraPainel / larguraImagem;
                     double escalaY = (double) alturaPainel / alturaImagem;
                     double escala = Math.max(escalaX, escalaY);
 
                     int novaLargura = (int) (larguraImagem * escala);
                     int novaAltura = (int) (alturaImagem * escala);
-
-                    // Centraliza a imagem no painel
                     int x = (larguraPainel - novaLargura) / 2;
                     int y = (alturaPainel - novaAltura) / 2;
 
