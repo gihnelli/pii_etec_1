@@ -39,44 +39,44 @@ public class TelaLogin extends JFrame {
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
         titulo.setBounds(35, 30, 340, 80);
-        titulo.setFont(new Font("Arial", Font.BOLD, 62));
+        titulo.setFont(new Font("Verdana", Font.BOLD, 62));
         titulo.setForeground(new Color(47, 76, 113));
         painelLogin.add(titulo);
 
         JLabel textoEmail = new JLabel("E-mail institucional");
         textoEmail.setBounds(45, 125, 250, 25);
-        textoEmail.setFont(new Font("Arial", Font.BOLD, 15));
+        textoEmail.setFont(new Font("Verdana", Font.BOLD, 15));
         textoEmail.setForeground(new Color(47, 76, 113));
         painelLogin.add(textoEmail);
 
         campoEmail = new CampoArredondado(15);
         campoEmail.setBounds(42, 150, 326, 45);
-        campoEmail.setFont(new Font("Arial", Font.PLAIN, 15));
+        campoEmail.setFont(new Font("Verdana", Font.PLAIN, 15));
         campoEmail.setBackground(new Color(245, 247, 251));
         painelLogin.add(campoEmail);
 
         JLabel textoSenha = new JLabel("Senha");
         textoSenha.setBounds(45, 205, 250, 25);
-        textoSenha.setFont(new Font("Arial", Font.BOLD, 15));
+        textoSenha.setFont(new Font("Verdana", Font.BOLD, 15));
         textoSenha.setForeground(new Color(47, 76, 113));
         painelLogin.add(textoSenha);
 
         campoSenha = new CampoSenhaArredondado(15);
         campoSenha.setBounds(42, 230, 326, 45);
-        campoSenha.setFont(new Font("Arial", Font.PLAIN, 15));
+        campoSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
         campoSenha.setBackground(new Color(245, 247, 251));
         painelLogin.add(campoSenha);
 
         caixaLembrarMe = new JCheckBox("Lembrar-me");
         caixaLembrarMe.setBounds(42, 290, 130, 25);
-        caixaLembrarMe.setFont(new Font("Arial", Font.PLAIN, 15));
+        caixaLembrarMe.setFont(new Font("Verdana", Font.PLAIN, 15));
         caixaLembrarMe.setBackground(Color.WHITE);
         caixaLembrarMe.setForeground(new Color(47, 76, 113));
         painelLogin.add(caixaLembrarMe);
 
         JLabel textoEsqueciSenha = new JLabel("<html><u>Esqueci minha senha</u></html>");
         textoEsqueciSenha.setBounds(230, 290, 150, 25);
-        textoEsqueciSenha.setFont(new Font("Arial", Font.PLAIN, 15));
+        textoEsqueciSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
         textoEsqueciSenha.setForeground(new Color(150, 40, 27));
         textoEsqueciSenha.setCursor(new Cursor(Cursor.HAND_CURSOR));
         painelLogin.add(textoEsqueciSenha);
@@ -88,7 +88,7 @@ public class TelaLogin extends JFrame {
 
         JLabel textoCadastro = new JLabel("<html><u>Não possui um conta? Cadastre-se</u></html>", SwingConstants.CENTER);
         textoCadastro.setBounds(35, 410, 340, 25);
-        textoCadastro.setFont(new Font("Arial", Font.PLAIN, 15));
+        textoCadastro.setFont(new Font("Verdana", Font.PLAIN, 15));
         textoCadastro.setForeground(new Color(47, 76, 113));
         textoCadastro.setCursor(new Cursor(Cursor.HAND_CURSOR));
         painelLogin.add(textoCadastro);
