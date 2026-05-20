@@ -71,7 +71,7 @@ public class TelaDesempenhoAluno extends JFrame {
 
         JLabel titulo = new JLabel("Desempenho do mês", SwingConstants.CENTER);
         titulo.setBounds(0, 14, 355, 35);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setFont(new Font("Verdana", Font.BOLD, 20));
         titulo.setForeground(Color.WHITE);
         painelGrafico.add(titulo);
 
@@ -89,7 +89,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 SwingConstants.CENTER
         );
         resumo.setBounds(0, 325, 355, 28);
-        resumo.setFont(new Font("Arial", Font.BOLD, 13));
+        resumo.setFont(new Font("Verdana", Font.BOLD, 13));
         resumo.setForeground(Color.WHITE);
         painelGrafico.add(resumo);
 
@@ -101,13 +101,13 @@ public class TelaDesempenhoAluno extends JFrame {
 
         JLabel textoRelatorio = new JLabel("Gerar relatório", SwingConstants.CENTER);
         textoRelatorio.setBounds(0, 8, 315, 34);
-        textoRelatorio.setFont(new Font("Arial", Font.BOLD, 19));
+        textoRelatorio.setFont(new Font("Verdana", Font.BOLD, 19));
         textoRelatorio.setForeground(Color.WHITE);
         painelRelatorio.add(textoRelatorio);
 
         JButton botaoPdf = new JButton("Baixar PDF");
         botaoPdf.setBounds(14, 50, 287, 40);
-        botaoPdf.setFont(new Font("Arial", Font.BOLD, 17));
+        botaoPdf.setFont(new Font("Verdana", Font.BOLD, 17));
         botaoPdf.setForeground(AZUL_ESCURO);
         botaoPdf.setBackground(BRANCO_GELO);
         botaoPdf.setFocusPainted(false);
@@ -117,31 +117,35 @@ public class TelaDesempenhoAluno extends JFrame {
     }
 
     private void adicionarIcones(JPanel painel) {
-        JLabel iconePerfil = new JLabel("●", SwingConstants.CENTER);
+        JButton iconePerfil = criarBotaoIconeReal("imagens/Perfil.png");
         iconePerfil.setBounds(16, 14, 48, 48);
-        iconePerfil.setFont(new Font("Arial", Font.BOLD, 28));
-        iconePerfil.setForeground(Color.WHITE);
-        iconePerfil.setOpaque(true);
-        iconePerfil.setBackground(AZUL_ESCURO);
         painel.add(iconePerfil);
 
-        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
+        JButton iconeSair = criarBotaoIconeReal("imagens/Sair.png");
         iconeSair.setBounds(654, 14, 48, 48);
-        iconeSair.setFont(new Font("Arial", Font.BOLD, 30));
-        iconeSair.setForeground(Color.WHITE);
-        iconeSair.setOpaque(true);
-        iconeSair.setBackground(AZUL_ESCURO);
-        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        iconeSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evento) {
-                dispose();
-            new TelaMenuAluno().setVisible(true);
-            }
+        iconeSair.addActionListener(evento -> {
+            dispose();
+            new TelaMenuAluno(aluno).setVisible(true);
         });
 
         painel.add(iconeSair);
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            Image img = iconOriginal.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     private Estatisticas calcularEstatisticasAluno(Aluno aluno) {
@@ -479,7 +483,7 @@ public class TelaDesempenhoAluno extends JFrame {
             desenho.fillArc(x, y, tamanho, tamanho, 90 - anguloAcertos, -anguloErros);
 
             desenho.setColor(Color.WHITE);
-            desenho.setFont(new Font("Arial", Font.BOLD, 11));
+            desenho.setFont(new Font("Verdana", Font.BOLD, 11));
 
             desenharTextoDoGrafico(
                     desenho,
@@ -576,7 +580,7 @@ public class TelaDesempenhoAluno extends JFrame {
         private Image imagemFundo;
 
         public PainelFundo() {
-            imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+            imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
         }
 
         @Override
@@ -607,33 +611,34 @@ public class TelaDesempenhoAluno extends JFrame {
         }
     }
 
-    private static Aluno gerarAlunoExemplo() {
-        Aluno aluno = new Aluno(
-                1,
-                "Aluno 1",
-                "aluno1@aluno.cps.sp.gov.br",
-                "123",
-                "0001"
-        );
+private static Aluno gerarAlunoExemplo() {
+    Aluno aluno = new Aluno();
 
-        Questao questaoTeste = new Questao();
-        Partida partida = new Partida(aluno);
+    aluno.setId(1);
+    aluno.setNome("Aluno 1");
+    aluno.setEmail("aluno1@aluno.cps.sp.gov.br");
+    aluno.setSenha("123");
+    aluno.setTurma("1º Química");
 
-        for (int i = 0; i < 10; i++) {
-            Resposta resposta = new Resposta();
-            resposta.setQuestao(questaoTeste);
+    Questao questaoTeste = new Questao();
+    questaoTeste.setNivelDificuldade(model.tipos.NivelDificuldade.FACIL);
+    Partida partida = new Partida(aluno);
 
-            Alternativa alternativa = new Alternativa();
-            alternativa.setECorreta(i < 7);
+    for (int i = 0; i < 10; i++) {
+        Resposta resposta = new Resposta();
+        resposta.setQuestao(questaoTeste);
 
-            resposta.setAlternativaEscolhida(alternativa);
-            partida.adicionarResposta(resposta);
-        }
+        Alternativa alternativa = new Alternativa();
+        alternativa.setECorreta(i < 7);
 
-        aluno.adicionarPartida(partida);
-
-        return aluno;
+        resposta.setAlternativaEscolhida(alternativa);
+        partida.adicionarResposta(resposta);
     }
+
+    aluno.adicionarPartida(partida);
+
+    return aluno;
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

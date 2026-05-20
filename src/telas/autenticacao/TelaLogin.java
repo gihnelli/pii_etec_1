@@ -1,18 +1,26 @@
 package telas.autenticacao;
 
+import database.DAO.UsuarioDAO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
 import javax.swing.*;
+import model.Aluno;
+import model.Professor;
+import model.Usuario;
 import telas.aluno.TelaMenuAluno;
 import telas.professor.TelaMenuProfessor;
+import utilitarios.Criptografia;
 
 public class TelaLogin extends JFrame {
 
     private JTextField campoEmail;
     private JPasswordField campoSenha;
     private JCheckBox caixaLembrarMe;
+    private UsuarioDAO usuarioDAO;
 
     public TelaLogin() {
+        this.usuarioDAO = new UsuarioDAO();
         configurarJanela();
         montarTela();
     }
@@ -73,24 +81,10 @@ public class TelaLogin extends JFrame {
         caixaLembrarMe.setForeground(new Color(47, 76, 113));
         painelLogin.add(caixaLembrarMe);
 
-        JLabel textoEsqueciSenha = new JLabel("<html><u>Esqueci minha senha</u></html>");
-        textoEsqueciSenha.setBounds(230, 290, 150, 25);
-        textoEsqueciSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
-        textoEsqueciSenha.setForeground(new Color(150, 40, 27));
-        textoEsqueciSenha.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        painelLogin.add(textoEsqueciSenha);
-
         BotaoArredondado botaoEntrar = new BotaoArredondado("Entrar", 15);
         botaoEntrar.setBounds(42, 335, 326, 45);
         botaoEntrar.addActionListener((ActionEvent evento) -> validarLogin());
         painelLogin.add(botaoEntrar);
-
-        JLabel textoCadastro = new JLabel("<html><u>Não possui um conta? Cadastre-se</u></html>", SwingConstants.CENTER);
-        textoCadastro.setBounds(35, 410, 340, 25);
-        textoCadastro.setFont(new Font("Verdana", Font.PLAIN, 15));
-        textoCadastro.setForeground(new Color(47, 76, 113));
-        textoCadastro.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        painelLogin.add(textoCadastro);
     }
 
     private static class PainelArredondado extends JPanel {
@@ -162,7 +156,7 @@ public class TelaLogin extends JFrame {
         public BotaoArredondado(String texto, int raio) {
             super(texto);
             this.raio = raio;
-            setFont(new Font("Arial", Font.BOLD, 18));
+            setFont(new Font("Verdana", Font.BOLD, 18));
             setForeground(Color.WHITE);
             setBackground(new Color(36, 73, 130));
             setFocusPainted(false);
@@ -187,7 +181,7 @@ public class TelaLogin extends JFrame {
 
         public PainelFundo() {
             try {
-                imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+                imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
             }
@@ -247,52 +241,38 @@ public class TelaLogin extends JFrame {
             return;
         }
 
-        if (ehEmailDeAluno(emailDigitado)) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Login de aluno identificado com sucesso.",
-                    "Aluno",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+        try {
+            String salt = usuarioDAO.buscarSaltPorEmail(emailDigitado);
+            if (salt == null) {
+                exibirErroLogin();
+                return;
+            }
 
-            abrirTelaDoAluno();
+            String senhaHash = Criptografia.criptografar(senhaDigitada, salt);
+            Usuario usuario = usuarioDAO.buscarPorEmail(emailDigitado);
 
-        } else if (ehEmailDeProfessor(emailDigitado)) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Login de professor identificado com sucesso.",
-                    "Professor",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            abrirTelaDoProfessor();
-
-        } else {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "E-mail institucional inválido.\n\nUse um dos formatos:\n\nAluno: nome@aluno.cps.sp.gov.br\nProfessor: nome@cps.sp.gov.br",
-                    "E-mail inválido",
-                    JOptionPane.ERROR_MESSAGE
-            );
+            if (usuario != null && usuario.getSenha().equals(senhaHash)) {
+                if (usuario instanceof Aluno aluno) {
+                    new TelaMenuAluno(aluno).setVisible(true);
+                } else if (usuario instanceof Professor professor) {
+                    new TelaMenuProfessor(professor).setVisible(true);
+                }
+                dispose();
+            } else {
+                exibirErroLogin();
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao conectar ao banco de dados: " + e.getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private boolean ehEmailDeAluno(String email) {
-        return email.matches("^[a-zA-Z0-9._%+-]+@aluno\\.cps\\.sp\\.gov\\.br$");
-    }
-
-    private boolean ehEmailDeProfessor(String email) {
-        return email.matches("^[a-zA-Z0-9._%+-]+@cps\\.sp\\.gov\\.br$");
-    }
-
-    private void abrirTelaDoAluno() {
-        new TelaMenuAluno().setVisible(true);
-        dispose();
-    }
-
-    private void abrirTelaDoProfessor() {
-        new TelaMenuProfessor().setVisible(true);
-        dispose();
+    private void exibirErroLogin() {
+        JOptionPane.showMessageDialog(
+                this,
+                "E-mail ou senha incorretos.",
+                "Erro de Autenticação",
+                JOptionPane.ERROR_MESSAGE
+        );
     }
 
     public static void main(String[] args) {

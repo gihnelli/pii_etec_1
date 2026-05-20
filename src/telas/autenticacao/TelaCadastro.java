@@ -1,18 +1,31 @@
 package telas.autenticacao;
 
+import database.DAO.UsuarioDAO;
 import java.awt.*;
+import java.sql.SQLException;
 import javax.swing.*;
+import model.Aluno;
+import model.tipos.TipoUsuario;
 import telas.professor.TelaMenuProfessor;
+import utilitarios.Criptografia;
 
 public class TelaCadastro extends JFrame {
 
+    private model.Professor professor;
     private JTextField campoNome;
     private JTextField campoEmail;
     private JPasswordField campoSenha;
+    private UsuarioDAO usuarioDAO;
 
-    public TelaCadastro() {
+    public TelaCadastro(model.Professor professor) {
+        this.professor = professor;
+        this.usuarioDAO = new UsuarioDAO();
         configurarJanela();
         montarTela();
+    }
+
+    public TelaCadastro() {
+        this(new model.Professor(0, "Professor", "professor@cps.sp.gov.br", ""));
     }
 
     private void configurarJanela() {
@@ -31,7 +44,7 @@ public class TelaCadastro extends JFrame {
         PainelArredondado painelCentral = new PainelArredondado(30);
         painelCentral.setLayout(null);
         painelCentral.setBounds(100, 150, 760, 380);
-        painelCentral.setBackground(new Color(220, 220, 220, 230)); // Cinza com leve transparência
+        painelCentral.setBackground(new Color(220, 220, 220, 230));
         painelFundo.add(painelCentral);
 
         campoNome = criarCampoArredondado("Nome:", 30, 30, 700, 55);
@@ -57,7 +70,7 @@ public class TelaCadastro extends JFrame {
     private JTextField criarCampoArredondado(String rotulo, int x, int y, int w, int h) {
         JTextField campo = new CampoTextoArredondado(20, rotulo);
         campo.setBounds(x, y, w, h);
-        campo.setFont(new Font("Arial", Font.BOLD, 18));
+        campo.setFont(new Font("Verdana", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
         return campo;
@@ -66,7 +79,7 @@ public class TelaCadastro extends JFrame {
     private JPasswordField criarCampoSenhaArredondado(String rotulo, int x, int y, int w, int h) {
         JPasswordField campo = new CampoSenhaArredondada(20, rotulo);
         campo.setBounds(x, y, w, h);
-        campo.setFont(new Font("Arial", Font.BOLD, 18));
+        campo.setFont(new Font("Verdana", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
         return campo;
@@ -74,7 +87,7 @@ public class TelaCadastro extends JFrame {
 
     private JButton criarBotaoCustomizado(String texto, Color corFundo, Color corTexto) {
         JButton btn = new JButton(texto);
-        btn.setFont(new Font("Arial", Font.BOLD, 20));
+        btn.setFont(new Font("Verdana", Font.BOLD, 20));
         btn.setForeground(corTexto);
         btn.setBackground(corFundo);
         btn.setFocusPainted(false);
@@ -97,7 +110,7 @@ public class TelaCadastro extends JFrame {
     }
 
     private void voltarAoMenu() {
-        new TelaMenuProfessor().setVisible(true);
+        new TelaMenuProfessor(professor).setVisible(true);
         dispose();
     }
 
@@ -107,32 +120,27 @@ public class TelaCadastro extends JFrame {
         String senha = new String(campoSenha.getPassword());
 
         if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.", "Erro", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Todos os campos devem ser preenchidos.", "Erro", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (!email.matches("^[a-zA-Z0-9._%+-]+@aluno\\.cps\\.sp\\.gov\\.br$")) {
-            JOptionPane.showMessageDialog(
-                this, 
-                "E-mail inválido!\nO aluno deve usar o formato: nome@aluno.cps.sp.gov.br", 
-                "Erro de Formato", 
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "O e-mail deve ser do domínio @aluno.cps.sp.gov.br", "E-mail Inválido", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (!senha.matches("^\\d{11}$")) {
-            JOptionPane.showMessageDialog(
-                this, 
-                "Senha inválida!\nA senha (CPF) deve conter exatamente 11 números, sem pontos ou traços.", 
-                "Erro de Senha", 
-                JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
+        try {
+            String salt = Criptografia.gerarSalt();
+            String senhaHash = Criptografia.criptografar(senha, salt);
 
-        JOptionPane.showMessageDialog(this, "Aluno " + nome + " cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-        voltarAoMenu();
+            Aluno novoAluno = new Aluno(0, nome, email, senhaHash, "Não Definida", "000000");
+            usuarioDAO.inserir(novoAluno, salt);
+
+            JOptionPane.showMessageDialog(this, "Aluno cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            voltarAoMenu();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar no banco: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private static class PainelArredondado extends JPanel {
@@ -202,7 +210,7 @@ public class TelaCadastro extends JFrame {
 
     private static class PainelFundo extends JPanel {
         private Image img;
-        public PainelFundo() { try { img = new ImageIcon("imagens/menu.png").getImage(); } catch(Exception e){} }
+        public PainelFundo() { try { img = new ImageIcon("imagens/Menu.png").getImage(); } catch(Exception e){} }
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);

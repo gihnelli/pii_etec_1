@@ -1,12 +1,20 @@
 package telas.professor;
 
+import database.DAO.PartidaDAO;
+import database.DAO.UsuarioDAO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
+import java.util.List;
 import javax.swing.*;
+import model.Aluno;
 
 public class TelaMenuProfessor extends JFrame {
 
-    public TelaMenuProfessor() {
+    private model.Professor professor;
+
+    public TelaMenuProfessor(model.Professor professor) {
+        this.professor = professor;
         configurarJanela();
         montarTela();
     }
@@ -36,7 +44,7 @@ public class TelaMenuProfessor extends JFrame {
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
         titulo.setBounds(70, 105, 500, 95);
-        titulo.setFont(new Font("Arial", Font.BOLD, 76));
+        titulo.setFont(new Font("Verdana", Font.BOLD, 76));
         titulo.setForeground(new Color(31, 65, 126));
         painelFundo.add(titulo);
 
@@ -60,7 +68,6 @@ public class TelaMenuProfessor extends JFrame {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
-            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
             Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
             btn.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -69,35 +76,40 @@ public class TelaMenuProfessor extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(this, "Abrindo perfil do professor...");
+        JOptionPane.showMessageDialog(this, "Nome: " + professor.getNome() + "\nE-mail: " + professor.getEmail());
     }
 
     private void abrirCadastrarAluno() {
-        new telas.autenticacao.TelaCadastro().setVisible(true);
+        new telas.autenticacao.TelaCadastro(professor).setVisible(true);
         dispose();
     }
 
     private void abrirGerenciarPerguntas() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberta a tela de gerenciamento de perguntas.",
-                "Gerenciar perguntas",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        new TelaGerenciarPerguntas().setVisible(true);
+        new TelaGerenciarPerguntas(professor).setVisible(true);
         dispose();
     }
 
     private void abrirRelatorios() {
-        new TelaDesempenho().setVisible(true);
-        dispose();
+        try {
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            PartidaDAO partidaDAO = new PartidaDAO();
+            
+            List<Aluno> alunos = usuarioDAO.listarAlunos();
+            for (Aluno aluno : alunos) {
+                aluno.setHistoricoPartidas(partidaDAO.listarPorAluno(aluno.getId()));
+            }
+            
+            new TelaDesempenho(professor, alunos).setVisible(true);
+            dispose();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao carregar dados dos alunos: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void sairDaConta() {
@@ -120,7 +132,7 @@ public class TelaMenuProfessor extends JFrame {
 
         public BotaoArredondado(String texto) {
             super(texto);
-            setFont(new Font("Arial", Font.BOLD, 21));
+            setFont(new Font("Verdana", Font.BOLD, 21));
             setForeground(Color.WHITE);
             setBackground(new Color(36, 73, 130));
             setFocusPainted(false);
@@ -147,7 +159,7 @@ public class TelaMenuProfessor extends JFrame {
 
         public PainelFundo() {
             try {
-                imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+                imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
             }
@@ -194,7 +206,8 @@ public class TelaMenuProfessor extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            TelaMenuProfessor tela = new TelaMenuProfessor();
+            model.Professor profExemplo = new model.Professor(0, "Professor Teste", "professor@cps.sp.gov.br", "");
+            TelaMenuProfessor tela = new TelaMenuProfessor(profExemplo);
             tela.setVisible(true);
         });
     }
