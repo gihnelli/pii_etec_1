@@ -26,7 +26,6 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 public class TelaDesempenho extends JFrame {
 
-    private model.Professor professor;
     private JPanel painelPrincipal;
     private CardLayout navegador;
     private List<Aluno> listaAlunos;
@@ -43,19 +42,10 @@ public class TelaDesempenho extends JFrame {
     private static final PDFont FONTE_NEGRITO =
             new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
-    public TelaDesempenho(model.Professor professor, List<Aluno> alunos) {
-        this.professor = professor;
+    public TelaDesempenho(List<Aluno> alunos) {
         this.listaAlunos = alunos;
         configurarJanela();
         montarEstrutura();
-    }
-
-    public TelaDesempenho(model.Professor professor) {
-        this(professor, gerarDadosExemplo());
-    }
-
-    public TelaDesempenho(List<Aluno> alunos) {
-        this(new model.Professor(0, "Professor", "professor@cps.sp.gov.br", ""), alunos);
     }
 
     public TelaDesempenho() {
@@ -97,7 +87,7 @@ public class TelaDesempenho extends JFrame {
 
         JLabel titulo = new JLabel("Desempenho da turma", SwingConstants.CENTER);
         titulo.setBounds(0, 18, 480, 40);
-        titulo.setFont(new Font("Verdana", Font.BOLD, 24));
+        titulo.setFont(new Font("Arial", Font.BOLD, 24));
         titulo.setForeground(Color.WHITE);
         painelGrafico.add(titulo);
 
@@ -117,7 +107,7 @@ public class TelaDesempenho extends JFrame {
                 SwingConstants.CENTER
         );
         resumo.setBounds(0, 475, 480, 35);
-        resumo.setFont(new Font("Verdana", Font.BOLD, 14));
+        resumo.setFont(new Font("Arial", Font.BOLD, 14));
         resumo.setForeground(Color.WHITE);
         painelGrafico.add(resumo);
 
@@ -134,13 +124,13 @@ public class TelaDesempenho extends JFrame {
 
         JLabel textoRelatorio = new JLabel("Gerar relatório", SwingConstants.CENTER);
         textoRelatorio.setBounds(0, 8, 420, 35);
-        textoRelatorio.setFont(new Font("Verdana", Font.BOLD, 20));
+        textoRelatorio.setFont(new Font("Arial", Font.BOLD, 20));
         textoRelatorio.setForeground(Color.WHITE);
         painelRelatorio.add(textoRelatorio);
 
         JButton botaoPdf = new JButton("Baixar PDF");
         botaoPdf.setBounds(26, 54, 368, 44);
-        botaoPdf.setFont(new Font("Verdana", Font.BOLD, 18));
+        botaoPdf.setFont(new Font("Arial", Font.BOLD, 18));
         botaoPdf.setForeground(AZUL_ESCURO);
         botaoPdf.setBackground(BRANCO_GELO);
         botaoPdf.setFocusPainted(false);
@@ -164,7 +154,7 @@ public class TelaDesempenho extends JFrame {
         painel.add(tituloLista);
 
         JLabel textoTitulo = new JLabel("Lista de alunos", SwingConstants.CENTER);
-        textoTitulo.setFont(new Font("Verdana", Font.BOLD, 18));
+        textoTitulo.setFont(new Font("Arial", Font.BOLD, 18));
         textoTitulo.setForeground(Color.WHITE);
         tituloLista.add(textoTitulo, BorderLayout.CENTER);
 
@@ -190,39 +180,34 @@ public class TelaDesempenho extends JFrame {
     }
 
     private void adicionarIcones(JPanel painel, boolean voltarParaTelaGeral) {
-        JButton iconePerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        JLabel iconePerfil = new JLabel("●", SwingConstants.CENTER);
         iconePerfil.setBounds(18, 18, 52, 52);
+        iconePerfil.setFont(new Font("Arial", Font.BOLD, 30));
+        iconePerfil.setForeground(Color.WHITE);
+        iconePerfil.setOpaque(true);
+        iconePerfil.setBackground(AZUL_ESCURO);
         painel.add(iconePerfil);
 
-        JButton iconeSair = criarBotaoIconeReal("imagens/Sair.png");
+        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
         iconeSair.setBounds(920, 18, 52, 52);
-        iconeSair.addActionListener(evento -> {
-            if (voltarParaTelaGeral) {
-                navegador.show(painelPrincipal, "GERAL");
-            } else {
-                new TelaMenuProfessor(professor).setVisible(true);
-                dispose();
+        iconeSair.setFont(new Font("Arial", Font.BOLD, 32));
+        iconeSair.setForeground(Color.WHITE);
+        iconeSair.setOpaque(true);
+        iconeSair.setBackground(AZUL_ESCURO);
+        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        iconeSair.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evento) {
+                if (voltarParaTelaGeral) {
+                    navegador.show(painelPrincipal, "GERAL");
+                } else {
+                    dispose();
+                }
             }
         });
 
         painel.add(iconeSair);
-    }
-
-    private JButton criarBotaoIconeReal(String caminho) {
-        JButton btn = new JButton();
-        try {
-            ImageIcon iconOriginal = new ImageIcon(caminho);
-            Image img = iconOriginal.getImage().getScaledInstance(52, 52, Image.SCALE_SMOOTH);
-            btn.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            btn.setText("?");
-        }
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
 
     private Estatisticas calcularEstatisticasTurma() {
@@ -620,13 +605,13 @@ public class TelaDesempenho extends JFrame {
             linhaAluno.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
             JLabel nomeAluno = new JLabel(aluno.getNome());
-            nomeAluno.setFont(new Font("Verdana", Font.BOLD, 15));
+            nomeAluno.setFont(new Font("Arial", Font.BOLD, 15));
             nomeAluno.setForeground(AZUL_ESCURO);
             nomeAluno.setBorder(new EmptyBorder(0, 20, 0, 0));
             linhaAluno.add(nomeAluno, BorderLayout.WEST);
 
             seta = new JLabel("<  ");
-            seta.setFont(new Font("Verdana", Font.BOLD, 16));
+            seta.setFont(new Font("Arial", Font.BOLD, 16));
             seta.setForeground(AZUL_ESCURO);
             linhaAluno.add(seta, BorderLayout.EAST);
 
@@ -659,7 +644,7 @@ public class TelaDesempenho extends JFrame {
 
             JLabel titulo = new JLabel("Desempenho do mês", SwingConstants.CENTER);
             titulo.setBounds(0, 10, 460, 35);
-            titulo.setFont(new Font("Verdana", Font.BOLD, 20));
+            titulo.setFont(new Font("Arial", Font.BOLD, 20));
             titulo.setForeground(Color.WHITE);
             painelGrafico.add(titulo);
 
@@ -668,7 +653,7 @@ public class TelaDesempenho extends JFrame {
                     estatisticas.percentualErros,
                     false
             );
-            grafico.setBounds(25, 45, 410, 205);
+            grafico.setBounds(20, 45, 420, 205);
             painelGrafico.add(grafico);
 
             JLabel resumo = new JLabel(
@@ -677,14 +662,18 @@ public class TelaDesempenho extends JFrame {
                             + estatisticas.pontuacaoTotal + " pontos",
                     SwingConstants.CENTER
             );
-            resumo.setBounds(0, 250, 460, 30);
-            resumo.setFont(new Font("Verdana", Font.BOLD, 13));
+            resumo.setBounds(0, 250, 460, 25);
+            resumo.setFont(new Font("Arial", Font.BOLD, 13));
             resumo.setForeground(Color.WHITE);
             painelGrafico.add(resumo);
 
-            JButton botaoPdfAluno = new BotaoMenu("Gerar relatório (PDF)");
-            botaoPdfAluno.setBounds(545, 115, 300, 50);
-            botaoPdfAluno.setFont(new Font("Verdana", Font.BOLD, 18));
+            JButton botaoPdfAluno = new JButton("Gerar PDF do aluno");
+            botaoPdfAluno.setBounds(560, 120, 250, 55);
+            botaoPdfAluno.setFont(new Font("Arial", Font.BOLD, 18));
+            botaoPdfAluno.setBackground(AZUL_ESCURO);
+            botaoPdfAluno.setForeground(Color.WHITE);
+            botaoPdfAluno.setFocusPainted(false);
+            botaoPdfAluno.setCursor(new Cursor(Cursor.HAND_CURSOR));
             botaoPdfAluno.addActionListener(evento -> gerarPdfDoAluno(aluno));
             painel.add(botaoPdfAluno);
 
@@ -749,7 +738,7 @@ public class TelaDesempenho extends JFrame {
             desenho.fillArc(x, y, tamanho, tamanho, 90 - anguloAcertos, -anguloErros);
 
             desenho.setColor(Color.WHITE);
-            desenho.setFont(new Font("Verdana", Font.BOLD, grande ? 13 : 10));
+            desenho.setFont(new Font("Arial", Font.BOLD, grande ? 13 : 10));
 
             desenharTextoDoGrafico(
                     desenho,
@@ -824,7 +813,7 @@ public class TelaDesempenho extends JFrame {
 
         public BotaoMenu(String texto) {
             super(texto);
-            setFont(new Font("Verdana", Font.BOLD, 24));
+            setFont(new Font("Arial", Font.BOLD, 24));
             setForeground(Color.WHITE);
             setBackground(new Color(34, 62, 107));
             setFocusPainted(false);
@@ -872,7 +861,7 @@ public class TelaDesempenho extends JFrame {
         private Image imagemFundo;
 
         public PainelFundo() {
-            imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
+            imagemFundo = new ImageIcon("imagens/menu.png").getImage();
         }
 
         @Override
@@ -906,7 +895,6 @@ public class TelaDesempenho extends JFrame {
     private static List<Aluno> gerarDadosExemplo() {
         List<Aluno> alunos = new ArrayList<>();
         Questao questaoTeste = new Questao();
-        questaoTeste.setNivelDificuldade(model.tipos.NivelDificuldade.FACIL);
 
         for (int i = 1; i <= 13; i++) {
             Aluno aluno = new Aluno(

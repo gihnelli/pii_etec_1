@@ -1,27 +1,20 @@
 package telas.professor;
 
-import database.DAO.QuestaoDAO;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import model.Alternativa;
-import model.Questao;
-import model.tipos.NivelDificuldade;
-import model.tipos.TipoQuestao;
 
 public class TelaGerenciarPerguntas extends JFrame {
 
-    private model.Professor professor;
-    private final List<Questao> bancoPerguntas = new ArrayList<>();
-    private QuestaoDAO questaoDAO = new QuestaoDAO();
+    private final List<PerguntaCadastro> bancoPerguntas = new ArrayList<>();
 
     private final CardLayout layoutConteudo = new CardLayout();
     private JPanel painelConteudo;
@@ -32,29 +25,11 @@ public class TelaGerenciarPerguntas extends JFrame {
     private String caminhoImagemAdicionar = "";
     private String caminhoImagemEditar = "";
 
-    public TelaGerenciarPerguntas(model.Professor professor) {
-        this.professor = professor;
-        carregarPerguntasDoBanco();
+    public TelaGerenciarPerguntas() {
+        carregarPerguntasExemplo();
         configurarJanela();
         montarTela();
         mostrarTela("VISUALIZAR");
-    }
-
-    private void carregarPerguntasDoBanco() {
-        try {
-            bancoPerguntas.clear();
-            bancoPerguntas.addAll(questaoDAO.listarTodas());
-            if (bancoPerguntas.isEmpty()) {
-                // Se o banco estiver vazio, carrega exemplos apenas visualmente (sem salvar)
-                // ou apenas deixa vazio. Vamos deixar vazio para ser fiel ao DB.
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar perguntas: " + e.getMessage());
-        }
-    }
-
-    public TelaGerenciarPerguntas() {
-        this(new model.Professor(0, "Professor", "professor@cps.sp.gov.br", ""));
     }
 
     private void configurarJanela() {
@@ -70,8 +45,12 @@ public class TelaGerenciarPerguntas extends JFrame {
         painelPrincipal.setLayout(null);
         setContentPane(painelPrincipal);
 
-        JButton iconePerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        JLabel iconePerfil = new JLabel("👤", SwingConstants.CENTER);
         iconePerfil.setBounds(28, 18, 55, 55);
+        iconePerfil.setFont(new Font("Arial", Font.PLAIN, 32));
+        iconePerfil.setForeground(Color.WHITE);
+        iconePerfil.setOpaque(true);
+        iconePerfil.setBackground(new Color(35, 74, 131));
         painelPrincipal.add(iconePerfil);
 
         JButton botaoAdicionar = criarBotaoTopo("Adicionar<br>pergunta");
@@ -89,9 +68,19 @@ public class TelaGerenciarPerguntas extends JFrame {
         botaoRemover.addActionListener(evento -> mostrarTela("REMOVER"));
         painelPrincipal.add(botaoRemover);
 
-        JButton iconeSair = criarBotaoIconeReal("imagens/Sair.png");
+        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
         iconeSair.setBounds(888, 18, 55, 55);
-        iconeSair.addActionListener(evento -> fecharTela());
+        iconeSair.setFont(new Font("Arial", Font.BOLD, 34));
+        iconeSair.setForeground(Color.WHITE);
+        iconeSair.setOpaque(true);
+        iconeSair.setBackground(new Color(35, 74, 131));
+        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        iconeSair.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evento) {
+                fecharTela();
+            }
+        });
         painelPrincipal.add(iconeSair);
 
         painelConteudo = new JPanel(layoutConteudo);
@@ -102,7 +91,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private JButton criarBotaoTopo(String texto) {
         BotaoArredondado botao = new BotaoArredondado("<html><center>" + texto + "</center></html>");
-        botao.setFont(new Font("Verdana", Font.BOLD, 17));
+        botao.setFont(new Font("Arial", Font.BOLD, 17));
         botao.setForeground(Color.WHITE);
         botao.setBackground(new Color(35, 74, 131));
         botao.setFocusPainted(false);
@@ -110,23 +99,6 @@ public class TelaGerenciarPerguntas extends JFrame {
         botao.setContentAreaFilled(false);
         botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return botao;
-    }
-
-    private JButton criarBotaoIconeReal(String caminho) {
-        JButton btn = new JButton();
-        try {
-            ImageIcon iconOriginal = new ImageIcon(caminho);
-            Image img = iconOriginal.getImage().getScaledInstance(55, 55, Image.SCALE_SMOOTH);
-            btn.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            btn.setText("?");
-        }
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
     }
 
     private void mostrarTela(String nomeTela) {
@@ -178,7 +150,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         return painelBase;
     }
 
-    private JPanel criarLinhaVisualizacao(Questao pergunta, int indice, boolean selecionada) {
+    private JPanel criarLinhaVisualizacao(PerguntaCadastro pergunta, int indice, boolean selecionada) {
         JPanel linha = new JPanel(null) {
             @Override
             protected void paintComponent(Graphics grafico) {
@@ -207,20 +179,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoPergunta = new JLabel("“" + pergunta.getEnunciado() + "”");
         textoPergunta.setBounds(18, 3, 338, 28);
-        textoPergunta.setFont(new Font("Verdana", Font.BOLD, 14));
+        textoPergunta.setFont(new Font("Arial", Font.BOLD, 14));
         textoPergunta.setForeground(new Color(35, 74, 131));
         linha.add(textoPergunta);
 
-        String resumoCorreta = "";
-        for (Alternativa alt : pergunta.getAlternativas()) {
-            if (alt.isECorreta()) {
-                resumoCorreta = alt.getTexto();
-                break;
-            }
-        }
-        JLabel textoResposta = new JLabel(resumoCorreta);
+        JLabel textoResposta = new JLabel(pergunta.getResumoRespostaCorreta());
         textoResposta.setBounds(380, 3, 450, 28);
-        textoResposta.setFont(new Font("Verdana", Font.BOLD, 14));
+        textoResposta.setFont(new Font("Arial", Font.BOLD, 14));
         textoResposta.setForeground(new Color(35, 74, 131));
         linha.add(textoResposta);
 
@@ -251,11 +216,11 @@ public class TelaGerenciarPerguntas extends JFrame {
         campoEnunciado.setToolTipText("Digite o enunciado");
         painelFormulario.add(campoEnunciado);
 
-        JLabel textoEnunciado = new JLabel("Escreva o enunciado:");
-        textoEnunciado.setBounds(28, 28, 300, 22);
-        textoEnunciado.setFont(new Font("Verdana", Font.BOLD, 16));
-        textoEnunciado.setForeground(new Color(35, 74, 131));
-        painelBase.add(textoEnunciado);
+        JLabel textoEnunciado = new JLabel("Enunciado:");
+        textoEnunciado.setBounds(38, 26, 120, 26);
+        textoEnunciado.setFont(new Font("Arial", Font.BOLD, 16));
+        textoEnunciado.setForeground(new Color(170, 170, 185));
+        painelFormulario.add(textoEnunciado);
 
         JTextField[] camposAlternativas = new JTextField[4];
         JRadioButton[] opcoesCorretas = new JRadioButton[4];
@@ -282,7 +247,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoLetra = new JLabel(letras[i]);
             textoLetra.setBounds(76, y + 8, 35, 28);
-            textoLetra.setFont(new Font("Verdana", Font.BOLD, 16));
+            textoLetra.setFont(new Font("Arial", Font.BOLD, 16));
             textoLetra.setForeground(new Color(170, 170, 185));
             painelFormulario.add(textoLetra);
 
@@ -298,7 +263,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JButton botaoImagem = new JButton("<html><center>⬆<br>Selecionar<br>imagem</center></html>");
         botaoImagem.setBounds(20, 18, 100, 80);
-        botaoImagem.setFont(new Font("Verdana", Font.BOLD, 18));
+        botaoImagem.setFont(new Font("Arial", Font.BOLD, 18));
         botaoImagem.setForeground(Color.BLACK);
         botaoImagem.setBorderPainted(false);
         botaoImagem.setFocusPainted(false);
@@ -308,13 +273,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoFormato = new JLabel("*.png, *.jpeg", SwingConstants.CENTER);
         textoFormato.setBounds(10, 104, 122, 24);
-        textoFormato.setFont(new Font("Verdana", Font.BOLD, 14));
+        textoFormato.setFont(new Font("Arial", Font.BOLD, 14));
         textoFormato.setForeground(new Color(96, 96, 120));
         painelImagem.add(textoFormato);
 
         JLabel textoArquivoEscolhido = new JLabel("Nenhum arquivo", SwingConstants.CENTER);
         textoArquivoEscolhido.setBounds(10, 88, 122, 18);
-        textoArquivoEscolhido.setFont(new Font("Verdana", Font.PLAIN, 11));
+        textoArquivoEscolhido.setFont(new Font("Arial", Font.PLAIN, 11));
         textoArquivoEscolhido.setForeground(new Color(100, 100, 100));
         painelImagem.add(textoArquivoEscolhido);
 
@@ -336,7 +301,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoNivel = new JLabel("Nível de dificuldade:");
         textoNivel.setBounds(10, 8, 190, 28);
-        textoNivel.setFont(new Font("Verdana", Font.BOLD, 15));
+        textoNivel.setFont(new Font("Arial", Font.BOLD, 15));
         textoNivel.setForeground(new Color(170, 170, 185));
         painelNivel.add(textoNivel);
 
@@ -388,29 +353,25 @@ public class TelaGerenciarPerguntas extends JFrame {
                 }
             }
 
-            NivelDificuldade nivelEnum = NivelDificuldade.FACIL;
+            String nivel = "Fácil";
             if (radioMedio.isSelected()) {
-                nivelEnum = NivelDificuldade.MEDIO;
+                nivel = "Médio";
             } else if (radioDificil.isSelected()) {
-                nivelEnum = NivelDificuldade.DIFICIL;
+                nivel = "Difícil";
             }
 
-            Questao novaQuestao = new Questao(0, enunciado, TipoQuestao.MULTIPLA_ESCOLHA, nivelEnum, "Geral");
-            novaQuestao.setImagemEnunciado(caminhoImagemAdicionar);
-            
-            for (int i = 0; i < alternativas.size(); i++) {
-                novaQuestao.adicionarAlternativa(new Alternativa(0, alternativas.get(i), i == indiceCorreta));
-            }
+            PerguntaCadastro novaPergunta = new PerguntaCadastro(
+                    enunciado,
+                    alternativas,
+                    indiceCorreta,
+                    nivel,
+                    caminhoImagemAdicionar
+            );
 
-            try {
-                questaoDAO.inserir(novaQuestao, professor.getId());
-                bancoPerguntas.add(novaQuestao);
-                indicePerguntaSelecionada = bancoPerguntas.size() - 1;
-                caminhoImagemAdicionar = "";
-                mostrarTela("VISUALIZAR");
-            } catch (SQLException e) {
-                mostrarMensagem("Erro ao salvar questão: " + e.getMessage());
-            }
+            bancoPerguntas.add(novaPergunta);
+            indicePerguntaSelecionada = bancoPerguntas.size() - 1;
+            caminhoImagemAdicionar = "";
+            mostrarTela("VISUALIZAR");
         });
         painelFormulario.add(botaoAdicionar);
 
@@ -425,7 +386,7 @@ public class TelaGerenciarPerguntas extends JFrame {
             return painelBase;
         }
 
-        Questao perguntaSelecionada = bancoPerguntas.get(indicePerguntaSelecionada);
+        PerguntaCadastro perguntaSelecionada = bancoPerguntas.get(indicePerguntaSelecionada);
 
         PainelArredondado painelFormulario = new PainelArredondado(new Color(212, 212, 212), new Color(42, 82, 145), 1);
         painelFormulario.setLayout(null);
@@ -439,7 +400,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoEnunciado = new JLabel("Enunciado: " + perguntaSelecionada.getEnunciado());
         textoEnunciado.setBounds(12, 8, 800, 28);
-        textoEnunciado.setFont(new Font("Verdana", Font.BOLD, 16));
+        textoEnunciado.setFont(new Font("Arial", Font.BOLD, 16));
         textoEnunciado.setForeground(new Color(120, 120, 145));
         campoEnunciado.add(textoEnunciado);
 
@@ -455,16 +416,12 @@ public class TelaGerenciarPerguntas extends JFrame {
             radio.setBounds(38, y + 14, 22, 22);
             radio.setOpaque(false);
             radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            
-            boolean eCorreta = i < perguntaSelecionada.getAlternativas().size() && perguntaSelecionada.getAlternativas().get(i).isECorreta();
-            radio.setSelected(eCorreta);
-            
+            radio.setSelected(i == perguntaSelecionada.getIndiceCorreta());
             grupoCorreta.add(radio);
             radiosCorretos[i] = radio;
             painelFormulario.add(radio);
 
-            String textoAlt = i < perguntaSelecionada.getAlternativas().size() ? perguntaSelecionada.getAlternativas().get(i).getTexto() : "";
-            JTextField campoAlternativa = new JTextField(textoAlt);
+            JTextField campoAlternativa = new JTextField(perguntaSelecionada.getAlternativas().get(i));
             configurarCampoTexto(campoAlternativa);
             campoAlternativa.setBounds(68, y, 650, 46);
             camposAlternativas[i] = campoAlternativa;
@@ -472,7 +429,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoLetra = new JLabel(letras[i]);
             textoLetra.setBounds(102, y + 8, 40, 28);
-            textoLetra.setFont(new Font("Verdana", Font.BOLD, 16));
+            textoLetra.setFont(new Font("Arial", Font.BOLD, 16));
             textoLetra.setForeground(new Color(120, 120, 145));
             painelFormulario.add(textoLetra);
 
@@ -486,22 +443,18 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel imagemLabel = new JLabel("Imagem", SwingConstants.CENTER);
         imagemLabel.setBounds(10, 10, 122, 110);
-        imagemLabel.setFont(new Font("Verdana", Font.BOLD, 18));
-        imagemLabel.setForeground(new Color(120, 120, 145));
+        imagemLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        imagemLabel.setForeground(new Color(80, 100, 130));
         painelImagem.add(imagemLabel);
 
         JButton botaoTrocarImagem = new JButton("Trocar");
-        botaoTrocarImagem.setBounds(30, 122, 82, 18);
-        botaoTrocarImagem.setFont(new Font("Verdana", Font.BOLD, 12));
-        botaoTrocarImagem.setForeground(new Color(35, 74, 131));
-        botaoTrocarImagem.setBorderPainted(false);
-        botaoTrocarImagem.setFocusPainted(false);
-        botaoTrocarImagem.setContentAreaFilled(false);
+        botaoTrocarImagem.setBounds(30, 106, 82, 24);
+        botaoTrocarImagem.setFont(new Font("Arial", Font.BOLD, 12));
         botaoTrocarImagem.setCursor(new Cursor(Cursor.HAND_CURSOR));
         painelImagem.add(botaoTrocarImagem);
 
-        if (perguntaSelecionada.getImagemEnunciado() != null && !perguntaSelecionada.getImagemEnunciado().isBlank()) {
-            configurarPreviaImagem(imagemLabel, perguntaSelecionada.getImagemEnunciado());
+        if (perguntaSelecionada.getCaminhoImagem() != null && !perguntaSelecionada.getCaminhoImagem().isBlank()) {
+            configurarPreviaImagem(imagemLabel, perguntaSelecionada.getCaminhoImagem());
         }
 
         botaoTrocarImagem.addActionListener(evento -> {
@@ -543,26 +496,15 @@ public class TelaGerenciarPerguntas extends JFrame {
                 }
             }
 
-            // Atualiza as alternativas locais
-            for (int i = 0; i < perguntaSelecionada.getAlternativas().size() && i < novasAlternativas.size(); i++) {
-                Alternativa alt = perguntaSelecionada.getAlternativas().get(i);
-                alt.setTexto(novasAlternativas.get(i));
-                alt.setECorreta(i == novaCorreta);
-            }
+            perguntaSelecionada.setAlternativas(novasAlternativas);
+            perguntaSelecionada.setIndiceCorreta(novaCorreta);
 
             if (!caminhoImagemEditar.isBlank()) {
-                perguntaSelecionada.setImagemEnunciado(caminhoImagemEditar);
+                perguntaSelecionada.setCaminhoImagem(caminhoImagemEditar);
             }
 
-            try {
-                questaoDAO.atualizar(perguntaSelecionada);
-                // Nota: O QuestaoDAO.atualizar atual não atualiza as alternativas individualmente.
-                // Mas para este projeto simplificado, vamos assumir que o texto da pergunta mudou.
-                caminhoImagemEditar = "";
-                mostrarTela("VISUALIZAR");
-            } catch (SQLException e) {
-                mostrarMensagem("Erro ao atualizar: " + e.getMessage());
-            }
+            caminhoImagemEditar = "";
+            mostrarTela("VISUALIZAR");
         });
         painelFormulario.add(botaoSalvar);
 
@@ -586,7 +528,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         int y = 8;
 
         for (int i = 0; i < bancoPerguntas.size(); i++) {
-            Questao pergunta = bancoPerguntas.get(i);
+            PerguntaCadastro pergunta = bancoPerguntas.get(i);
 
             JPanel linha = new JPanel(null) {
                 @Override
@@ -621,20 +563,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoPergunta = new JLabel("“" + pergunta.getEnunciado() + "”");
             textoPergunta.setBounds(42, 3, 294, 28);
-            textoPergunta.setFont(new Font("Verdana", Font.BOLD, 14));
+            textoPergunta.setFont(new Font("Arial", Font.BOLD, 14));
             textoPergunta.setForeground(new Color(35, 74, 131));
             linha.add(textoPergunta);
 
-            String resumoCorreta = "";
-            for (Alternativa alt : pergunta.getAlternativas()) {
-                if (alt.isECorreta()) {
-                    resumoCorreta = alt.getTexto();
-                    break;
-                }
-            }
-            JLabel textoResposta = new JLabel(resumoCorreta);
+            JLabel textoResposta = new JLabel(pergunta.getResumoRespostaCorreta());
             textoResposta.setBounds(360, 3, 460, 28);
-            textoResposta.setFont(new Font("Verdana", Font.BOLD, 14));
+            textoResposta.setFont(new Font("Arial", Font.BOLD, 14));
             textoResposta.setForeground(new Color(35, 74, 131));
             linha.add(textoResposta);
 
@@ -671,21 +606,15 @@ public class TelaGerenciarPerguntas extends JFrame {
             );
 
             if (resposta == JOptionPane.YES_OPTION) {
-                Questao q = bancoPerguntas.get(indicePerguntaSelecionada);
-                try {
-                    questaoDAO.desativar(q.getId());
-                    bancoPerguntas.remove(indicePerguntaSelecionada);
+                bancoPerguntas.remove(indicePerguntaSelecionada);
 
-                    if (bancoPerguntas.isEmpty()) {
-                        indicePerguntaSelecionada = 0;
-                    } else if (indicePerguntaSelecionada >= bancoPerguntas.size()) {
-                        indicePerguntaSelecionada = bancoPerguntas.size() - 1;
-                    }
-
-                    mostrarTela("VISUALIZAR");
-                } catch (SQLException e) {
-                    mostrarMensagem("Erro ao remover: " + e.getMessage());
+                if (bancoPerguntas.isEmpty()) {
+                    indicePerguntaSelecionada = 0;
+                } else if (indicePerguntaSelecionada >= bancoPerguntas.size()) {
+                    indicePerguntaSelecionada = bancoPerguntas.size() - 1;
                 }
+
+                mostrarTela("VISUALIZAR");
             }
         });
         painelListaExterna.add(botaoRemover);
@@ -694,7 +623,7 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void configurarCampoTexto(JTextField campo) {
-        campo.setFont(new Font("Verdana", Font.BOLD, 15));
+        campo.setFont(new Font("Arial", Font.BOLD, 15));
         campo.setForeground(new Color(120, 120, 145));
         campo.setBackground(new Color(235, 235, 239));
         campo.setBorder(new EmptyBorder(0, 12, 0, 12));
@@ -705,7 +634,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         radio.setBounds(x, 8, 120, 28);
         radio.setOpaque(false);
         radio.setSelected(selecionado);
-        radio.setFont(new Font("Verdana", Font.BOLD, 15));
+        radio.setFont(new Font("Arial", Font.BOLD, 15));
         radio.setForeground(new Color(35, 74, 131));
         radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return radio;
@@ -713,7 +642,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private JButton criarBotaoAcao(String texto, Color corFundo, Color corTexto) {
         BotaoArredondado botao = new BotaoArredondado(texto);
-        botao.setFont(new Font("Verdana", Font.BOLD, 16));
+        botao.setFont(new Font("Arial", Font.BOLD, 16));
         botao.setForeground(corTexto);
         botao.setBackground(corFundo);
         botao.setBorderPainted(false);
@@ -737,7 +666,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
-            new TelaMenuProfessor(professor).setVisible(true);
+            new TelaMenuProfessor().setVisible(true);
         }
     }
 
@@ -753,11 +682,144 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
     }
 
+    private void carregarPerguntasExemplo() {
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual a função do Béquer?",
+                Arrays.asList(
+                        "Misturar e aquecer líquidos",
+                        "Transferir líquidos",
+                        "Medir volume exato de líquido",
+                        "Liberar volume controlado"
+                ),
+                0,
+                "Fácil",
+                ""
+        ));
+
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual a função do funil?",
+                Arrays.asList(
+                        "Misturar líquidos",
+                        "Aquecimento de soluções",
+                        "Medir soluções",
+                        "Transferir líquidos e auxiliar na filtração"
+                ),
+                3,
+                "Fácil",
+                ""
+        ));
+
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual material é usado em um sistema de titulação?",
+                Arrays.asList(
+                        "Proveta",
+                        "Bureta",
+                        "Béquer",
+                        "Bastão de vidro"
+                ),
+                1,
+                "Médio",
+                ""
+        ));
+
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual material é usado em um sistema de mistura?",
+                Arrays.asList(
+                        "Pipeta",
+                        "Bureta",
+                        "Béquer",
+                        "Funil"
+                ),
+                2,
+                "Fácil",
+                ""
+        ));
+
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual a função do bastão de vidro?",
+                Arrays.asList(
+                        "Aquecimento",
+                        "Titulação",
+                        "Filtração",
+                        "Misturar soluções"
+                ),
+                3,
+                "Fácil",
+                ""
+        ));
+
+        bancoPerguntas.add(new PerguntaCadastro(
+                "Qual material é usado em um sistema de filtração?",
+                Arrays.asList(
+                        "Funil",
+                        "Pipeta",
+                        "Bastão de vidro",
+                        "Proveta"
+                ),
+                0,
+                "Fácil",
+                ""
+        ));
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             TelaGerenciarPerguntas tela = new TelaGerenciarPerguntas();
             tela.setVisible(true);
         });
+    }
+
+    private static class PerguntaCadastro {
+        private String enunciado;
+        private List<String> alternativas;
+        private int indiceCorreta;
+        private String nivel;
+        private String caminhoImagem;
+
+        public PerguntaCadastro(String enunciado, List<String> alternativas, int indiceCorreta, String nivel, String caminhoImagem) {
+            this.enunciado = enunciado;
+            this.alternativas = new ArrayList<>(alternativas);
+            this.indiceCorreta = indiceCorreta;
+            this.nivel = nivel;
+            this.caminhoImagem = caminhoImagem;
+        }
+
+        public String getEnunciado() {
+            return enunciado;
+        }
+
+        public List<String> getAlternativas() {
+            return alternativas;
+        }
+
+        public void setAlternativas(List<String> alternativas) {
+            this.alternativas = new ArrayList<>(alternativas);
+        }
+
+        public int getIndiceCorreta() {
+            return indiceCorreta;
+        }
+
+        public void setIndiceCorreta(int indiceCorreta) {
+            this.indiceCorreta = indiceCorreta;
+        }
+
+        public String getNivel() {
+            return nivel;
+        }
+
+        public String getCaminhoImagem() {
+            return caminhoImagem;
+        }
+
+        public void setCaminhoImagem(String caminhoImagem) {
+            this.caminhoImagem = caminhoImagem;
+        }
+
+        public String getResumoRespostaCorreta() {
+            String[] letras = {"a", "b", "c", "d"};
+            return letras[indiceCorreta] + ") " + alternativas.get(indiceCorreta);
+        }
     }
 
     private static class BotaoArredondado extends JButton {
@@ -817,8 +879,13 @@ private static class PainelFundoImagem extends JPanel {
     private Image imagemFundo;
 
     public PainelFundoImagem() {
+        carregarImagem();
+    }
+
+    private void carregarImagem() {
         try {
-            imagemFundo = ImageIO.read(new File("imagens/Menu.png"));
+            File arquivo = new File("imagens/menu.png");
+            imagemFundo = ImageIO.read(arquivo);
         } catch (IOException erro) {
             System.out.println("Erro ao carregar imagem de fundo: " + erro.getMessage());
         }

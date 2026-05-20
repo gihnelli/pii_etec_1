@@ -1,8 +1,6 @@
 package telas.jogo;
 
-import database.DAO.PartidaDAO;
 import java.awt.*;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +8,6 @@ import javax.swing.*;
 import model.Alternativa;
 import model.Partida;
 import model.Questao;
-import model.Resposta;
 import model.tipos.TipoQuestao;
 
 public class TelaJogo extends JFrame {
@@ -18,7 +15,6 @@ public class TelaJogo extends JFrame {
     private Partida partida;
     private List<Questao> questoes;
     private int indiceQuestaoAtual = 0;
-    private PartidaDAO partidaDAO;
 
     private JLabel labelPergunta;
     private JLabel labelImagemQuestao;
@@ -34,22 +30,10 @@ public class TelaJogo extends JFrame {
     private BotaoAssociacao selecionadoDireita = null;
     private int paresResolvidos = 0;
 
-    private List<BotaoAssociacao> botoesEsq;
-    private List<BotaoAssociacao> botoesDir;
-
     public TelaJogo(Partida partida, List<Questao> questoes) {
         this.partida = partida;
         this.questoes = questoes;
         this.botoesAlternativas = new ArrayList<>();
-        this.botoesEsq = new ArrayList<>();
-        this.botoesDir = new ArrayList<>();
-        this.partidaDAO = new PartidaDAO();
-
-        try {
-            partidaDAO.iniciarPartida(partida);
-        } catch (SQLException e) {
-            System.err.println("Erro ao registrar início da partida: " + e.getMessage());
-        }
 
         configurarJanela();
         montarEstruturaBase();
@@ -83,8 +67,14 @@ public class TelaJogo extends JFrame {
         painelIcones.add(botaoSair);
         painelFundo.add(painelIcones);
 
-        JButton botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
+        JButton botaoAjuda = new JButton("?!");
         botaoAjuda.setBounds(20, 20, 50, 50);
+        botaoAjuda.setFont(new Font("Arial", Font.BOLD, 24));
+        botaoAjuda.setForeground(Color.WHITE);
+        botaoAjuda.setBackground(new Color(47, 76, 113));
+        botaoAjuda.setFocusPainted(false);
+        botaoAjuda.setBorderPainted(false);
+        botaoAjuda.setCursor(new Cursor(Cursor.HAND_CURSOR));
         botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
         painelFundo.add(botaoAjuda);
 
@@ -113,15 +103,13 @@ public class TelaJogo extends JFrame {
     }
 
     private void abrirPerfil() {
-        if (partida.getAluno() != null) {
-            JOptionPane.showMessageDialog(this, "Jogador: " + partida.getAluno().getNome() + "\nPontuação Atual: " + partida.getPontuacao());
-        }
+        JOptionPane.showMessageDialog(this, "Perfil do jogador...");
     }
 
     private JButton criarBotaoIcone(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setPreferredSize(new Dimension(65, 65));
-        btn.setFont(new Font("Verdana", Font.BOLD, 32));
+        btn.setFont(new Font("Arial", Font.BOLD, 32));
         btn.setForeground(Color.WHITE);
         btn.setBackground(cor);
         btn.setFocusPainted(false);
@@ -136,8 +124,8 @@ public class TelaJogo extends JFrame {
             return;
         }
 
-        painelConteudo.removeAll();
         Questao questao = questoes.get(indiceQuestaoAtual);
+        painelConteudo.removeAll();
         chanceExtraAtiva = false;
         paresResolvidos = 0;
         selecionadoEsquerda = null;
@@ -162,7 +150,7 @@ public class TelaJogo extends JFrame {
 
         labelPergunta = new JLabel("<html><center>" + questao.getEnunciado() + "</center></html>", SwingConstants.CENTER);
         labelPergunta.setBounds(40, 20, 720, 60);
-        labelPergunta.setFont(new Font("Verdana", Font.BOLD, 28));
+        labelPergunta.setFont(new Font("Arial", Font.BOLD, 28));
         labelPergunta.setForeground(Color.WHITE);
         painelPergunta.add(labelPergunta);
 
@@ -175,7 +163,7 @@ public class TelaJogo extends JFrame {
                 labelImagemQuestao.setIcon(new ImageIcon(img));
             } catch (Exception e) {
                 labelImagemQuestao.setText("🧪");
-                labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, 100));
+                labelImagemQuestao.setFont(new Font("Arial", Font.PLAIN, 100));
                 labelImagemQuestao.setForeground(Color.WHITE);
             }
         }
@@ -186,7 +174,7 @@ public class TelaJogo extends JFrame {
         int y = 350;
         char letra = 'a';
         for (Alternativa alt : alternativas) {
-            BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto(), alt);
+            BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto());
             btn.setBounds(50, y, 800, 48);
             btn.addActionListener(e -> processarRespostaAlternativa(alt, btn));
             painelConteudo.add(btn);
@@ -203,7 +191,7 @@ public class TelaJogo extends JFrame {
         painelInstrucao.setBackground(new Color(47, 76, 113));
         
         JLabel lblMsg = new JLabel("Conecte o material ao sistema experimental correspondente", SwingConstants.CENTER);
-        lblMsg.setFont(new Font("Verdana", Font.BOLD, 18));
+        lblMsg.setFont(new Font("Arial", Font.BOLD, 18));
         lblMsg.setForeground(Color.WHITE);
         painelInstrucao.add(lblMsg);
         painelConteudo.add(painelInstrucao);
@@ -221,8 +209,6 @@ public class TelaJogo extends JFrame {
         Collections.shuffle(ordemEsq);
         Collections.shuffle(ordemDir);
 
-        botoesEsq.clear();
-        botoesDir.clear();
         int y = 90;
         for (int i = 0; i < 4; i++) {
             final int idxEsq = ordemEsq.get(i);
@@ -230,17 +216,13 @@ public class TelaJogo extends JFrame {
             
             BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
             btnEsq.setBounds(50, y, 230, 110);
-            btnEsq.setIdPar(pares[idxEsq][1]); // Atribui o ID correto IMEDIATAMENTE
             btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
             painelConteudo.add(btnEsq);
-            botoesEsq.add(btnEsq);
 
             BotaoAssociacao btnDir = new BotaoAssociacao(pares[idxDir][1], null, false);
             btnDir.setBounds(620, y, 230, 110);
-            btnDir.setIdPar(pares[idxDir][1]); // Atribui o ID correto IMEDIATAMENTE
             btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, pares[idxDir][1]));
             painelConteudo.add(btnDir);
-            botoesDir.add(btnDir);
 
             y += 120;
         }
@@ -253,10 +235,12 @@ public class TelaJogo extends JFrame {
             if (selecionadoEsquerda != null) selecionadoEsquerda.setSelecionado(false);
             selecionadoEsquerda = btn;
             selecionadoEsquerda.setSelecionado(true);
+            selecionadoEsquerda.setIdPar(idCorreto);
         } else {
             if (selecionadoDireita != null) selecionadoDireita.setSelecionado(false);
             selecionadoDireita = btn;
             selecionadoDireita.setSelecionado(true);
+            selecionadoDireita.setIdPar(idCorreto);
         }
 
         if (selecionadoEsquerda != null && selecionadoDireita != null) {
@@ -266,33 +250,33 @@ public class TelaJogo extends JFrame {
                 selecionadoEsquerda.setBackground(new Color(46, 204, 113));
                 selecionadoDireita.setBackground(new Color(46, 204, 113));
                 paresResolvidos++;
-
-                selecionadoEsquerda.setSelecionado(false);
-                selecionadoDireita.setSelecionado(false);
-                selecionadoEsquerda = null;
-                selecionadoDireita = null;
-
+                
                 if (paresResolvidos == 4) {
-                    JOptionPane.showMessageDialog(this, "Parabéns! Você completou todas as associações.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                    indiceQuestaoAtual++;
-                    carregarQuestaoAtual();
+                    Timer t = new Timer(800, e -> { indiceQuestaoAtual++; carregarQuestaoAtual(); });
+                    t.setRepeats(false);
+                    t.start();
                 }
             } else {
-                if (chanceExtraAtiva) {
-                    JOptionPane.showMessageDialog(this, "Incorreto! Mas você usou sua Chance Extra. Tente novamente!", "Segunda Chance", JOptionPane.WARNING_MESSAGE);
-                    chanceExtraAtiva = false;
-                } else {
-                    JOptionPane.showMessageDialog(this, "Incorreto! Você perdeu a chance nesta questão de associação.", "Fim de Turno", JOptionPane.ERROR_MESSAGE);
-                    indiceQuestaoAtual++;
-                    carregarQuestaoAtual();
-                    return;
-                }
-                
-                selecionadoEsquerda.setSelecionado(false);
-                selecionadoDireita.setSelecionado(false);
-                selecionadoEsquerda = null;
-                selecionadoDireita = null;
+                selecionadoEsquerda.setBackground(new Color(231, 76, 60));
+                selecionadoDireita.setBackground(new Color(231, 76, 60));
+                Timer t = new Timer(500, e -> {
+                    if (selecionadoEsquerda != null) {
+                        selecionadoEsquerda.setSelecionado(false);
+                        selecionadoEsquerda.setBackground(new Color(130, 150, 220));
+                    }
+                    if (selecionadoDireita != null) {
+                        selecionadoDireita.setSelecionado(false);
+                        selecionadoDireita.setBackground(new Color(130, 150, 220));
+                    }
+                    selecionadoEsquerda = null;
+                    selecionadoDireita = null;
+                });
+                t.setRepeats(false);
+                t.start();
+                return;
             }
+            selecionadoEsquerda = null;
+            selecionadoDireita = null;
         }
     }
 
@@ -305,7 +289,7 @@ public class TelaJogo extends JFrame {
 
         JLabel titulo = new JLabel("Central de Ajuda", SwingConstants.CENTER);
         titulo.setBounds(0, 20, 600, 40);
-        titulo.setFont(new Font("Verdana", Font.BOLD, 32));
+        titulo.setFont(new Font("Arial", Font.BOLD, 32));
         titulo.setForeground(Color.WHITE);
         dialog.add(titulo);
 
@@ -333,7 +317,7 @@ public class TelaJogo extends JFrame {
     private JButton criarBotaoAjuda(String texto, int x, int y, boolean ativo) {
         JButton btn = new JButton(texto);
         btn.setBounds(x, y, 240, 145);
-        btn.setFont(new Font("Verdana", Font.BOLD, 22));
+        btn.setFont(new Font("Arial", Font.BOLD, 22));
         btn.setBackground(ativo ? Color.WHITE : new Color(100, 100, 100));
         btn.setForeground(new Color(47, 76, 113));
         btn.setFocusPainted(false);
@@ -345,57 +329,23 @@ public class TelaJogo extends JFrame {
     private void usar5050() {
         ajuda5050Usada = true;
         Questao q = questoes.get(indiceQuestaoAtual);
-
-        if (q.getTipo() == TipoQuestao.ASSOCIACAO) {
-            int removidos = 0;
-            List<BotaoAssociacao> copiaEsq = new ArrayList<>(botoesEsq);
-            Collections.shuffle(copiaEsq);
-
-            for (BotaoAssociacao btnEsq : copiaEsq) {
-                if (!btnEsq.isResolvido() && removidos < 2) {
-                    String idPar = btnEsq.getIdPar();
-                    
-                    BotaoAssociacao btnDirCorrespondente = null;
-                    for (BotaoAssociacao bDir : botoesDir) {
-                        if (bDir.getIdPar().equals(idPar)) {
-                            btnDirCorrespondente = bDir;
-                            break;
-                        }
-                    }
-
-                    if (btnDirCorrespondente != null && !btnDirCorrespondente.isResolvido()) {
-                        btnEsq.setResolvido(true);
-                        btnDirCorrespondente.setResolvido(true);
-                        btnEsq.setBackground(new Color(46, 204, 113));
-                        btnDirCorrespondente.setBackground(new Color(46, 204, 113));
-                        paresResolvidos++;
-                        removidos++;
-                    }
-                }
-            }
-            JOptionPane.showMessageDialog(this, "Ajuda 50/50: Dois pares foram resolvidos automaticamente!");
-            
-            if (paresResolvidos == 4) {
-                JOptionPane.showMessageDialog(this, "Parabéns! Você completou todas as associações.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
-                indiceQuestaoAtual++;
-                carregarQuestaoAtual();
-            }
-            return;
-        }
+        if (q.getTipo() == TipoQuestao.ASSOCIACAO) return;
 
         int removidas = 0;
         List<BotaoAlternativa> copia = new ArrayList<>(botoesAlternativas);
         Collections.shuffle(copia);
 
         for (BotaoAlternativa btn : copia) {
-            Alternativa alt = btn.getAlternativa();
+            String txt = btn.getText().substring(3);
+            Alternativa alt = q.getAlternativas().stream()
+                .filter(a -> a.getTexto().equals(txt)).findFirst().orElse(null);
+
             if (alt != null && !alt.isECorreta() && removidas < 2) {
                 btn.setEnabled(false);
                 btn.setAlpha(0.2f);
                 removidas++;
             }
         }
-        JOptionPane.showMessageDialog(this, "Ajuda 50/50: Duas alternativas incorretas foram removidas!");
     }
 
     private void usarChanceExtra() {
@@ -411,12 +361,6 @@ public class TelaJogo extends JFrame {
     }
 
     private void processarRespostaAlternativa(Alternativa escolhida, BotaoAlternativa btn) {
-        Questao questaoAtual = questoes.get(indiceQuestaoAtual);
-        Resposta resposta = new Resposta();
-        resposta.setQuestao(questaoAtual);
-        resposta.setAlternativaEscolhida(escolhida);
-        partida.adicionarResposta(resposta);
-
         if (escolhida.isECorreta()) {
             btn.setBackground(new Color(46, 204, 113));
             JOptionPane.showMessageDialog(this, "Resposta Correta! +10 pontos.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
@@ -444,17 +388,6 @@ public class TelaJogo extends JFrame {
 
     private void finalizarPartida() {
         partida.finalizar();
-        
-        try {
-            partidaDAO.finalizarPartida(partida);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao salvar resultados no banco: " + e.getMessage(), "Erro de Persistência", JOptionPane.ERROR_MESSAGE);
-        }
-
-        if (partida.getAluno() != null) {
-            partida.getAluno().adicionarPartida(partida);
-        }
-
         JOptionPane.showMessageDialog(this, "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(), "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
         dispose();
     }
@@ -474,13 +407,10 @@ public class TelaJogo extends JFrame {
 
     private static class BotaoAlternativa extends JButton {
         private float alpha = 1.0f;
-        private Alternativa alternativa;
-
-        public BotaoAlternativa(String texto, Alternativa alt) {
+        public BotaoAlternativa(String texto) {
             super(texto);
-            this.alternativa = alt;
             setHorizontalAlignment(SwingConstants.LEFT);
-            setFont(new Font("Verdana", Font.BOLD, 20));
+            setFont(new Font("Arial", Font.BOLD, 20));
             setForeground(Color.WHITE);
             setBackground(new Color(130, 150, 220));
             setFocusPainted(false);
@@ -489,8 +419,6 @@ public class TelaJogo extends JFrame {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         }
-
-        public Alternativa getAlternativa() { return alternativa; }
         public void setAlpha(float a) { this.alpha = a; repaint(); }
         @Override
         protected void paintComponent(Graphics g) {
@@ -526,7 +454,7 @@ public class TelaJogo extends JFrame {
             }
 
             JLabel lbl = new JLabel("<html><center>" + texto + "</center></html>", SwingConstants.CENTER);
-            lbl.setFont(new Font("Verdana", Font.BOLD, 14));
+            lbl.setFont(new Font("Arial", Font.BOLD, 14));
             lbl.setForeground(Color.WHITE);
             add(lbl, comImagem ? BorderLayout.SOUTH : BorderLayout.CENTER);
         }
@@ -556,7 +484,7 @@ public class TelaJogo extends JFrame {
 
     private static class PainelFundo extends JPanel {
         private Image img;
-        public PainelFundo() { try { img = new ImageIcon("imagens/Menu.png").getImage(); } catch(Exception e){} }
+        public PainelFundo() { try { img = new ImageIcon("imagens/menu.png").getImage(); } catch(Exception e){} }
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);

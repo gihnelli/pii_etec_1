@@ -1,24 +1,19 @@
 package telas.aluno;
 
-import database.DAO.PartidaDAO;
-import database.DAO.QuestaoDAO;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
+import model.Alternativa;
 import model.Partida;
 import model.Questao;
-import model.tipos.NivelDificuldade;
+import model.tipos.TipoQuestao;
 import telas.jogo.TelaJogo;
 
 public class TelaMenuAluno extends JFrame {
 
-    private model.Aluno aluno;
-
-    public TelaMenuAluno(model.Aluno aluno) {
-        this.aluno = aluno;
+    public TelaMenuAluno() {
         configurarJanela();
         montarTela();
     }
@@ -48,7 +43,7 @@ public class TelaMenuAluno extends JFrame {
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
         titulo.setBounds(70, 85, 400, 90);
-        titulo.setFont(new Font("Verdana", Font.BOLD, 72));
+        titulo.setFont(new Font("Arial", Font.BOLD, 72));
         titulo.setForeground(new Color(31, 65, 126));
         painelFundo.add(titulo);
 
@@ -81,12 +76,12 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(this, "Nome: " + aluno.getNome() + "\nE-mail: " + aluno.getEmail() + "\nTurma: " + aluno.getTurma());
+        JOptionPane.showMessageDialog(this, "Abrindo perfil do aluno...");
     }
 
     private JButton criarBotaoMenu(String texto) {
         JButton botao = new JButton(texto);
-        botao.setFont(new Font("Verdana", Font.BOLD, 18));
+        botao.setFont(new Font("Arial", Font.BOLD, 18));
         botao.setForeground(Color.WHITE);
         botao.setBackground(new Color(36, 73, 130));
         botao.setBorderPainted(false);
@@ -96,38 +91,35 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaJogo() {
-        try {
-            QuestaoDAO questaoDAO = new QuestaoDAO();
-            // Busca questões de todos os níveis para o jogo
-            List<Questao> lista = new ArrayList<>();
-            lista.addAll(questaoDAO.listarPorNivel(NivelDificuldade.FACIL));
-            lista.addAll(questaoDAO.listarPorNivel(NivelDificuldade.MEDIO));
-            
-            if (lista.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Não há questões cadastradas no banco de dados.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+        model.Aluno alunoExemplo = new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345");
+        Partida partida = new Partida(alunoExemplo);
+        List<Questao> lista = new ArrayList<>();
 
-            Partida partida = new Partida(aluno);
-            new TelaJogo(partida, lista).setVisible(true);
-            dispose();
-            
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar questões: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Química");
+        q1.setImagemEnunciado("imagens/Béquer.jpg");
+        q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
+        q1.adicionarAlternativa(new Alternativa(2, "Pipeta Volumétrica", true));
+        q1.adicionarAlternativa(new Alternativa(3, "Tubo de Ensaio", false));
+        q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
+        lista.add(q1);
+
+        Questao q2 = new Questao(2, "Combine os materiais aos sistemas correspondentes", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Química");
+        lista.add(q2);
+
+        new TelaJogo(partida, lista).setVisible(true);
+        dispose();
     }
 
     private void abrirTelaDesempenho() {
-        try {
-            PartidaDAO partidaDAO = new PartidaDAO();
-            List<Partida> historico = partidaDAO.listarPorAluno(aluno.getId());
-            aluno.setHistoricoPartidas(historico);
-            
-            new TelaDesempenhoAluno(aluno).setVisible(true);
-            dispose();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Erro ao carregar histórico: " + e.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
-        }
+        JOptionPane.showMessageDialog(
+                this,
+                "Aqui será aberta a tela de desempenho do aluno.",
+                "Desempenho",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        new TelaDesempenhoAluno().setVisible(true);
+        dispose();
     }
 
     private void sairDaConta() {
@@ -149,7 +141,7 @@ public class TelaMenuAluno extends JFrame {
 
         public PainelFundo() {
             try {
-                imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
+                imagemFundo = new ImageIcon("imagens/menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
             }
@@ -195,8 +187,7 @@ public class TelaMenuAluno extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            model.Aluno alunoExemplo = new model.Aluno(0, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "", "1º Química", "12345");
-            TelaMenuAluno tela = new TelaMenuAluno(alunoExemplo);
+            TelaMenuAluno tela = new TelaMenuAluno();
             tela.setVisible(true);
         });
     }
