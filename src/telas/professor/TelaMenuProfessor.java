@@ -75,7 +75,12 @@ public class TelaMenuProfessor extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(this, "Abrindo perfil do professor...");
+        JOptionPane.showMessageDialog(
+            this,
+            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
+            "Perfil do Professor",
+            JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     private void abrirCadastrarAluno() {
@@ -84,13 +89,6 @@ public class TelaMenuProfessor extends JFrame {
     }
 
     private void abrirGerenciarPerguntas() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberta a tela de gerenciamento de perguntas.",
-                "Gerenciar perguntas",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
         new TelaGerenciarPerguntas().setVisible(true);
         dispose();
     }

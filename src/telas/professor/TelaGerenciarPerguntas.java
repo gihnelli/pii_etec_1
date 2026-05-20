@@ -45,13 +45,10 @@ public class TelaGerenciarPerguntas extends JFrame {
         painelPrincipal.setLayout(null);
         setContentPane(painelPrincipal);
 
-        JLabel iconePerfil = new JLabel("👤", SwingConstants.CENTER);
-        iconePerfil.setBounds(28, 18, 55, 55);
-        iconePerfil.setFont(new Font("Arial", Font.PLAIN, 32));
-        iconePerfil.setForeground(Color.WHITE);
-        iconePerfil.setOpaque(true);
-        iconePerfil.setBackground(new Color(35, 74, 131));
-        painelPrincipal.add(iconePerfil);
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.setBounds(18, 18, 45, 45);
+        botaoPerfil.addActionListener(e -> abrirPerfil());
+        painelPrincipal.add(botaoPerfil);
 
         JButton botaoAdicionar = criarBotaoTopo("Adicionar<br>pergunta");
         botaoAdicionar.setBounds(248, 18, 148, 60);
@@ -68,25 +65,41 @@ public class TelaGerenciarPerguntas extends JFrame {
         botaoRemover.addActionListener(evento -> mostrarTela("REMOVER"));
         painelPrincipal.add(botaoRemover);
 
-        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
-        iconeSair.setBounds(888, 18, 55, 55);
-        iconeSair.setFont(new Font("Arial", Font.BOLD, 34));
-        iconeSair.setForeground(Color.WHITE);
-        iconeSair.setOpaque(true);
-        iconeSair.setBackground(new Color(35, 74, 131));
-        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        iconeSair.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evento) {
-                fecharTela();
-            }
-        });
-        painelPrincipal.add(iconeSair);
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.setBounds(888, 18, 45, 45);
+        botaoSair.addActionListener(e -> fecharTela());
+        painelPrincipal.add(botaoSair);
 
         painelConteudo = new JPanel(layoutConteudo);
         painelConteudo.setOpaque(false);
         painelConteudo.setBounds(18, 98, 940, 590);
         painelPrincipal.add(painelConteudo);
+    }
+
+    private void abrirPerfil() {
+        JOptionPane.showMessageDialog(
+            this,
+            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
+            "Perfil do Professor",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     private JButton criarBotaoTopo(String texto) {
@@ -319,12 +332,12 @@ public class TelaGerenciarPerguntas extends JFrame {
         painelNivel.add(radioDificil);
 
         JButton botaoCancelar = criarBotaoAcao("Cancelar", new Color(221, 188, 188), new Color(104, 44, 44));
-        botaoCancelar.setBounds(228, 386, 206, 44);
+        botaoCancelar.setBounds(228, 385, 206, 44);
         botaoCancelar.addActionListener(evento -> mostrarTela("VISUALIZAR"));
         painelFormulario.add(botaoCancelar);
 
         JButton botaoAdicionar = criarBotaoAcao("Adicionar", new Color(176, 215, 172), new Color(44, 103, 48));
-        botaoAdicionar.setBounds(468, 366, 206, 52);
+        botaoAdicionar.setBounds(468, 385, 206, 44);
         botaoAdicionar.addActionListener(evento -> {
             String enunciado = campoEnunciado.getText().trim();
 

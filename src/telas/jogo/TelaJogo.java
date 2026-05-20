@@ -20,6 +20,8 @@ public class TelaJogo extends JFrame {
     private JLabel labelImagemQuestao;
     private JPanel painelConteudo;
     private List<BotaoAlternativa> botoesAlternativas;
+    private List<BotaoAssociacao> botoesEsq;
+    private List<BotaoAssociacao> botoesDir;
     
     private boolean ajuda5050Usada = false;
     private boolean chanceExtraUsada = false;
@@ -34,6 +36,8 @@ public class TelaJogo extends JFrame {
         this.partida = partida;
         this.questoes = questoes;
         this.botoesAlternativas = new ArrayList<>();
+        this.botoesEsq = new ArrayList<>();
+        this.botoesDir = new ArrayList<>();
 
         configurarJanela();
         montarEstruturaBase();
@@ -67,14 +71,8 @@ public class TelaJogo extends JFrame {
         painelIcones.add(botaoSair);
         painelFundo.add(painelIcones);
 
-        JButton botaoAjuda = new JButton("?!");
+        JButton botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
         botaoAjuda.setBounds(20, 20, 50, 50);
-        botaoAjuda.setFont(new Font("Arial", Font.BOLD, 24));
-        botaoAjuda.setForeground(Color.WHITE);
-        botaoAjuda.setBackground(new Color(47, 76, 113));
-        botaoAjuda.setFocusPainted(false);
-        botaoAjuda.setBorderPainted(false);
-        botaoAjuda.setCursor(new Cursor(Cursor.HAND_CURSOR));
         botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
         painelFundo.add(botaoAjuda);
 
@@ -103,7 +101,17 @@ public class TelaJogo extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(this, "Perfil do jogador...");
+        if (this.partida != null && this.partida.getAluno() != null) {
+            model.Aluno aluno = this.partida.getAluno();
+            JOptionPane.showMessageDialog(
+                this,
+                "Nome: " + aluno.getNome() + "\nE-mail: " + aluno.getEmail(),
+                "Perfil do Jogador",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            JOptionPane.showMessageDialog(this, "Informações do jogador não encontradas.");
+        }
     }
 
     private JButton criarBotaoIcone(String texto, Color cor) {
@@ -126,6 +134,10 @@ public class TelaJogo extends JFrame {
 
         Questao questao = questoes.get(indiceQuestaoAtual);
         painelConteudo.removeAll();
+        botoesAlternativas.clear();
+        botoesEsq.clear();
+        botoesDir.clear();
+        
         chanceExtraAtiva = false;
         paresResolvidos = 0;
         selecionadoEsquerda = null;
@@ -217,12 +229,16 @@ public class TelaJogo extends JFrame {
             BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
             btnEsq.setBounds(50, y, 230, 110);
             btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
+            btnEsq.setIdPar(pares[idxEsq][1]); // Garantir que o ID do par esteja setado para a ajuda 50/50
             painelConteudo.add(btnEsq);
+            botoesEsq.add(btnEsq);
 
             BotaoAssociacao btnDir = new BotaoAssociacao(pares[idxDir][1], null, false);
             btnDir.setBounds(620, y, 230, 110);
             btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, pares[idxDir][1]));
+            btnDir.setIdPar(pares[idxDir][1]); // Garantir que o ID do par esteja setado para a ajuda 50/50
             painelConteudo.add(btnDir);
+            botoesDir.add(btnDir);
 
             y += 120;
         }
@@ -327,24 +343,71 @@ public class TelaJogo extends JFrame {
     }
 
     private void usar5050() {
+        if (ajuda5050Usada) return;
         ajuda5050Usada = true;
+
         Questao q = questoes.get(indiceQuestaoAtual);
-        if (q.getTipo() == TipoQuestao.ASSOCIACAO) return;
+        
+        if (q.getTipo() == TipoQuestao.MULTIPLA_ESCOLHA) {
+            List<Integer> indicesIncorretos = new ArrayList<>();
+            List<Alternativa> alternativas = q.getAlternativas();
 
-        int removidas = 0;
-        List<BotaoAlternativa> copia = new ArrayList<>(botoesAlternativas);
-        Collections.shuffle(copia);
-
-        for (BotaoAlternativa btn : copia) {
-            String txt = btn.getText().substring(3);
-            Alternativa alt = q.getAlternativas().stream()
-                .filter(a -> a.getTexto().equals(txt)).findFirst().orElse(null);
-
-            if (alt != null && !alt.isECorreta() && removidas < 2) {
-                btn.setEnabled(false);
-                btn.setAlpha(0.2f);
-                removidas++;
+            for (int i = 0; i < alternativas.size(); i++) {
+                if (!alternativas.get(i).isECorreta()) {
+                    indicesIncorretos.add(i);
+                }
             }
+
+            Collections.shuffle(indicesIncorretos);
+
+            int removidas = 0;
+            for (int i = 0; i < indicesIncorretos.size() && removidas < 2; i++) {
+                int idx = indicesIncorretos.get(i);
+                if (idx < botoesAlternativas.size()) {
+                    BotaoAlternativa btn = botoesAlternativas.get(idx);
+                    btn.setEnabled(false);
+                    btn.setAlpha(0.0f);
+                    btn.setVisible(false);
+                    removidas++;
+                }
+            }
+        } else if (q.getTipo() == TipoQuestao.ASSOCIACAO) {
+            // No caso de associação, o 50/50 resolve 2 pares aleatórios
+            List<String> idsDisponiveis = new ArrayList<>();
+            for (BotaoAssociacao btn : botoesEsq) {
+                if (!btn.isResolvido()) {
+                    idsDisponiveis.add(btn.getIdPar());
+                }
+            }
+            
+            Collections.shuffle(idsDisponiveis);
+            int resolved = 0;
+            for (int i = 0; i < idsDisponiveis.size() && resolved < 2; i++) {
+                String id = idsDisponiveis.get(i);
+                
+                BotaoAssociacao bEsq = botoesEsq.stream().filter(b -> b.getIdPar().equals(id)).findFirst().orElse(null);
+                BotaoAssociacao bDir = botoesDir.stream().filter(b -> b.getIdPar().equals(id)).findFirst().orElse(null);
+                
+                if (bEsq != null && bDir != null) {
+                    bEsq.setResolvido(true);
+                    bDir.setResolvido(true);
+                    bEsq.setBackground(new Color(46, 204, 113));
+                    bDir.setBackground(new Color(46, 204, 113));
+                    paresResolvidos++;
+                    resolved++;
+                }
+            }
+            
+            if (paresResolvidos == 4) {
+                Timer t = new Timer(800, e -> { indiceQuestaoAtual++; carregarQuestaoAtual(); });
+                t.setRepeats(false);
+                t.start();
+            }
+        }
+        
+        if (painelConteudo != null) {
+            painelConteudo.revalidate();
+            painelConteudo.repaint();
         }
     }
 
@@ -383,7 +446,10 @@ public class TelaJogo extends JFrame {
 
     private void confirmarSaida() {
         int opt = JOptionPane.showConfirmDialog(this, "Sair agora interromperá sua partida. Confirmar?", "Sair do Jogo", JOptionPane.YES_NO_OPTION);
-        if (opt == JOptionPane.YES_OPTION) dispose();
+        if (opt == JOptionPane.YES_OPTION) {
+            new telas.aluno.TelaMenuAluno(this.partida.getAluno()).setVisible(true);
+            dispose();
+        }
     }
 
     private void finalizarPartida() {

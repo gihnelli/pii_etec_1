@@ -21,6 +21,10 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+/**
+ * Nota: Se o editor marcar erros no PDFBox, certifique-se de que o JAR
+ * libs/pdfbox-app-3.0.7.jar está nas Referenced Libraries do projeto Java.
+ */
 public class TelaDesempenhoAluno extends JFrame {
 
     private Aluno aluno;
@@ -117,31 +121,48 @@ public class TelaDesempenhoAluno extends JFrame {
     }
 
     private void adicionarIcones(JPanel painel) {
-        JLabel iconePerfil = new JLabel("●", SwingConstants.CENTER);
-        iconePerfil.setBounds(16, 14, 48, 48);
-        iconePerfil.setFont(new Font("Arial", Font.BOLD, 28));
-        iconePerfil.setForeground(Color.WHITE);
-        iconePerfil.setOpaque(true);
-        iconePerfil.setBackground(AZUL_ESCURO);
-        painel.add(iconePerfil);
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.setBounds(16, 14, 45, 45);
+        botaoPerfil.addActionListener(e -> abrirPerfil());
+        painel.add(botaoPerfil);
 
-        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
-        iconeSair.setBounds(654, 14, 48, 48);
-        iconeSair.setFont(new Font("Arial", Font.BOLD, 30));
-        iconeSair.setForeground(Color.WHITE);
-        iconeSair.setOpaque(true);
-        iconeSair.setBackground(AZUL_ESCURO);
-        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        iconeSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evento) {
-                dispose();
-            new TelaMenuAluno().setVisible(true);
-            }
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.setBounds(654, 14, 45, 45);
+        botaoSair.addActionListener(e -> {
+            dispose();
+            new TelaMenuAluno(this.aluno).setVisible(true);
         });
+        painel.add(botaoSair);
+    }
 
-        painel.add(iconeSair);
+    private void abrirPerfil() {
+        if (this.aluno != null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
+                "Perfil do Aluno",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
+        }
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     private Estatisticas calcularEstatisticasAluno(Aluno aluno) {
@@ -613,6 +634,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 "Aluno 1",
                 "aluno1@aluno.cps.sp.gov.br",
                 "123",
+                "1A",
                 "0001"
         );
 

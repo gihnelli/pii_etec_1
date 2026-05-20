@@ -180,34 +180,47 @@ public class TelaDesempenho extends JFrame {
     }
 
     private void adicionarIcones(JPanel painel, boolean voltarParaTelaGeral) {
-        JLabel iconePerfil = new JLabel("●", SwingConstants.CENTER);
-        iconePerfil.setBounds(18, 18, 52, 52);
-        iconePerfil.setFont(new Font("Arial", Font.BOLD, 30));
-        iconePerfil.setForeground(Color.WHITE);
-        iconePerfil.setOpaque(true);
-        iconePerfil.setBackground(AZUL_ESCURO);
-        painel.add(iconePerfil);
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.setBounds(18, 18, 45, 45);
+        botaoPerfil.addActionListener(e -> abrirPerfil());
+        painel.add(botaoPerfil);
 
-        JLabel iconeSair = new JLabel("↪", SwingConstants.CENTER);
-        iconeSair.setBounds(920, 18, 52, 52);
-        iconeSair.setFont(new Font("Arial", Font.BOLD, 32));
-        iconeSair.setForeground(Color.WHITE);
-        iconeSair.setOpaque(true);
-        iconeSair.setBackground(AZUL_ESCURO);
-        iconeSair.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        iconeSair.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evento) {
-                if (voltarParaTelaGeral) {
-                    navegador.show(painelPrincipal, "GERAL");
-                } else {
-                    dispose();
-                }
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.setBounds(920, 18, 45, 45);
+        botaoSair.addActionListener(e -> {
+            if (voltarParaTelaGeral) {
+                navegador.show(painelPrincipal, "GERAL");
+            } else {
+                dispose();
             }
         });
+        painel.add(botaoSair);
+    }
 
-        painel.add(iconeSair);
+    private void abrirPerfil() {
+        JOptionPane.showMessageDialog(
+            this,
+            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
+            "Perfil do Professor",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private JButton criarBotaoIconeReal(String caminho) {
+        JButton btn = new JButton();
+        try {
+            ImageIcon iconOriginal = new ImageIcon(caminho);
+            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            btn.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setMargin(new Insets(0, 0, 0, 0));
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 
     private Estatisticas calcularEstatisticasTurma() {

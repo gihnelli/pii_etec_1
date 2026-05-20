@@ -13,9 +13,16 @@ import telas.jogo.TelaJogo;
 
 public class TelaMenuAluno extends JFrame {
 
-    public TelaMenuAluno() {
+    private model.Aluno aluno;
+
+    public TelaMenuAluno(model.Aluno aluno) {
+        this.aluno = aluno;
         configurarJanela();
         montarTela();
+    }
+
+    public TelaMenuAluno() {
+        this(new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345"));
     }
 
     private void configurarJanela() {
@@ -76,7 +83,16 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(this, "Abrindo perfil do aluno...");
+        if (this.aluno != null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
+                "Perfil do Aluno",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+        } else {
+            JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
+        }
     }
 
     private JButton criarBotaoMenu(String texto) {
@@ -91,8 +107,7 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaJogo() {
-        model.Aluno alunoExemplo = new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345");
-        Partida partida = new Partida(alunoExemplo);
+        Partida partida = new Partida(this.aluno);
         List<Questao> lista = new ArrayList<>();
 
         Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Química");
@@ -111,14 +126,7 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaDesempenho() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Aqui será aberta a tela de desempenho do aluno.",
-                "Desempenho",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        new TelaDesempenhoAluno().setVisible(true);
+        new TelaDesempenhoAluno(this.aluno).setVisible(true);
         dispose();
     }
 

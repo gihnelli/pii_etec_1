@@ -69,6 +69,22 @@ public class TelaCadastro extends JFrame {
         campo.setFont(new Font("Arial", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
+        // Adicionando filtro para permitir apenas números e limitar a 11 caracteres (padrão CPF)
+        ((javax.swing.text.AbstractDocument) campo.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                if (string.matches("\\d+") && (fb.getDocument().getLength() + string.length()) <= 11) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
+                if (text.matches("\\d*") && (fb.getDocument().getLength() - length + text.length()) <= 11) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
         return campo;
     }
 

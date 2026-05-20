@@ -54,7 +54,7 @@ public class TelaLogin extends JFrame {
         campoEmail.setBackground(new Color(245, 247, 251));
         painelLogin.add(campoEmail);
 
-        JLabel textoSenha = new JLabel("Senha");
+        JLabel textoSenha = new JLabel("Senha (CPF)");
         textoSenha.setBounds(45, 205, 250, 25);
         textoSenha.setFont(new Font("Verdana", Font.BOLD, 15));
         textoSenha.setForeground(new Color(47, 76, 113));
@@ -64,6 +64,22 @@ public class TelaLogin extends JFrame {
         campoSenha.setBounds(42, 230, 326, 45);
         campoSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
         campoSenha.setBackground(new Color(245, 247, 251));
+        // Adicionando filtro para permitir apenas números e limitar a 11 caracteres
+        ((javax.swing.text.AbstractDocument) campoSenha.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
+            @Override
+            public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                if (string.matches("\\d+") && (fb.getDocument().getLength() + string.length()) <= 11) {
+                    super.insertString(fb, offset, string, attr);
+                }
+            }
+
+            @Override
+            public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
+                if (text.matches("\\d*") && (fb.getDocument().getLength() - length + text.length()) <= 11) {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+        });
         painelLogin.add(campoSenha);
 
         caixaLembrarMe = new JCheckBox("Lembrar-me");
@@ -73,24 +89,10 @@ public class TelaLogin extends JFrame {
         caixaLembrarMe.setForeground(new Color(47, 76, 113));
         painelLogin.add(caixaLembrarMe);
 
-        JLabel textoEsqueciSenha = new JLabel("<html><u>Esqueci minha senha</u></html>");
-        textoEsqueciSenha.setBounds(230, 290, 150, 25);
-        textoEsqueciSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
-        textoEsqueciSenha.setForeground(new Color(150, 40, 27));
-        textoEsqueciSenha.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        painelLogin.add(textoEsqueciSenha);
-
         BotaoArredondado botaoEntrar = new BotaoArredondado("Entrar", 15);
         botaoEntrar.setBounds(42, 335, 326, 45);
         botaoEntrar.addActionListener((ActionEvent evento) -> validarLogin());
         painelLogin.add(botaoEntrar);
-
-        JLabel textoCadastro = new JLabel("<html><u>Não possui um conta? Cadastre-se</u></html>", SwingConstants.CENTER);
-        textoCadastro.setBounds(35, 410, 340, 25);
-        textoCadastro.setFont(new Font("Verdana", Font.PLAIN, 15));
-        textoCadastro.setForeground(new Color(47, 76, 113));
-        textoCadastro.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        painelLogin.add(textoCadastro);
     }
 
     private static class PainelArredondado extends JPanel {
@@ -247,6 +249,17 @@ public class TelaLogin extends JFrame {
             return;
         }
 
+        // Validação de senha: deve ser CPF (11 dígitos numéricos)
+        if (!senhaDigitada.matches("^\\d{11}$")) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Senha inválida!\nA senha deve ser o seu CPF (apenas os 11 números, sem caracteres).",
+                    "Erro de Autenticação",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
         if (ehEmailDeAluno(emailDigitado)) {
             JOptionPane.showMessageDialog(
                     this,
@@ -286,7 +299,11 @@ public class TelaLogin extends JFrame {
     }
 
     private void abrirTelaDoAluno() {
-        new TelaMenuAluno().setVisible(true);
+        String email = campoEmail.getText().trim();
+        String nome = email.split("@")[0];
+        // Criando um objeto Aluno real para passar para o menu
+        model.Aluno aluno = new model.Aluno(1, nome, email, "123", "1º Química", "RA12345");
+        new TelaMenuAluno(aluno).setVisible(true);
         dispose();
     }
 
