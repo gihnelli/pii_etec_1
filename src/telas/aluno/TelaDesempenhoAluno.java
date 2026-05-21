@@ -40,18 +40,15 @@ import model.Partida;
 import model.Questao;
 import model.Resposta;
 
-/**
- * Nota: Se o editor marcar erros no PDFBox, certifique-se de que o JAR
- * libs/pdfbox-app-3.0.7.jar está nas Referenced Libraries do projeto Java.
- */
 public class TelaDesempenhoAluno extends JFrame {
 
     private Aluno aluno;
 
-    private final Color AZUL_ESCURO = new Color(36, 60, 103);
-    private final Color AZUL_CLARO = new Color(160, 205, 250);
+    private final Color AZUL_ESCURO = new Color(34, 62, 107);
+    private final Color AZUL_CLARO = new Color(160, 205, 245);
     private final Color AZUL_MEDIO = new Color(70, 130, 230);
-    private final Color BRANCO_GELO = new Color(240, 245, 250);
+    private final Color BRANCO_GELO = new Color(238, 242, 248);
+    private final Color CINZA_CLARO = new Color(210, 210, 210);
 
     private static final PDFont FONTE_NORMAL =
             new PDType1Font(Standard14Fonts.FontName.HELVETICA);
@@ -77,14 +74,14 @@ public class TelaDesempenhoAluno extends JFrame {
     }
 
     private void montarTela() {
-        PainelFundo painel = new PainelFundo();
-        painel.setLayout(new GridBagLayout());
-        setContentPane(painel);
+        PainelFundo painelBase = new PainelFundo();
+        painelBase.setLayout(new GridBagLayout());
+        setContentPane(painelBase);
 
         JPanel conteinerCentral = new JPanel(null);
         conteinerCentral.setPreferredSize(new Dimension(1000, 750));
         conteinerCentral.setOpaque(false);
-        painel.add(conteinerCentral);
+        painelBase.add(conteinerCentral);
 
         adicionarIcones(conteinerCentral);
 
@@ -111,7 +108,8 @@ public class TelaDesempenhoAluno extends JFrame {
         painelGrafico.add(grafico);
 
         JLabel resumo = new JLabel(
-                "Total: " + estatisticas.totalRespostas + " respostas | "
+                "Total: " + estatisticas.totalRespostas
+                        + " respostas | "
                         + estatisticas.totalAcertos + " acertos | "
                         + estatisticas.totalErros + " erros",
                 SwingConstants.CENTER
@@ -162,10 +160,12 @@ public class TelaDesempenhoAluno extends JFrame {
     private void abrirPerfil() {
         if (this.aluno != null) {
             JOptionPane.showMessageDialog(
-                this,
-                "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
-                "Perfil do Aluno",
-                JOptionPane.INFORMATION_MESSAGE
+                    this,
+                    "Nome: " + this.aluno.getNome()
+                            + "\nE-mail: " + this.aluno.getEmail()
+                            + "\nTurma: " + this.aluno.getTurma(),
+                    "Perfil do Aluno",
+                    JOptionPane.INFORMATION_MESSAGE
             );
         } else {
             JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
@@ -173,20 +173,23 @@ public class TelaDesempenhoAluno extends JFrame {
     }
 
     private JButton criarBotaoIconeReal(String caminho) {
-        JButton btn = new JButton();
+        JButton botao = new JButton();
+
         try {
-            ImageIcon iconOriginal = new ImageIcon(caminho);
-            Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
-            btn.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            btn.setText("?");
+            ImageIcon iconeOriginal = new ImageIcon(caminho);
+            Image imagem = iconeOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
+            botao.setIcon(new ImageIcon(imagem));
+        } catch (Exception erro) {
+            botao.setText("?");
         }
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0));
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        return btn;
+
+        botao.setFocusPainted(false);
+        botao.setBorderPainted(false);
+        botao.setContentAreaFilled(false);
+        botao.setMargin(new Insets(0, 0, 0, 0));
+        botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        return botao;
     }
 
     private Estatisticas calcularEstatisticasAluno(Aluno aluno) {
@@ -366,7 +369,6 @@ public class TelaDesempenhoAluno extends JFrame {
         conteudo.fill();
 
         escreverTexto(conteudo, titulo, FONTE_NEGRITO, 18, 40, 810, Color.WHITE);
-
         escreverTexto(
                 conteudo,
                 "Gerado automaticamente pelo sistema LabQuest",
@@ -402,25 +404,8 @@ public class TelaDesempenhoAluno extends JFrame {
         conteudo.addRect(x, y, largura, altura);
         conteudo.stroke();
 
-        escreverTexto(
-                conteudo,
-                "Acertos: " + formatarPercentual(percentualAcertos),
-                FONTE_NEGRITO,
-                10,
-                x,
-                y - 18,
-                Color.BLACK
-        );
-
-        escreverTexto(
-                conteudo,
-                "Erros: " + formatarPercentual(percentualErros),
-                FONTE_NEGRITO,
-                10,
-                x + 180,
-                y - 18,
-                Color.BLACK
-        );
+        escreverTexto(conteudo, "Acertos: " + formatarPercentual(percentualAcertos), FONTE_NEGRITO, 10, x, y - 18, Color.BLACK);
+        escreverTexto(conteudo, "Erros: " + formatarPercentual(percentualErros), FONTE_NEGRITO, 10, x + 180, y - 18, Color.BLACK);
     }
 
     private void desenharLinhaTabela(PDPageContentStream conteudo, float y, boolean cabecalho) throws IOException {
@@ -445,9 +430,7 @@ public class TelaDesempenhoAluno extends JFrame {
     ) throws IOException {
         conteudo.beginText();
         conteudo.setFont(fonte, tamanho);
-
         definirCorPreenchimento(conteudo, cor);
-
         conteudo.newLineAtOffset(x, y);
         conteudo.showText(prepararTextoPdf(texto));
         conteudo.endText();
