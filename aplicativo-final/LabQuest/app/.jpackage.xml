@@ -1,5 +1,0 @@
-<?xml version="1.0" ?>
-<jpackage-state version="25.0.3" platform="windows">
-  <app-version>1.0</app-version>
-  <main-launcher>LabQuest</main-launcher>
-  <main-class>aplicativo.LabQuest</main-class></jpackage-state>
