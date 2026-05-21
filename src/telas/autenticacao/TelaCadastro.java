@@ -1,7 +1,26 @@
 package telas.autenticacao;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.RenderingHints;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import telas.professor.TelaMenuProfessor;
 
 public class TelaCadastro extends JFrame {
@@ -17,22 +36,26 @@ public class TelaCadastro extends JFrame {
 
     private void configurarJanela() {
         setTitle("LabQuest - Cadastrar Aluno");
-        setSize(960, 680);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
         PainelFundo painelFundo = new PainelFundo();
-        painelFundo.setLayout(null);
+        painelFundo.setLayout(new GridBagLayout());
         setContentPane(painelFundo);
+
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(960, 680));
+        conteinerCentral.setOpaque(false);
+        painelFundo.add(conteinerCentral);
 
         PainelArredondado painelCentral = new PainelArredondado(30);
         painelCentral.setLayout(null);
         painelCentral.setBounds(100, 150, 760, 380);
         painelCentral.setBackground(new Color(220, 220, 220, 230)); // Cinza com leve transparência
-        painelFundo.add(painelCentral);
+        conteinerCentral.add(painelCentral);
 
         campoNome = criarCampoArredondado("Nome:", 30, 30, 700, 55);
         painelCentral.add(campoNome);
@@ -57,7 +80,7 @@ public class TelaCadastro extends JFrame {
     private JTextField criarCampoArredondado(String rotulo, int x, int y, int w, int h) {
         JTextField campo = new CampoTextoArredondado(20, rotulo);
         campo.setBounds(x, y, w, h);
-        campo.setFont(new Font("Arial", Font.BOLD, 18));
+        campo.setFont(new Font("Verdana", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
         return campo;
@@ -66,7 +89,7 @@ public class TelaCadastro extends JFrame {
     private JPasswordField criarCampoSenhaArredondado(String rotulo, int x, int y, int w, int h) {
         JPasswordField campo = new CampoSenhaArredondada(20, rotulo);
         campo.setBounds(x, y, w, h);
-        campo.setFont(new Font("Arial", Font.BOLD, 18));
+        campo.setFont(new Font("Verdana", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
         // Adicionando filtro para permitir apenas números e limitar a 11 caracteres (padrão CPF)
@@ -90,7 +113,7 @@ public class TelaCadastro extends JFrame {
 
     private JButton criarBotaoCustomizado(String texto, Color corFundo, Color corTexto) {
         JButton btn = new JButton(texto);
-        btn.setFont(new Font("Arial", Font.BOLD, 20));
+        btn.setFont(new Font("Verdana", Font.BOLD, 20));
         btn.setForeground(corTexto);
         btn.setBackground(corFundo);
         btn.setFocusPainted(false);

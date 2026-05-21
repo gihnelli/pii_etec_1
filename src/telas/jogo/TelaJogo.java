@@ -10,6 +10,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
@@ -75,85 +76,48 @@ public class TelaJogo extends JFrame {
     }
 
     private void configurarJanela() {
-    setTitle("LabQuest - Desafio de Laboratório");
-    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-
-    setExtendedState(JFrame.MAXIMIZED_BOTH);
-    setResizable(true);
-
-    setLocationRelativeTo(null);
-}
+        setTitle("LabQuest - Desafio de Laboratório");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setLocationRelativeTo(null);
+    }
 
     private void montarEstruturaBase() {
-    PainelFundo painelFundo = new PainelFundo();
-    painelFundo.setLayout(null);
-    setContentPane(painelFundo);
+        PainelFundo painelFundo = new PainelFundo();
+        painelFundo.setLayout(new GridBagLayout());
+        setContentPane(painelFundo);
 
-    painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
-    painelIcones.setOpaque(false);
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(1000, 750));
+        conteinerCentral.setOpaque(false);
+        painelFundo.add(conteinerCentral);
 
-    JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-    botaoPerfil.addActionListener(e -> abrirPerfil());
+        JPanel painelIconesLocal = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+        painelIconesLocal.setOpaque(false);
+        painelIconesLocal.setBounds(800, 10, 180, 80);
+        this.painelIcones = painelIconesLocal;
 
-    JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
-    botaoSair.addActionListener(e -> confirmarSaida());
+        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+        botaoPerfil.addActionListener(e -> abrirPerfil());
 
-    painelIcones.add(botaoPerfil);
-    painelIcones.add(botaoSair);
-    painelFundo.add(painelIcones);
+        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+        botaoSair.addActionListener(e -> confirmarSaida());
 
-    botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
-    botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
-    painelFundo.add(botaoAjuda);
+        painelIconesLocal.add(botaoPerfil);
+        painelIconesLocal.add(botaoSair);
+        conteinerCentral.add(painelIconesLocal);
 
-    painelConteudo = new JPanel();
-    painelConteudo.setLayout(null);
-    painelConteudo.setOpaque(false);
-    painelFundo.add(painelConteudo);
+        this.botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
+        this.botaoAjuda.setBounds(20, 20, 50, 50);
+        this.botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
+        conteinerCentral.add(this.botaoAjuda);
 
-    painelFundo.addComponentListener(new java.awt.event.ComponentAdapter() {
-        @Override
-        public void componentResized(java.awt.event.ComponentEvent evento) {
-            centralizarElementos();
-        }
-    });
-
-    centralizarElementos();
-}
-    private void centralizarElementos() {
-    int larguraTela = getContentPane().getWidth();
-    int alturaTela = getContentPane().getHeight();
-
-    if (larguraTela <= 0 || alturaTela <= 0) {
-        return;
+        painelConteudo = new JPanel();
+        painelConteudo.setLayout(null);
+        painelConteudo.setOpaque(false);
+        painelConteudo.setBounds(50, 100, 900, 580);
+        conteinerCentral.add(painelConteudo);
     }
-
-    int larguraConteudo = 900;
-    int alturaConteudo = 580;
-
-    int xConteudo = (larguraTela - larguraConteudo) / 2;
-    int yConteudo = (alturaTela - alturaConteudo) / 2 + 25;
-
-    painelConteudo.setBounds(
-            xConteudo,
-            yConteudo,
-            larguraConteudo,
-            alturaConteudo
-    );
-
-    if (botaoAjuda != null) {
-        botaoAjuda.setBounds(25, 25, 50, 50);
-    }
-
-    if (painelIcones != null) {
-        painelIcones.setBounds(
-                larguraTela - 210,
-                10,
-                180,
-                80
-        );
-    }
-}
 
         private JButton criarBotaoIconeReal(String caminho) {
         JButton btn = new JButton();
@@ -189,7 +153,7 @@ public class TelaJogo extends JFrame {
     private JButton criarBotaoIcone(String texto, Color cor) {
         JButton btn = new JButton(texto);
         btn.setPreferredSize(new Dimension(65, 65));
-        btn.setFont(new Font("Arial", Font.BOLD, 32));
+        btn.setFont(new Font("Verdana", Font.BOLD, 32));
         btn.setForeground(Color.WHITE);
         btn.setBackground(cor);
         btn.setFocusPainted(false);
@@ -234,7 +198,7 @@ public class TelaJogo extends JFrame {
 
         labelPergunta = new JLabel("<html><center>" + questao.getEnunciado() + "</center></html>", SwingConstants.CENTER);
         labelPergunta.setBounds(40, 20, 720, 60);
-        labelPergunta.setFont(new Font("Arial", Font.BOLD, 28));
+        labelPergunta.setFont(new Font("Verdana", Font.BOLD, 28));
         labelPergunta.setForeground(Color.WHITE);
         painelPergunta.add(labelPergunta);
 
@@ -247,7 +211,7 @@ public class TelaJogo extends JFrame {
                 labelImagemQuestao.setIcon(new ImageIcon(img));
             } catch (Exception e) {
                 labelImagemQuestao.setText("🧪");
-                labelImagemQuestao.setFont(new Font("Arial", Font.PLAIN, 100));
+                labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, 100));
                 labelImagemQuestao.setForeground(Color.WHITE);
             }
         }
@@ -275,7 +239,7 @@ public class TelaJogo extends JFrame {
         painelInstrucao.setBackground(new Color(47, 76, 113));
         
         JLabel lblMsg = new JLabel("Conecte o material ao sistema experimental correspondente", SwingConstants.CENTER);
-        lblMsg.setFont(new Font("Arial", Font.BOLD, 18));
+        lblMsg.setFont(new Font("Verdana", Font.BOLD, 18));
         lblMsg.setForeground(Color.WHITE);
         painelInstrucao.add(lblMsg);
         painelConteudo.add(painelInstrucao);
@@ -377,7 +341,7 @@ public class TelaJogo extends JFrame {
 
         JLabel titulo = new JLabel("Central de Ajuda", SwingConstants.CENTER);
         titulo.setBounds(0, 20, 600, 40);
-        titulo.setFont(new Font("Arial", Font.BOLD, 32));
+        titulo.setFont(new Font("Verdana", Font.BOLD, 32));
         titulo.setForeground(Color.WHITE);
         dialog.add(titulo);
 
@@ -405,7 +369,7 @@ public class TelaJogo extends JFrame {
     private JButton criarBotaoAjuda(String texto, int x, int y, boolean ativo) {
         JButton btn = new JButton(texto);
         btn.setBounds(x, y, 240, 145);
-        btn.setFont(new Font("Arial", Font.BOLD, 22));
+        btn.setFont(new Font("Verdana", Font.BOLD, 22));
         btn.setBackground(ativo ? Color.WHITE : new Color(100, 100, 100));
         btn.setForeground(new Color(47, 76, 113));
         btn.setFocusPainted(false);
@@ -548,7 +512,7 @@ public class TelaJogo extends JFrame {
         public BotaoAlternativa(String texto) {
             super(texto);
             setHorizontalAlignment(SwingConstants.LEFT);
-            setFont(new Font("Arial", Font.BOLD, 20));
+            setFont(new Font("Verdana", Font.BOLD, 20));
             setForeground(Color.WHITE);
             setBackground(new Color(130, 150, 220));
             setFocusPainted(false);
@@ -592,7 +556,7 @@ public class TelaJogo extends JFrame {
             }
 
             JLabel lbl = new JLabel("<html><center>" + texto + "</center></html>", SwingConstants.CENTER);
-            lbl.setFont(new Font("Arial", Font.BOLD, 14));
+            lbl.setFont(new Font("Verdana", Font.BOLD, 14));
             lbl.setForeground(Color.WHITE);
             add(lbl, comImagem ? BorderLayout.SOUTH : BorderLayout.CENTER);
         }

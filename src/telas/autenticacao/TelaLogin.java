@@ -2,9 +2,11 @@ package telas.autenticacao;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -38,22 +40,26 @@ public class TelaLogin extends JFrame {
 
     private void configurarJanela() {
         setTitle("LabQuest - Login");
-        setSize(960, 680);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
         PainelFundo painelFundo = new PainelFundo();
-        painelFundo.setLayout(null);
+        painelFundo.setLayout(new GridBagLayout());
         setContentPane(painelFundo);
+
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(960, 680));
+        conteinerCentral.setOpaque(false);
+        painelFundo.add(conteinerCentral);
 
         PainelArredondado painelLogin = new PainelArredondado(30);
         painelLogin.setLayout(null);
         painelLogin.setBounds(275, 135, 410, 480);
         painelLogin.setBackground(Color.WHITE);
-        painelFundo.add(painelLogin);
+        conteinerCentral.add(painelLogin);
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
         titulo.setBounds(35, 30, 340, 80);
@@ -183,7 +189,7 @@ public class TelaLogin extends JFrame {
         public BotaoArredondado(String texto, int raio) {
             super(texto);
             this.raio = raio;
-            setFont(new Font("Arial", Font.BOLD, 18));
+            setFont(new Font("Verdana", Font.BOLD, 18));
             setForeground(Color.WHITE);
             setBackground(new Color(36, 73, 130));
             setFocusPainted(false);

@@ -1,6 +1,17 @@
 package telas.professor;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -8,8 +19,21 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 public class TelaGerenciarPerguntas extends JFrame {
@@ -33,17 +57,21 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("Tela - Gerenciar perguntas");
-        setSize(980, 720);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("LabQuest - Gerenciar Perguntas");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
-        PainelFundoImagem painelPrincipal = new PainelFundoImagem();
-        painelPrincipal.setLayout(null);
-        setContentPane(painelPrincipal);
+        PainelFundoImagem painelBase = new PainelFundoImagem();
+        painelBase.setLayout(new GridBagLayout());
+        setContentPane(painelBase);
+
+        JPanel painelPrincipal = new JPanel(null);
+        painelPrincipal.setPreferredSize(new Dimension(980, 720));
+        painelPrincipal.setOpaque(false);
+        painelBase.add(painelPrincipal);
 
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
         botaoPerfil.setBounds(18, 18, 45, 45);
@@ -104,7 +132,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private JButton criarBotaoTopo(String texto) {
         BotaoArredondado botao = new BotaoArredondado("<html><center>" + texto + "</center></html>");
-        botao.setFont(new Font("Arial", Font.BOLD, 17));
+        botao.setFont(new Font("Verdana", Font.BOLD, 17));
         botao.setForeground(Color.WHITE);
         botao.setBackground(new Color(35, 74, 131));
         botao.setFocusPainted(false);
@@ -192,13 +220,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoPergunta = new JLabel("“" + pergunta.getEnunciado() + "”");
         textoPergunta.setBounds(18, 3, 338, 28);
-        textoPergunta.setFont(new Font("Arial", Font.BOLD, 14));
+        textoPergunta.setFont(new Font("Verdana", Font.BOLD, 14));
         textoPergunta.setForeground(new Color(35, 74, 131));
         linha.add(textoPergunta);
 
         JLabel textoResposta = new JLabel(pergunta.getResumoRespostaCorreta());
         textoResposta.setBounds(380, 3, 450, 28);
-        textoResposta.setFont(new Font("Arial", Font.BOLD, 14));
+        textoResposta.setFont(new Font("Verdana", Font.BOLD, 14));
         textoResposta.setForeground(new Color(35, 74, 131));
         linha.add(textoResposta);
 
@@ -231,7 +259,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoEnunciado = new JLabel("Enunciado:");
         textoEnunciado.setBounds(38, 26, 120, 26);
-        textoEnunciado.setFont(new Font("Arial", Font.BOLD, 16));
+        textoEnunciado.setFont(new Font("Verdana", Font.BOLD, 16));
         textoEnunciado.setForeground(new Color(170, 170, 185));
         painelFormulario.add(textoEnunciado);
 
@@ -260,7 +288,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoLetra = new JLabel(letras[i]);
             textoLetra.setBounds(76, y + 8, 35, 28);
-            textoLetra.setFont(new Font("Arial", Font.BOLD, 16));
+            textoLetra.setFont(new Font("Verdana", Font.BOLD, 16));
             textoLetra.setForeground(new Color(170, 170, 185));
             painelFormulario.add(textoLetra);
 
@@ -276,7 +304,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JButton botaoImagem = new JButton("<html><center>⬆<br>Selecionar<br>imagem</center></html>");
         botaoImagem.setBounds(20, 18, 100, 80);
-        botaoImagem.setFont(new Font("Arial", Font.BOLD, 18));
+        botaoImagem.setFont(new Font("Verdana", Font.BOLD, 18));
         botaoImagem.setForeground(Color.BLACK);
         botaoImagem.setBorderPainted(false);
         botaoImagem.setFocusPainted(false);
@@ -286,13 +314,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoFormato = new JLabel("*.png, *.jpeg", SwingConstants.CENTER);
         textoFormato.setBounds(10, 104, 122, 24);
-        textoFormato.setFont(new Font("Arial", Font.BOLD, 14));
+        textoFormato.setFont(new Font("Verdana", Font.BOLD, 14));
         textoFormato.setForeground(new Color(96, 96, 120));
         painelImagem.add(textoFormato);
 
         JLabel textoArquivoEscolhido = new JLabel("Nenhum arquivo", SwingConstants.CENTER);
         textoArquivoEscolhido.setBounds(10, 88, 122, 18);
-        textoArquivoEscolhido.setFont(new Font("Arial", Font.PLAIN, 11));
+        textoArquivoEscolhido.setFont(new Font("Verdana", Font.PLAIN, 11));
         textoArquivoEscolhido.setForeground(new Color(100, 100, 100));
         painelImagem.add(textoArquivoEscolhido);
 
@@ -314,7 +342,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoNivel = new JLabel("Nível de dificuldade:");
         textoNivel.setBounds(10, 8, 190, 28);
-        textoNivel.setFont(new Font("Arial", Font.BOLD, 15));
+        textoNivel.setFont(new Font("Verdana", Font.BOLD, 15));
         textoNivel.setForeground(new Color(170, 170, 185));
         painelNivel.add(textoNivel);
 
@@ -413,7 +441,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel textoEnunciado = new JLabel("Enunciado: " + perguntaSelecionada.getEnunciado());
         textoEnunciado.setBounds(12, 8, 800, 28);
-        textoEnunciado.setFont(new Font("Arial", Font.BOLD, 16));
+        textoEnunciado.setFont(new Font("Verdana", Font.BOLD, 16));
         textoEnunciado.setForeground(new Color(120, 120, 145));
         campoEnunciado.add(textoEnunciado);
 
@@ -442,7 +470,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoLetra = new JLabel(letras[i]);
             textoLetra.setBounds(102, y + 8, 40, 28);
-            textoLetra.setFont(new Font("Arial", Font.BOLD, 16));
+            textoLetra.setFont(new Font("Verdana", Font.BOLD, 16));
             textoLetra.setForeground(new Color(120, 120, 145));
             painelFormulario.add(textoLetra);
 
@@ -456,13 +484,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JLabel imagemLabel = new JLabel("Imagem", SwingConstants.CENTER);
         imagemLabel.setBounds(10, 10, 122, 110);
-        imagemLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        imagemLabel.setFont(new Font("Verdana", Font.BOLD, 18));
         imagemLabel.setForeground(new Color(80, 100, 130));
         painelImagem.add(imagemLabel);
 
         JButton botaoTrocarImagem = new JButton("Trocar");
         botaoTrocarImagem.setBounds(30, 106, 82, 24);
-        botaoTrocarImagem.setFont(new Font("Arial", Font.BOLD, 12));
+        botaoTrocarImagem.setFont(new Font("Verdana", Font.BOLD, 12));
         botaoTrocarImagem.setCursor(new Cursor(Cursor.HAND_CURSOR));
         painelImagem.add(botaoTrocarImagem);
 
@@ -576,13 +604,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
             JLabel textoPergunta = new JLabel("“" + pergunta.getEnunciado() + "”");
             textoPergunta.setBounds(42, 3, 294, 28);
-            textoPergunta.setFont(new Font("Arial", Font.BOLD, 14));
+            textoPergunta.setFont(new Font("Verdana", Font.BOLD, 14));
             textoPergunta.setForeground(new Color(35, 74, 131));
             linha.add(textoPergunta);
 
             JLabel textoResposta = new JLabel(pergunta.getResumoRespostaCorreta());
             textoResposta.setBounds(360, 3, 460, 28);
-            textoResposta.setFont(new Font("Arial", Font.BOLD, 14));
+            textoResposta.setFont(new Font("Verdana", Font.BOLD, 14));
             textoResposta.setForeground(new Color(35, 74, 131));
             linha.add(textoResposta);
 
@@ -636,7 +664,7 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void configurarCampoTexto(JTextField campo) {
-        campo.setFont(new Font("Arial", Font.BOLD, 15));
+        campo.setFont(new Font("Verdana", Font.BOLD, 15));
         campo.setForeground(new Color(120, 120, 145));
         campo.setBackground(new Color(235, 235, 239));
         campo.setBorder(new EmptyBorder(0, 12, 0, 12));
@@ -647,7 +675,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         radio.setBounds(x, 8, 120, 28);
         radio.setOpaque(false);
         radio.setSelected(selecionado);
-        radio.setFont(new Font("Arial", Font.BOLD, 15));
+        radio.setFont(new Font("Verdana", Font.BOLD, 15));
         radio.setForeground(new Color(35, 74, 131));
         radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return radio;
@@ -655,7 +683,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private JButton criarBotaoAcao(String texto, Color corFundo, Color corTexto) {
         BotaoArredondado botao = new BotaoArredondado(texto);
-        botao.setFont(new Font("Arial", Font.BOLD, 16));
+        botao.setFont(new Font("Verdana", Font.BOLD, 16));
         botao.setForeground(corTexto);
         botao.setBackground(corFundo);
         botao.setBorderPainted(false);

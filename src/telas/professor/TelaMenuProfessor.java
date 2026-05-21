@@ -1,8 +1,25 @@
 package telas.professor;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 public class TelaMenuProfessor extends JFrame {
 
@@ -13,47 +30,51 @@ public class TelaMenuProfessor extends JFrame {
 
     private void configurarJanela() {
         setTitle("Tela - Início");
-        setSize(640, 480);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
         PainelFundo painelFundo = new PainelFundo();
-        painelFundo.setLayout(null);
+        painelFundo.setLayout(new GridBagLayout());
         setContentPane(painelFundo);
 
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(960, 680));
+        conteinerCentral.setOpaque(false);
+        painelFundo.add(conteinerCentral);
+
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-        botaoPerfil.setBounds(20, 20, 45, 45);
+        botaoPerfil.setBounds(30, 30, 55, 55);
         botaoPerfil.addActionListener(e -> abrirPerfil());
-        painelFundo.add(botaoPerfil);
+        conteinerCentral.add(botaoPerfil);
 
         JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
-        botaoSair.setBounds(575, 20, 45, 45);
+        botaoSair.setBounds(875, 30, 55, 55);
         botaoSair.addActionListener(e -> sairDaConta());
-        painelFundo.add(botaoSair);
+        conteinerCentral.add(botaoSair);
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
-        titulo.setBounds(70, 105, 500, 95);
-        titulo.setFont(new Font("Arial", Font.BOLD, 76));
+        titulo.setBounds(80, 100, 800, 120);
+        titulo.setFont(new Font("Verdana", Font.BOLD, 110));
         titulo.setForeground(new Color(31, 65, 126));
-        painelFundo.add(titulo);
+        conteinerCentral.add(titulo);
 
         BotaoArredondado botaoGerenciarPerguntas = new BotaoArredondado("Gerenciar perguntas");
-        botaoGerenciarPerguntas.setBounds(170, 240, 300, 45);
+        botaoGerenciarPerguntas.setBounds(280, 280, 400, 65);
         botaoGerenciarPerguntas.addActionListener((ActionEvent evento) -> abrirGerenciarPerguntas());
-        painelFundo.add(botaoGerenciarPerguntas);
+        conteinerCentral.add(botaoGerenciarPerguntas);
 
         BotaoArredondado botaoRelatorios = new BotaoArredondado("Relatórios");
-        botaoRelatorios.setBounds(170, 295, 300, 45);
+        botaoRelatorios.setBounds(280, 365, 400, 65);
         botaoRelatorios.addActionListener((ActionEvent evento) -> abrirRelatorios());
-        painelFundo.add(botaoRelatorios);
+        conteinerCentral.add(botaoRelatorios);
 
         BotaoArredondado botaoCadastrarAluno = new BotaoArredondado("Cadastrar Aluno");
-        botaoCadastrarAluno.setBounds(170, 350, 300, 45);
+        botaoCadastrarAluno.setBounds(280, 450, 400, 65);
         botaoCadastrarAluno.addActionListener((ActionEvent evento) -> abrirCadastrarAluno());
-        painelFundo.add(botaoCadastrarAluno);
+        conteinerCentral.add(botaoCadastrarAluno);
     }
 
     private JButton criarBotaoIconeReal(String caminho) {
@@ -118,7 +139,7 @@ public class TelaMenuProfessor extends JFrame {
 
         public BotaoArredondado(String texto) {
             super(texto);
-            setFont(new Font("Arial", Font.BOLD, 21));
+            setFont(new Font("Verdana", Font.BOLD, 21));
             setForeground(Color.WHITE);
             setBackground(new Color(36, 73, 130));
             setFocusPainted(false);

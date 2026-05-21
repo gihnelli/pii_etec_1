@@ -1,17 +1,30 @@
 package telas.aluno;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.format.DateTimeFormatter;
-import javax.swing.*;
 
-import model.Alternativa;
-import model.Aluno;
-import model.Partida;
-import model.Questao;
-import model.Resposta;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -21,6 +34,12 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import model.Alternativa;
+import model.Aluno;
+import model.Partida;
+import model.Questao;
+import model.Resposta;
+
 /**
  * Nota: Se o editor marcar erros no PDFBox, certifique-se de que o JAR
  * libs/pdfbox-app-3.0.7.jar está nas Referenced Libraries do projeto Java.
@@ -29,10 +48,10 @@ public class TelaDesempenhoAluno extends JFrame {
 
     private Aluno aluno;
 
-    private final Color AZUL_ESCURO = new Color(34, 62, 107);
-    private final Color AZUL_CLARO = new Color(160, 205, 245);
+    private final Color AZUL_ESCURO = new Color(36, 60, 103);
+    private final Color AZUL_CLARO = new Color(160, 205, 250);
     private final Color AZUL_MEDIO = new Color(70, 130, 230);
-    private final Color BRANCO_GELO = new Color(238, 242, 248);
+    private final Color BRANCO_GELO = new Color(240, 245, 250);
 
     private static final PDFont FONTE_NORMAL =
             new PDType1Font(Standard14Fonts.FontName.HELVETICA);
@@ -52,66 +71,71 @@ public class TelaDesempenhoAluno extends JFrame {
 
     private void configurarJanela() {
         setTitle("Tela - Desempenho do Aluno");
-        setSize(720, 560);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
         PainelFundo painel = new PainelFundo();
-        painel.setLayout(null);
+        painel.setLayout(new GridBagLayout());
         setContentPane(painel);
 
-        adicionarIcones(painel);
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(1000, 750));
+        conteinerCentral.setOpaque(false);
+        painel.add(conteinerCentral);
+
+        adicionarIcones(conteinerCentral);
 
         Estatisticas estatisticas = calcularEstatisticasAluno(aluno);
 
-        PainelArredondado painelGrafico = new PainelArredondado(18);
-        painelGrafico.setBounds(14, 85, 355, 385);
+        PainelArredondado painelGrafico = new PainelArredondado(22);
+        painelGrafico.setBounds(18, 80, 480, 540);
         painelGrafico.setBackground(AZUL_ESCURO);
         painelGrafico.setLayout(null);
-        painel.add(painelGrafico);
+        conteinerCentral.add(painelGrafico);
 
         JLabel titulo = new JLabel("Desempenho do mês", SwingConstants.CENTER);
-        titulo.setBounds(0, 14, 355, 35);
-        titulo.setFont(new Font("Arial", Font.BOLD, 20));
+        titulo.setBounds(0, 18, 480, 40);
+        titulo.setFont(new Font("Verdana", Font.BOLD, 24));
         titulo.setForeground(Color.WHITE);
         painelGrafico.add(titulo);
 
         GraficoPizza grafico = new GraficoPizza(
                 estatisticas.percentualAcertos,
-                estatisticas.percentualErros
+                estatisticas.percentualErros,
+                true
         );
-        grafico.setBounds(20, 55, 315, 265);
+        grafico.setBounds(20, 70, 440, 390);
         painelGrafico.add(grafico);
 
         JLabel resumo = new JLabel(
-                estatisticas.totalAcertos + " acertos | "
-                        + estatisticas.totalErros + " erros | "
-                        + estatisticas.pontuacaoTotal + " pontos",
+                "Total: " + estatisticas.totalRespostas + " respostas | "
+                        + estatisticas.totalAcertos + " acertos | "
+                        + estatisticas.totalErros + " erros",
                 SwingConstants.CENTER
         );
-        resumo.setBounds(0, 325, 355, 28);
-        resumo.setFont(new Font("Arial", Font.BOLD, 13));
+        resumo.setBounds(0, 475, 480, 35);
+        resumo.setFont(new Font("Verdana", Font.BOLD, 14));
         resumo.setForeground(Color.WHITE);
         painelGrafico.add(resumo);
 
         PainelArredondado painelRelatorio = new PainelArredondado(18);
-        painelRelatorio.setBounds(382, 250, 315, 105);
+        painelRelatorio.setBounds(535, 420, 420, 115);
         painelRelatorio.setBackground(AZUL_ESCURO);
         painelRelatorio.setLayout(null);
-        painel.add(painelRelatorio);
+        conteinerCentral.add(painelRelatorio);
 
         JLabel textoRelatorio = new JLabel("Gerar relatório", SwingConstants.CENTER);
-        textoRelatorio.setBounds(0, 8, 315, 34);
-        textoRelatorio.setFont(new Font("Arial", Font.BOLD, 19));
+        textoRelatorio.setBounds(0, 8, 420, 35);
+        textoRelatorio.setFont(new Font("Verdana", Font.BOLD, 20));
         textoRelatorio.setForeground(Color.WHITE);
         painelRelatorio.add(textoRelatorio);
 
         JButton botaoPdf = new JButton("Baixar PDF");
-        botaoPdf.setBounds(14, 50, 287, 40);
-        botaoPdf.setFont(new Font("Arial", Font.BOLD, 17));
+        botaoPdf.setBounds(26, 54, 368, 44);
+        botaoPdf.setFont(new Font("Verdana", Font.BOLD, 18));
         botaoPdf.setForeground(AZUL_ESCURO);
         botaoPdf.setBackground(BRANCO_GELO);
         botaoPdf.setFocusPainted(false);
@@ -122,12 +146,12 @@ public class TelaDesempenhoAluno extends JFrame {
 
     private void adicionarIcones(JPanel painel) {
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-        botaoPerfil.setBounds(16, 14, 45, 45);
+        botaoPerfil.setBounds(18, 18, 45, 45);
         botaoPerfil.addActionListener(e -> abrirPerfil());
         painel.add(botaoPerfil);
 
         JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
-        botaoSair.setBounds(654, 14, 45, 45);
+        botaoSair.setBounds(920, 18, 45, 45);
         botaoSair.addActionListener(e -> {
             dispose();
             new TelaMenuAluno(this.aluno).setVisible(true);
@@ -467,10 +491,12 @@ public class TelaDesempenhoAluno extends JFrame {
 
         private final double percentualAcertos;
         private final double percentualErros;
+        private final boolean grande;
 
-        public GraficoPizza(double percentualAcertos, double percentualErros) {
+        public GraficoPizza(double percentualAcertos, double percentualErros, boolean grande) {
             this.percentualAcertos = percentualAcertos;
             this.percentualErros = percentualErros;
+            this.grande = grande;
             setOpaque(false);
         }
 
@@ -481,10 +507,11 @@ public class TelaDesempenhoAluno extends JFrame {
             Graphics2D desenho = (Graphics2D) grafico.create();
             desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            int tamanho = Math.min(getWidth(), getHeight()) - 80;
+            int margem = grande ? 110 : 70;
+            int tamanho = Math.min(getWidth(), getHeight()) - margem;
 
-            if (tamanho < 120) {
-                tamanho = 120;
+            if (tamanho < 80) {
+                tamanho = 80;
             }
 
             int x = (getWidth() - tamanho) / 2;
@@ -500,7 +527,7 @@ public class TelaDesempenhoAluno extends JFrame {
             desenho.fillArc(x, y, tamanho, tamanho, 90 - anguloAcertos, -anguloErros);
 
             desenho.setColor(Color.WHITE);
-            desenho.setFont(new Font("Arial", Font.BOLD, 11));
+            desenho.setFont(new Font("Verdana", Font.BOLD, grande ? 13 : 10));
 
             desenharTextoDoGrafico(
                     desenho,
@@ -535,7 +562,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 String linha2
         ) {
             double radiano = Math.toRadians(angulo);
-            int raio = tamanho / 2 + 38;
+            int raio = tamanho / 2 + (grande ? 42 : 28);
 
             int posicaoX = (int) (x + tamanho / 2 + raio * Math.cos(radiano));
             int posicaoY = (int) (y + tamanho / 2 - raio * Math.sin(radiano));

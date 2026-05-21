@@ -1,10 +1,28 @@
 package telas.aluno;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 import model.Alternativa;
 import model.Partida;
 import model.Questao;
@@ -27,42 +45,46 @@ public class TelaMenuAluno extends JFrame {
 
     private void configurarJanela() {
         setTitle("Tela - Início");
-        setSize(540, 420);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void montarTela() {
         PainelFundo painelFundo = new PainelFundo();
-        painelFundo.setLayout(null);
+        painelFundo.setLayout(new GridBagLayout());
         setContentPane(painelFundo);
 
+        JPanel conteinerCentral = new JPanel(null);
+        conteinerCentral.setPreferredSize(new Dimension(960, 680));
+        conteinerCentral.setOpaque(false);
+        painelFundo.add(conteinerCentral);
+
         JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-        botaoPerfil.setBounds(20, 20, 45, 45);
+        botaoPerfil.setBounds(30, 30, 55, 55);
         botaoPerfil.addActionListener(e -> abrirPerfil());
-        painelFundo.add(botaoPerfil);
+        conteinerCentral.add(botaoPerfil);
 
         JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
-        botaoSair.setBounds(475, 20, 45, 45);
+        botaoSair.setBounds(875, 30, 55, 55);
         botaoSair.addActionListener(e -> sairDaConta());
-        painelFundo.add(botaoSair);
+        conteinerCentral.add(botaoSair);
 
         JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
-        titulo.setBounds(70, 85, 400, 90);
-        titulo.setFont(new Font("Arial", Font.BOLD, 72));
+        titulo.setBounds(80, 100, 800, 120);
+        titulo.setFont(new Font("Verdana", Font.BOLD, 110));
         titulo.setForeground(new Color(31, 65, 126));
-        painelFundo.add(titulo);
+        conteinerCentral.add(titulo);
 
         JButton botaoJogar = criarBotaoMenu("Jogar");
-        botaoJogar.setBounds(148, 225, 240, 38);
+        botaoJogar.setBounds(280, 280, 400, 65);
         botaoJogar.addActionListener((ActionEvent evento) -> abrirTelaJogo());
-        painelFundo.add(botaoJogar);
+        conteinerCentral.add(botaoJogar);
 
         JButton botaoDesempenho = criarBotaoMenu("Desempenho");
-        botaoDesempenho.setBounds(148, 272, 240, 38);
+        botaoDesempenho.setBounds(280, 365, 400, 65);
         botaoDesempenho.addActionListener((ActionEvent evento) -> abrirTelaDesempenho());
-        painelFundo.add(botaoDesempenho);
+        conteinerCentral.add(botaoDesempenho);
     }
 
     private JButton criarBotaoIconeReal(String caminho) {
@@ -97,7 +119,7 @@ public class TelaMenuAluno extends JFrame {
 
     private JButton criarBotaoMenu(String texto) {
         JButton botao = new JButton(texto);
-        botao.setFont(new Font("Arial", Font.BOLD, 18));
+        botao.setFont(new Font("Verdana", Font.BOLD, 21));
         botao.setForeground(Color.WHITE);
         botao.setBackground(new Color(36, 73, 130));
         botao.setBorderPainted(false);
