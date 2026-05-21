@@ -119,6 +119,7 @@ public class TelaDesempenhoAluno extends JFrame {
         resumo.setForeground(Color.WHITE);
         painelGrafico.add(resumo);
 
+
         PainelArredondado painelRelatorio = new PainelArredondado(18);
         painelRelatorio.setBounds(535, 420, 420, 115);
         painelRelatorio.setBackground(AZUL_ESCURO);

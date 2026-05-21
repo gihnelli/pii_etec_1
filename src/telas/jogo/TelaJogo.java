@@ -26,6 +26,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -195,19 +196,34 @@ public class TelaJogo extends JFrame {
         painelPergunta.setBounds(50, 10, 800, 320);
         painelPergunta.setBackground(new Color(47, 76, 113));
         painelConteudo.add(painelPergunta);
+        String enunciado = questao.getEnunciado();
+boolean perguntaLonga = enunciado.length() > 65;
 
-        labelPergunta = new JLabel("<html><center>" + questao.getEnunciado() + "</center></html>", SwingConstants.CENTER);
-        labelPergunta.setBounds(40, 20, 720, 60);
-        labelPergunta.setFont(new Font("Verdana", Font.BOLD, 28));
-        labelPergunta.setForeground(Color.WHITE);
-        painelPergunta.add(labelPergunta);
+JTextArea textoPergunta = new JTextArea(enunciado);
+textoPergunta.setBounds(40, 15, 720, perguntaLonga ? 105 : 65);
+textoPergunta.setFont(new Font("Verdana", Font.BOLD, perguntaLonga ? 23 : 28));
+textoPergunta.setForeground(Color.WHITE);
+textoPergunta.setOpaque(false);
+textoPergunta.setEditable(false);
+textoPergunta.setFocusable(false);
+textoPergunta.setLineWrap(true);
+textoPergunta.setWrapStyleWord(true);
+textoPergunta.setAlignmentX(CENTER_ALIGNMENT);
+textoPergunta.setHighlighter(null);
+painelPergunta.add(textoPergunta);
 
-        labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
-        labelImagemQuestao.setBounds(250, 90, 300, 210);
+labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
+labelImagemQuestao.setBounds(
+        250,
+        perguntaLonga ? 125 : 90,
+        300,
+        perguntaLonga ? 175 : 210
+);
         if (questao.getImagemEnunciado() != null && !questao.getImagemEnunciado().isEmpty()) {
             try {
                 ImageIcon icon = new ImageIcon(questao.getImagemEnunciado());
-                Image img = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                int tamanhoImagem = perguntaLonga ? 170 : 200;
+                Image img = icon.getImage().getScaledInstance(tamanhoImagem, tamanhoImagem, Image.SCALE_SMOOTH);
                 labelImagemQuestao.setIcon(new ImageIcon(img));
             } catch (Exception e) {
                 labelImagemQuestao.setText("🧪");
@@ -489,10 +505,23 @@ public class TelaJogo extends JFrame {
     }
 
     private void finalizarPartida() {
-        partida.finalizar();
-        JOptionPane.showMessageDialog(this, "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(), "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
-        dispose();
+    partida.finalizar();
+
+    JOptionPane.showMessageDialog(
+            this,
+            "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(),
+            "Fim de Jogo",
+            JOptionPane.INFORMATION_MESSAGE
+    );
+
+    dispose();
+
+    if (partida != null && partida.getAluno() != null) {
+        new telas.aluno.TelaMenuAluno(partida.getAluno()).setVisible(true);
+    } else {
+        new telas.aluno.TelaMenuAluno().setVisible(true);
     }
+}
 
     private static class PainelArredondado extends JPanel {
         private int raio;
