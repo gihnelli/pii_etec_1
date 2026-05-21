@@ -1,10 +1,34 @@
 package telas.jogo;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+
 import model.Alternativa;
 import model.Partida;
 import model.Questao;
@@ -32,6 +56,12 @@ public class TelaJogo extends JFrame {
     private BotaoAssociacao selecionadoDireita = null;
     private int paresResolvidos = 0;
 
+    private final int LARGURA_CONTEUDO = 900;
+    private final int ALTURA_CONTEUDO = 580;
+
+    private JButton botaoAjuda;
+    private JPanel painelIcones;
+
     public TelaJogo(Partida partida, List<Questao> questoes) {
         this.partida = partida;
         this.questoes = questoes;
@@ -45,45 +75,87 @@ public class TelaJogo extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("LabQuest - Desafio de Laboratório");
-        setSize(1000, 750);
-        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
-    }
+    setTitle("LabQuest - Desafio de Laboratório");
+    setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+    setExtendedState(JFrame.MAXIMIZED_BOTH);
+    setResizable(true);
+
+    setLocationRelativeTo(null);
+}
 
     private void montarEstruturaBase() {
-        PainelFundo painelFundo = new PainelFundo();
-        painelFundo.setLayout(null);
-        setContentPane(painelFundo);
+    PainelFundo painelFundo = new PainelFundo();
+    painelFundo.setLayout(null);
+    setContentPane(painelFundo);
 
-        JPanel painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
-        painelIcones.setOpaque(false);
-        painelIcones.setBounds(800, 10, 180, 80);
+    painelIcones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 15));
+    painelIcones.setOpaque(false);
 
-        JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
-        botaoPerfil.addActionListener(e -> abrirPerfil());
-        
-        JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
-        botaoSair.addActionListener(e -> confirmarSaida());
+    JButton botaoPerfil = criarBotaoIconeReal("imagens/Perfil.png");
+    botaoPerfil.addActionListener(e -> abrirPerfil());
 
-        painelIcones.add(botaoPerfil);
-        painelIcones.add(botaoSair);
-        painelFundo.add(painelIcones);
+    JButton botaoSair = criarBotaoIconeReal("imagens/Sair.png");
+    botaoSair.addActionListener(e -> confirmarSaida());
 
-        JButton botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
-        botaoAjuda.setBounds(20, 20, 50, 50);
-        botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
-        painelFundo.add(botaoAjuda);
+    painelIcones.add(botaoPerfil);
+    painelIcones.add(botaoSair);
+    painelFundo.add(painelIcones);
 
-        painelConteudo = new JPanel();
-        painelConteudo.setLayout(null);
-        painelConteudo.setOpaque(false);
-        painelConteudo.setBounds(50, 100, 900, 580);
-        painelFundo.add(painelConteudo);
+    botaoAjuda = criarBotaoIconeReal("imagens/Ajuda.png");
+    botaoAjuda.addActionListener(e -> mostrarPopUpAjuda());
+    painelFundo.add(botaoAjuda);
+
+    painelConteudo = new JPanel();
+    painelConteudo.setLayout(null);
+    painelConteudo.setOpaque(false);
+    painelFundo.add(painelConteudo);
+
+    painelFundo.addComponentListener(new java.awt.event.ComponentAdapter() {
+        @Override
+        public void componentResized(java.awt.event.ComponentEvent evento) {
+            centralizarElementos();
+        }
+    });
+
+    centralizarElementos();
+}
+    private void centralizarElementos() {
+    int larguraTela = getContentPane().getWidth();
+    int alturaTela = getContentPane().getHeight();
+
+    if (larguraTela <= 0 || alturaTela <= 0) {
+        return;
     }
 
-    private JButton criarBotaoIconeReal(String caminho) {
+    int larguraConteudo = 900;
+    int alturaConteudo = 580;
+
+    int xConteudo = (larguraTela - larguraConteudo) / 2;
+    int yConteudo = (alturaTela - alturaConteudo) / 2 + 25;
+
+    painelConteudo.setBounds(
+            xConteudo,
+            yConteudo,
+            larguraConteudo,
+            alturaConteudo
+    );
+
+    if (botaoAjuda != null) {
+        botaoAjuda.setBounds(25, 25, 50, 50);
+    }
+
+    if (painelIcones != null) {
+        painelIcones.setBounds(
+                larguraTela - 210,
+                10,
+                180,
+                80
+        );
+    }
+}
+
+        private JButton criarBotaoIconeReal(String caminho) {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
