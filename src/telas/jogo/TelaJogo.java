@@ -563,22 +563,155 @@ public class TelaJogo extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            model.Aluno a = new model.Aluno(1, "Demo", "a@a.com", "1", "1A", "1");
-            Partida p = new Partida(a);
-            List<Questao> lista = new ArrayList<>();
-            Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Q");
-            q1.setImagemEnunciado("imagens/Béquer.jpg");
-            q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
-            q1.adicionarAlternativa(new Alternativa(2, "Pipeta Volumétrica", true));
-            q1.adicionarAlternativa(new Alternativa(3, "Tubo de Ensaio", false));
-            q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
-            lista.add(q1);
+    SwingUtilities.invokeLater(() -> {
+        model.Aluno alunoTeste = new model.Aluno(
+                1,
+                "Demo",
+                "demo@aluno.cps.sp.gov.br",
+                "123",
+                "1A",
+                "0001"
+        );
 
-            Questao q2 = new Questao(2, "Combine os materiais aos sistemas", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Q");
-            lista.add(q2);
+        Partida partidaTeste = new Partida(alunoTeste);
+        List<Questao> lista = new ArrayList<>();
 
-            new TelaJogo(p, lista).setVisible(true);
-        });
-    }
+        Questao q1 = new Questao(
+                1,
+                "Qual é a principal função do Béquer?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q1.setImagemEnunciado("imagens/Béquer.jpg");
+        q1.adicionarAlternativa(new Alternativa(1, "Misturar e aquecer líquidos", true));
+        q1.adicionarAlternativa(new Alternativa(2, "Medir volume exato de líquido", false));
+        q1.adicionarAlternativa(new Alternativa(3, "Separar líquidos imiscíveis", false));
+        q1.adicionarAlternativa(new Alternativa(4, "Prender tubos de ensaio", false));
+        lista.add(q1);
+
+        Questao q2 = new Questao(
+                2,
+                "Qual instrumento é usado para medir volumes exatos?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q2.setImagemEnunciado("imagens/PipetaVolumétrica.jpg");
+        q2.adicionarAlternativa(new Alternativa(1, "Béquer", false));
+        q2.adicionarAlternativa(new Alternativa(2, "Pipeta volumétrica", true));
+        q2.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
+        q2.adicionarAlternativa(new Alternativa(4, "Bastão de vidro", false));
+        lista.add(q2);
+
+        Questao q3 = new Questao(
+                3,
+                "Qual é a principal função do Bico de Bunsen?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q3.setImagemEnunciado("imagens/BicoDeBunsen.jpg");
+        q3.adicionarAlternativa(new Alternativa(1, "Aquecer substâncias no laboratório", true));
+        q3.adicionarAlternativa(new Alternativa(2, "Filtrar misturas", false));
+        q3.adicionarAlternativa(new Alternativa(3, "Medir volume exato", false));
+        q3.adicionarAlternativa(new Alternativa(4, "Armazenar soluções", false));
+        lista.add(q3);
+
+        Questao q4 = new Questao(
+                4,
+                "Qual material é mais usado em uma titulação?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química"
+        );
+        q4.setImagemEnunciado("imagens/Bureta.jpg");
+        q4.adicionarAlternativa(new Alternativa(1, "Bureta", true));
+        q4.adicionarAlternativa(new Alternativa(2, "Vidro relógio", false));
+        q4.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
+        q4.adicionarAlternativa(new Alternativa(4, "Pisseta", false));
+        lista.add(q4);
+
+        Questao q5 = new Questao(
+                5,
+                "Qual é a função do Erlenmeyer?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q5.setImagemEnunciado("imagens/Erlenmeyer.jpg");
+        q5.adicionarAlternativa(new Alternativa(1, "Misturar soluções com menor risco de derramamento", true));
+        q5.adicionarAlternativa(new Alternativa(2, "Produzir chama para aquecimento", false));
+        q5.adicionarAlternativa(new Alternativa(3, "Medir volume com alta precisão", false));
+        q5.adicionarAlternativa(new Alternativa(4, "Prender buretas no suporte", false));
+        lista.add(q5);
+
+        Questao q6 = new Questao(
+                6,
+                "Qual material auxilia na transferência de líquidos e na filtração?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q6.setImagemEnunciado("imagens/FunilDeHasteLonga.jpg");
+        q6.adicionarAlternativa(new Alternativa(1, "Funil de haste longa", true));
+        q6.adicionarAlternativa(new Alternativa(2, "Balão volumétrico", false));
+        q6.adicionarAlternativa(new Alternativa(3, "Garra", false));
+        q6.adicionarAlternativa(new Alternativa(4, "Tripé", false));
+        lista.add(q6);
+
+        Questao q7 = new Questao(
+                7,
+                "Qual é a função do Bastão de Vidro?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química"
+        );
+        q7.setImagemEnunciado("imagens/BastãoDeVidro.jpg");
+        q7.adicionarAlternativa(new Alternativa(1, "Misturar soluções", true));
+        q7.adicionarAlternativa(new Alternativa(2, "Aquecer diretamente líquidos", false));
+        q7.adicionarAlternativa(new Alternativa(3, "Medir massa", false));
+        q7.adicionarAlternativa(new Alternativa(4, "Separar líquidos imiscíveis", false));
+        lista.add(q7);
+
+        Questao q8 = new Questao(
+                8,
+                "Qual material é usado para medir volumes aproximados de líquidos?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química"
+        );
+        q8.setImagemEnunciado("imagens/Proveta.jpg");
+        q8.adicionarAlternativa(new Alternativa(1, "Proveta", true));
+        q8.adicionarAlternativa(new Alternativa(2, "Bico de Bunsen", false));
+        q8.adicionarAlternativa(new Alternativa(3, "Vidro relógio", false));
+        q8.adicionarAlternativa(new Alternativa(4, "Suporte universal", false));
+        lista.add(q8);
+
+        Questao q9 = new Questao(
+                9,
+                "Qual material pode ser usado para evaporar pequenas quantidades de líquido ou cobrir recipientes?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química"
+        );
+        q9.setImagemEnunciado("imagens/VidroRelógio.jpg");
+        q9.adicionarAlternativa(new Alternativa(1, "Vidro relógio", true));
+        q9.adicionarAlternativa(new Alternativa(2, "Pipeta Pasteur", false));
+        q9.adicionarAlternativa(new Alternativa(3, "Pisseta", false));
+        q9.adicionarAlternativa(new Alternativa(4, "Garra", false));
+        lista.add(q9);
+
+        Questao q10 = new Questao(
+                10,
+                "Combine os materiais aos sistemas experimentais",
+                TipoQuestao.ASSOCIACAO,
+                model.tipos.NivelDificuldade.DIFICIL,
+                "Química"
+        );
+        lista.add(q10);
+
+        new TelaJogo(partidaTeste, lista).setVisible(true);
+    });
+}
 }
