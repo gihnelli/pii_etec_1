@@ -11,8 +11,6 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,10 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import model.Alternativa;
 import model.Partida;
-import model.Questao;
-import model.tipos.TipoQuestao;
 import telas.jogo.TelaJogo;
 
 public class TelaMenuAluno extends JFrame {
@@ -40,7 +35,14 @@ public class TelaMenuAluno extends JFrame {
     }
 
     public TelaMenuAluno() {
-        this(new model.Aluno(1, "Aluno Teste", "aluno@aluno.cps.sp.gov.br", "123", "1A", "12345"));
+        this(new model.Aluno(
+                1,
+                "Aluno Teste",
+                "aluno@aluno.cps.sp.gov.br",
+                "123",
+                "1A",
+                "12345"
+        ));
     }
 
     private void configurarJanela() {
@@ -89,6 +91,7 @@ public class TelaMenuAluno extends JFrame {
 
     private JButton criarBotaoIconeReal(String caminho) {
         JButton btn = new JButton();
+
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
             Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
@@ -96,21 +99,23 @@ public class TelaMenuAluno extends JFrame {
         } catch (Exception e) {
             btn.setText("?");
         }
+
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
         btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         return btn;
     }
 
     private void abrirPerfil() {
         if (this.aluno != null) {
             JOptionPane.showMessageDialog(
-                this,
-                "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
-                "Perfil do Aluno",
-                JOptionPane.INFORMATION_MESSAGE
+                    this,
+                    "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
+                    "Perfil do Aluno",
+                    JOptionPane.INFORMATION_MESSAGE
             );
         } else {
             JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
@@ -125,25 +130,18 @@ public class TelaMenuAluno extends JFrame {
         botao.setBorderPainted(false);
         botao.setFocusPainted(false);
         botao.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         return botao;
     }
 
     private void abrirTelaJogo() {
         Partida partida = new Partida(this.aluno);
-        List<Questao> lista = new ArrayList<>();
 
-        Questao q1 = new Questao(1, "Qual instrumento é usado para medir volumes exatos?", TipoQuestao.MULTIPLA_ESCOLHA, model.tipos.NivelDificuldade.FACIL, "Química");
-        q1.setImagemEnunciado("imagens/Béquer.jpg");
-        q1.adicionarAlternativa(new Alternativa(1, "Béquer", false));
-        q1.adicionarAlternativa(new Alternativa(2, "Pipeta Volumétrica", true));
-        q1.adicionarAlternativa(new Alternativa(3, "Tubo de Ensaio", false));
-        q1.adicionarAlternativa(new Alternativa(4, "Bastão de Vidro", false));
-        lista.add(q1);
+        new TelaJogo(
+                partida,
+                TelaJogo.criarQuestoesPadrao()
+        ).setVisible(true);
 
-        Questao q2 = new Questao(2, "Combine os materiais aos sistemas correspondentes", TipoQuestao.ASSOCIACAO, model.tipos.NivelDificuldade.MEDIO, "Química");
-        lista.add(q2);
-
-        new TelaJogo(partida, lista).setVisible(true);
         dispose();
     }
 
@@ -162,11 +160,12 @@ public class TelaMenuAluno extends JFrame {
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
-        new telas.autenticacao.TelaLogin().setVisible(true);
+            new telas.autenticacao.TelaLogin().setVisible(true);
         }
     }
 
     private static class PainelFundo extends JPanel {
+
         private Image imagemFundo;
 
         public PainelFundo() {
@@ -180,8 +179,9 @@ public class TelaMenuAluno extends JFrame {
         @Override
         protected void paintComponent(Graphics grafico) {
             super.paintComponent(grafico);
+
             Graphics2D g2 = (Graphics2D) grafico.create();
-            
+
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -210,7 +210,7 @@ public class TelaMenuAluno extends JFrame {
                 g2.setColor(new Color(223, 239, 252));
                 g2.fillRect(0, 0, getWidth(), getHeight());
             }
-            
+
             g2.dispose();
         }
     }

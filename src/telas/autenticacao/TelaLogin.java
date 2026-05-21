@@ -89,7 +89,6 @@ public class TelaLogin extends JFrame {
         campoSenha.setBounds(42, 230, 326, 45);
         campoSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
         campoSenha.setBackground(new Color(245, 247, 251));
-        // Adicionando filtro para permitir apenas números e limitar a 11 caracteres
         ((javax.swing.text.AbstractDocument) campoSenha.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
@@ -272,8 +271,6 @@ public class TelaLogin extends JFrame {
             );
             return;
         }
-
-        // Validação de senha: deve ser CPF (11 dígitos numéricos)
         if (!senhaDigitada.matches("^\\d{11}$")) {
             JOptionPane.showMessageDialog(
                     this,

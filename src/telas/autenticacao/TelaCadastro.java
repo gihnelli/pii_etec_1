@@ -92,7 +92,6 @@ public class TelaCadastro extends JFrame {
         campo.setFont(new Font("Verdana", Font.BOLD, 18));
         campo.setForeground(new Color(100, 100, 100));
         campo.setBackground(Color.WHITE);
-        // Adicionando filtro para permitir apenas números e limitar a 11 caracteres (padrão CPF)
         ((javax.swing.text.AbstractDocument) campo.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
