@@ -20,7 +20,6 @@ public class QuestaoDAO {
         con.setAutoCommit(false);
  
         try (PreparedStatement ps = con.prepareStatement(sqlQuestao, Statement.RETURN_GENERATED_KEYS)) {
- 
             ps.setString(1, questao.getEnunciado());
             ps.setString(2, questao.getTipo().name());
             ps.setString(3, questao.getNivelDificuldade().name());
@@ -134,7 +133,7 @@ public class QuestaoDAO {
         return lista;
     }
  
-    // Lista questões cadastradas por um professor específico.
+    // Lista questões cadastradas por um professor.
     public List<Questao> listarPorProfessor(int idProfessor) throws SQLException {
         String sql = "SELECT * FROM questao WHERE id_professor = ? AND ativa = TRUE ORDER BY id DESC";
         List<Questao> lista = new ArrayList<>();
@@ -169,11 +168,8 @@ public class QuestaoDAO {
         }
         return lista;
     }
- 
-    // -------------------------------------------------------------------------
+    
     // UPDATE
-    // -------------------------------------------------------------------------
- 
     // Atualiza os dados principais de uma questão (sem alterar alternativas).
     public boolean atualizar(Questao questao) throws SQLException {
         String sql = """
@@ -206,10 +202,8 @@ public class QuestaoDAO {
             return ps.executeUpdate() > 0;
         }
     }
- 
-    // -------------------------------------------------------------------------
+
     // Mapeamento ResultSet → Model
-    // -------------------------------------------------------------------------
  
     private Questao mapearQuestao(ResultSet rs) throws SQLException {
         Questao q = new Questao(

@@ -89,10 +89,30 @@ public class TelaLogin extends JFrame {
         caixaLembrarMe.setForeground(new Color(47, 76, 113));
         painelLogin.add(caixaLembrarMe);
 
+<<<<<<< Updated upstream
+=======
+        JLabel textoEsqueciSenha = new JLabel("Esqueci minha senha");
+        textoEsqueciSenha.setBounds(230, 290, 150, 25);
+        textoEsqueciSenha.setFont(new Font("Arial", Font.PLAIN, 15));
+        textoEsqueciSenha.setForeground(new Color(150, 40, 27));
+        textoEsqueciSenha.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        painelLogin.add(textoEsqueciSenha);
+
+>>>>>>> Stashed changes
         BotaoArredondado botaoEntrar = new BotaoArredondado("Entrar", 15);
         botaoEntrar.setBounds(42, 335, 326, 45);
         botaoEntrar.addActionListener((ActionEvent evento) -> validarLogin());
         painelLogin.add(botaoEntrar);
+<<<<<<< Updated upstream
+=======
+
+        JLabel textoCadastro = new JLabel("Não possui um conta? Cadastre-se", SwingConstants.CENTER);
+        textoCadastro.setBounds(35, 410, 340, 25);
+        textoCadastro.setFont(new Font("Arial", Font.PLAIN, 15));
+        textoCadastro.setForeground(new Color(47, 76, 113));
+        textoCadastro.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        painelLogin.add(textoCadastro);
+>>>>>>> Stashed changes
     }
 
     private static class PainelArredondado extends JPanel {
@@ -233,7 +253,6 @@ public class TelaLogin extends JFrame {
             g2.dispose();
         }
     }
-
 
     private void validarLogin() {
         String emailDigitado = campoEmail.getText().trim().toLowerCase();

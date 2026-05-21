@@ -2,7 +2,6 @@ package model;
 import model.tipos.TipoAjuda;
 
 public class Ajuda {
-
     private int id;
     private TipoAjuda tipoAjuda;
     private int quantidadeDisponivel;
