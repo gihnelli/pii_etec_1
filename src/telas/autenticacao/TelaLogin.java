@@ -1,8 +1,27 @@
 package telas.autenticacao;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import javax.swing.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 import telas.aluno.TelaMenuAluno;
 import telas.professor.TelaMenuProfessor;
 
@@ -110,7 +129,7 @@ public class TelaLogin extends JFrame {
     }
 
     private static class PainelArredondado extends JPanel {
-        private int raio;
+        private final int raio;
 
         public PainelArredondado(int raio) {
             this.raio = raio;
@@ -129,7 +148,7 @@ public class TelaLogin extends JFrame {
     }
 
     private static class CampoArredondado extends JTextField {
-        private int raio;
+        private final int raio;
 
         public CampoArredondado(int raio) {
             this.raio = raio;
@@ -151,7 +170,7 @@ public class TelaLogin extends JFrame {
     }
 
     private static class CampoSenhaArredondado extends JPasswordField {
-        private int raio;
+        private final int raio;
 
         public CampoSenhaArredondado(int raio) {
             this.raio = raio;
@@ -173,7 +192,7 @@ public class TelaLogin extends JFrame {
     }
 
     private static class BotaoArredondado extends JButton {
-        private int raio;
+        private final int raio;
 
         public BotaoArredondado(String texto, int raio) {
             super(texto);
