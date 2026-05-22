@@ -37,6 +37,7 @@ import javax.swing.text.StyledDocument;
 import model.Alternativa;
 import model.Partida;
 import model.Questao;
+import model.Resposta;
 import model.tipos.TipoQuestao;
 
 public class TelaJogo extends JFrame {
@@ -353,10 +354,16 @@ public class TelaJogo extends JFrame {
                 paresResolvidos++;
                 
                 if (paresResolvidos == 4) {
-                    Timer t = new Timer(800, e -> { indiceQuestaoAtual++; carregarQuestaoAtual(); });
-                    t.setRepeats(false);
-                    t.start();
-                }
+    registrarRespostaAssociacao(true);
+
+    Timer t = new Timer(800, e -> {
+        indiceQuestaoAtual++;
+        carregarQuestaoAtual();
+    });
+
+    t.setRepeats(false);
+    t.start();
+}
             } else {
                 selecionadoEsquerda.setBackground(new Color(231, 76, 60));
                 selecionadoDireita.setBackground(new Color(231, 76, 60));
@@ -484,10 +491,16 @@ public class TelaJogo extends JFrame {
             }
             
             if (paresResolvidos == 4) {
-                Timer t = new Timer(800, e -> { indiceQuestaoAtual++; carregarQuestaoAtual(); });
-                t.setRepeats(false);
-                t.start();
-            }
+    registrarRespostaAssociacao(true);
+
+    Timer t = new Timer(800, e -> {
+        indiceQuestaoAtual++;
+        carregarQuestaoAtual();
+    });
+
+    t.setRepeats(false);
+    t.start();
+}
         }
         
         if (painelConteudo != null) {
@@ -508,26 +521,92 @@ public class TelaJogo extends JFrame {
         carregarQuestaoAtual();
     }
 
+    private void registrarResposta(Questao questao, Alternativa alternativaEscolhida) {
+    if (partida == null || questao == null || alternativaEscolhida == null) {
+        return;
+    }
+
+    Resposta resposta = new Resposta();
+    resposta.setQuestao(questao);
+    resposta.setAlternativaEscolhida(alternativaEscolhida);
+
+    partida.adicionarResposta(resposta);
+}
+
+private void registrarRespostaAssociacao(boolean correta) {
+    Questao questaoAtual = questoes.get(indiceQuestaoAtual);
+
+    Alternativa alternativaResultado = new Alternativa(
+            0,
+            correta ? "Associação concluída" : "Associação incorreta",
+            correta
+    );
+
+    registrarResposta(questaoAtual, alternativaResultado);
+}
+
+private void salvarPartidaNoHistoricoAluno() {
+    if (partida == null || partida.getAluno() == null) {
+        return;
+    }
+
+    try {
+        if (partida.getAluno().getHistoricoPartidas() == null
+                || !partida.getAluno().getHistoricoPartidas().contains(partida)) {
+            partida.getAluno().adicionarPartida(partida);
+        }
+    } catch (Exception erro) {
+        System.out.println("Não foi possível salvar a partida no histórico do aluno: " + erro.getMessage());
+    }
+}
     private void processarRespostaAlternativa(Alternativa escolhida, BotaoAlternativa btn) {
-        if (escolhida.isECorreta()) {
-            btn.setBackground(new Color(46, 204, 113));
-            JOptionPane.showMessageDialog(this, "Resposta Correta! +10 pontos.", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+    Questao questaoAtual = questoes.get(indiceQuestaoAtual);
+
+    if (escolhida.isECorreta()) {
+        registrarResposta(questaoAtual, escolhida);
+
+        btn.setBackground(new Color(46, 204, 113));
+
+        JOptionPane.showMessageDialog(
+                this,
+                "Resposta Correta! +10 pontos.",
+                "Sucesso",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+
+        indiceQuestaoAtual++;
+        carregarQuestaoAtual();
+
+    } else {
+        if (chanceExtraAtiva) {
+            btn.setEnabled(false);
+            btn.setBackground(new Color(231, 76, 60));
+            chanceExtraAtiva = false;
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Ops! Resposta errada, mas você tem sua Chance Extra. Tente de novo!",
+                    "Segunda Chance",
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+        } else {
+            registrarResposta(questaoAtual, escolhida);
+
+            btn.setBackground(new Color(231, 76, 60));
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Incorreto!",
+                    "Fim de Turno",
+                    JOptionPane.ERROR_MESSAGE
+            );
+
             indiceQuestaoAtual++;
             carregarQuestaoAtual();
-        } else {
-            if (chanceExtraAtiva) {
-                btn.setEnabled(false);
-                btn.setBackground(new Color(231, 76, 60));
-                chanceExtraAtiva = false;
-                JOptionPane.showMessageDialog(this, "Ops! Resposta errada, mas você tem sua Chance Extra. Tente de novo!", "Segunda Chance", JOptionPane.WARNING_MESSAGE);
-            } else {
-                btn.setBackground(new Color(231, 76, 60));
-                JOptionPane.showMessageDialog(this, "Incorreto! A resposta certa seria destacada.", "Fim de Turno", JOptionPane.ERROR_MESSAGE);
-                indiceQuestaoAtual++;
-                carregarQuestaoAtual();
-            }
         }
     }
+}
 
     private void confirmarSaida() {
         int opt = JOptionPane.showConfirmDialog(this, "Sair agora interromperá sua partida. Confirmar?", "Sair do Jogo", JOptionPane.YES_NO_OPTION);
@@ -539,6 +618,7 @@ public class TelaJogo extends JFrame {
 
     private void finalizarPartida() {
     partida.finalizar();
+    salvarPartidaNoHistoricoAluno();
 
     JOptionPane.showMessageDialog(
             this,

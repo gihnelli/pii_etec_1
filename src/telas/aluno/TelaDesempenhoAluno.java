@@ -491,7 +491,7 @@ public class TelaDesempenhoAluno extends JFrame {
             Graphics2D desenho = (Graphics2D) grafico.create();
             desenho.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            int margem = grande ? 110 : 70;
+            int margem = grande ? 150 : 90;
             int tamanho = Math.min(getWidth(), getHeight()) - margem;
 
             if (tamanho < 80) {
@@ -546,7 +546,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 String linha2
         ) {
             double radiano = Math.toRadians(angulo);
-            int raio = tamanho / 2 + (grande ? 42 : 28);
+            int raio = tamanho / 2 + (grande ? 35 : 20);
 
             int posicaoX = (int) (x + tamanho / 2 + raio * Math.cos(radiano));
             int posicaoY = (int) (y + tamanho / 2 - raio * Math.sin(radiano));
