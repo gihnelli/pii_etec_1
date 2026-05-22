@@ -26,10 +26,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import model.Alternativa;
 import model.Partida;
@@ -189,66 +192,96 @@ public class TelaJogo extends JFrame {
         painelConteudo.revalidate();
         painelConteudo.repaint();
     }
+        private void montarInterfaceAlternativa(Questao questao) {
+    PainelArredondado painelPergunta = new PainelArredondado(30);
+    painelPergunta.setLayout(null);
+    painelPergunta.setBounds(50, 10, 800, 320);
+    painelPergunta.setBackground(new Color(47, 76, 113));
+    painelConteudo.add(painelPergunta);
 
-    private void montarInterfaceAlternativa(Questao questao) {
-        PainelArredondado painelPergunta = new PainelArredondado(30);
-        painelPergunta.setLayout(null);
-        painelPergunta.setBounds(50, 10, 800, 320);
-        painelPergunta.setBackground(new Color(47, 76, 113));
-        painelConteudo.add(painelPergunta);
-        String enunciado = questao.getEnunciado();
-boolean perguntaLonga = enunciado.length() > 65;
+    String enunciado = questao.getEnunciado();
+    boolean perguntaLonga = enunciado.length() > 65;
 
-JTextArea textoPergunta = new JTextArea(enunciado);
-textoPergunta.setBounds(40, 15, 720, perguntaLonga ? 105 : 65);
-textoPergunta.setFont(new Font("Verdana", Font.BOLD, perguntaLonga ? 23 : 28));
-textoPergunta.setForeground(Color.WHITE);
-textoPergunta.setOpaque(false);
-textoPergunta.setEditable(false);
-textoPergunta.setFocusable(false);
-textoPergunta.setLineWrap(true);
-textoPergunta.setWrapStyleWord(true);
-textoPergunta.setAlignmentX(CENTER_ALIGNMENT);
-textoPergunta.setHighlighter(null);
-painelPergunta.add(textoPergunta);
+    JTextPane textoPergunta = new JTextPane();
+    textoPergunta.setText(enunciado);
+    textoPergunta.setBounds(
+            40,
+            perguntaLonga ? 10 : 20,
+            720,
+            perguntaLonga ? 110 : 70
+    );
 
-labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
-labelImagemQuestao.setBounds(
-        250,
-        perguntaLonga ? 125 : 90,
-        300,
-        perguntaLonga ? 175 : 210
-);
-        if (questao.getImagemEnunciado() != null && !questao.getImagemEnunciado().isEmpty()) {
-            try {
-                ImageIcon icon = new ImageIcon(questao.getImagemEnunciado());
-                int tamanhoImagem = perguntaLonga ? 170 : 200;
-                Image img = icon.getImage().getScaledInstance(tamanhoImagem, tamanhoImagem, Image.SCALE_SMOOTH);
-                labelImagemQuestao.setIcon(new ImageIcon(img));
-            } catch (Exception e) {
-                labelImagemQuestao.setText("🧪");
-                labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, 100));
-                labelImagemQuestao.setForeground(Color.WHITE);
-            }
-        }
-        painelPergunta.add(labelImagemQuestao);
+    textoPergunta.setFont(new Font(
+            "Verdana",
+            Font.BOLD,
+            perguntaLonga ? 24 : 28
+    ));
 
-        botoesAlternativas.clear();
-        List<Alternativa> alternativas = questao.getAlternativas();
-        int y = 350;
-        char letra = 'a';
-        for (Alternativa alt : alternativas) {
-            BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto());
-            btn.setBounds(50, y, 800, 48);
-            btn.addActionListener(e -> processarRespostaAlternativa(alt, btn));
-            painelConteudo.add(btn);
-            botoesAlternativas.add(btn);
-            y += 58;
-            letra++;
+    textoPergunta.setForeground(Color.WHITE);
+    textoPergunta.setOpaque(false);
+    textoPergunta.setEditable(false);
+    textoPergunta.setFocusable(false);
+    textoPergunta.setBorder(null);
+    textoPergunta.setHighlighter(null);
+
+    StyledDocument documento = textoPergunta.getStyledDocument();
+    SimpleAttributeSet alinhamento = new SimpleAttributeSet();
+    StyleConstants.setAlignment(alinhamento, StyleConstants.ALIGN_CENTER);
+    documento.setParagraphAttributes(0, documento.getLength(), alinhamento, false);
+
+    painelPergunta.add(textoPergunta);
+
+    labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
+    labelImagemQuestao.setBounds(
+            250,
+            perguntaLonga ? 130 : 95,
+            300,
+            perguntaLonga ? 165 : 205
+    );
+
+    if (questao.getImagemEnunciado() != null && !questao.getImagemEnunciado().isEmpty()) {
+        try {
+            ImageIcon icon = new ImageIcon(questao.getImagemEnunciado());
+
+            int tamanhoImagem = perguntaLonga ? 165 : 200;
+
+            Image img = icon.getImage().getScaledInstance(
+                    tamanhoImagem,
+                    tamanhoImagem,
+                    Image.SCALE_SMOOTH
+            );
+
+            labelImagemQuestao.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+            labelImagemQuestao.setText("🧪");
+            labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, perguntaLonga ? 80 : 100));
+            labelImagemQuestao.setForeground(Color.WHITE);
         }
     }
 
-    private void montarInterfaceAssociacao(Questao questao) {
+    painelPergunta.add(labelImagemQuestao);
+
+    botoesAlternativas.clear();
+
+    List<Alternativa> alternativas = questao.getAlternativas();
+
+    int y = 350;
+    char letra = 'a';
+
+    for (Alternativa alt : alternativas) {
+        BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto());
+        btn.setBounds(50, y, 800, 48);
+        btn.addActionListener(e -> processarRespostaAlternativa(alt, btn));
+
+        painelConteudo.add(btn);
+        botoesAlternativas.add(btn);
+
+        y += 58;
+        letra++;
+    }
+}
+
+        private void montarInterfaceAssociacao(Questao questao) {
         PainelArredondado painelInstrucao = new PainelArredondado(20);
         painelInstrucao.setLayout(new BorderLayout());
         painelInstrucao.setBounds(100, 5, 700, 70);
