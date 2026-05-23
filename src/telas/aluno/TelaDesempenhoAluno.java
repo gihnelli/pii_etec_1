@@ -225,14 +225,26 @@ public class TelaDesempenhoAluno extends JFrame {
         return estatisticas;
     }
 
+      private File criarPastaRelatorios() {
+        File pasta = new File("relatorios");
+
+        if (!pasta.exists()) {
+            pasta.mkdirs();
+        }
+
+        return pasta;
+    }
+
+
     private void gerarPdfDoAluno() {
         File arquivo = null;
 
         try {
+            File pastaRelatorios = criarPastaRelatorios();
             String nomeAluno = aluno != null ? aluno.getNome() : "Aluno";
             String nomeArquivo = "Relatorio_" + limparNomeArquivo(nomeAluno) + ".pdf";
 
-            arquivo = new File(nomeArquivo);
+            arquivo = new File(pastaRelatorios, nomeArquivo);
 
             try (PDDocument documento = new PDDocument()) {
                 PDPage pagina = new PDPage(PDRectangle.A4);
@@ -608,7 +620,7 @@ public class TelaDesempenhoAluno extends JFrame {
         private Image imagemFundo;
 
         public PainelFundo() {
-            imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+            imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
         }
 
         @Override

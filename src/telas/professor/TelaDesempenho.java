@@ -904,7 +904,7 @@ public class TelaDesempenho extends JFrame {
         private Image imagemFundo;
 
         public PainelFundo() {
-            imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+            imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
         }
 
         @Override

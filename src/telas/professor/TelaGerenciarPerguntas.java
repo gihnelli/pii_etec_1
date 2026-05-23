@@ -925,7 +925,7 @@ private static class PainelFundoImagem extends JPanel {
 
     private void carregarImagem() {
         try {
-            File arquivo = new File("imagens/menu.png");
+            File arquivo = new File("imagens/Menu.png");
             imagemFundo = ImageIO.read(arquivo);
         } catch (IOException erro) {
             System.out.println("Erro ao carregar imagem de fundo: " + erro.getMessage());

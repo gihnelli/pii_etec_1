@@ -1,2 +1,0 @@
-Main-Class: aplicativo.LabQuest
-Class-Path: libs/pdfbox-app-3.0.7.jar

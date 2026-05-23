@@ -728,7 +728,7 @@ private void salvarPartidaNoHistoricoAluno() {
 
     private static class PainelFundo extends JPanel {
         private Image img;
-        public PainelFundo() { try { img = new ImageIcon("imagens/menu.png").getImage(); } catch(Exception e){} }
+        public PainelFundo() { try { img = new ImageIcon("imagens/Menu.png").getImage(); } catch(Exception e){} }
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);

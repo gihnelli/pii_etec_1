@@ -170,7 +170,7 @@ public class TelaMenuAluno extends JFrame {
 
         public PainelFundo() {
             try {
-                imagemFundo = new ImageIcon("imagens/menu.png").getImage();
+                imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
             }
