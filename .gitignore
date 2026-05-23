@@ -1,1 +1,7 @@
+target/
+*.class
+
+relatorios/*.pdf
+
+*.log
 .env
