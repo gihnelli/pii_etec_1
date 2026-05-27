@@ -9,13 +9,12 @@ public class Questao {
 
     private int id;
     private String enunciado;
-    private String imagemEnunciado;   // caminho ou URL da imagem do enunciado
+    private String imagemEnunciado;
     private TipoQuestao tipo;
     private NivelDificuldade nivelDificuldade;
     private String categoria;
     private List<Alternativa> alternativas;
 
-    // Construtores
     public Questao() {
         this.alternativas = new ArrayList<>();
     }
@@ -29,14 +28,10 @@ public class Questao {
         this.alternativas = new ArrayList<>();
     }
 
-    // Métodos de comportamento
-
-    // Retorna a lista de alternativas da questão.
     public List<Alternativa> getAlternativas() {
         return new ArrayList<>(alternativas);
     }
 
-    // Adiciona uma alternativa à questão.
     public void adicionarAlternativa(Alternativa alternativa) {
         if (alternativa == null) {
             throw new IllegalArgumentException("Alternativa não pode ser nula.");
@@ -44,7 +39,6 @@ public class Questao {
         this.alternativas.add(alternativa);
     }
 
-    // Retorna a alternativa correta da questão.
     public Alternativa getAlternativaCorreta() {
         for (Alternativa alt : alternativas) {
             if (alt.isECorreta()) {
@@ -54,12 +48,10 @@ public class Questao {
         return null;
     }
 
-    // Verifica se a questão está completa e válida para ser utilizada em uma partida.
     public boolean isValida() {
         return enunciado != null && !enunciado.isBlank() && tipo != null && nivelDificuldade != null && !alternativas.isEmpty() && getAlternativaCorreta() != null;
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

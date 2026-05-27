@@ -1,6 +1,5 @@
 package model;
 
-/// Representa a resposta dada por um aluno a uma questão durante uma partida.
 public class Resposta {
 
     private int id;
@@ -9,7 +8,6 @@ public class Resposta {
     private boolean correta;
     private int tempoResposta;
 
-    // Construtores
     public Resposta() {}
 
     public Resposta(int id, Questao questao, Alternativa alternativaEscolhida, int tempoResposta) {
@@ -20,7 +18,6 @@ public class Resposta {
         this.correta = validar();
     }
 
-    // Valida se a resposta escolhida é correta ou não.
     public boolean validar() {
         if (alternativaEscolhida == null || questao == null) {
             return false;
@@ -28,7 +25,6 @@ public class Resposta {
         return alternativaEscolhida.isECorreta();
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

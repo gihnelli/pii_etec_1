@@ -21,8 +21,6 @@ public class Desempenho {
         calcularNivelMedio();
     }
 
-    // Métodos de comportamento
-    //Calcula a porcentagem de acertos.
     public void calcularPercentualAcerto() {
         int totalRespostas = totalAcertos + totalErros;
         if (totalRespostas == 0) {
@@ -32,7 +30,6 @@ public class Desempenho {
         }
     }
 
-    // Define o nível médio de dificuldade com base no percentual de acertos
     public void calcularNivelMedio() {
         if (percentualAcerto >= 70.0) {
             this.nivelMedio = NivelDificuldade.DIFICIL;
@@ -43,14 +40,12 @@ public class Desempenho {
         }
     }
 
-    // Gera o relatório
     public Relatorio gerarRelatorio() {
         Relatorio relatorio = new Relatorio();
         relatorio.setDesempenho(this);
         return relatorio;
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

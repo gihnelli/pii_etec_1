@@ -12,10 +12,8 @@ public class MaterialLaboratorio {
     private String categoria;
     private String funcao;
 
-    // Sistemas experimentais nos quais este material é utilizado
     private List<SistemaExperimental> sistemasAssociados;
 
-    // Construtores
     public MaterialLaboratorio() {
         this.sistemasAssociados = new ArrayList<>();
     }
@@ -30,13 +28,10 @@ public class MaterialLaboratorio {
         this.sistemasAssociados = new ArrayList<>();
     }
 
-    // Métodos
-    // Retorna a lista de sistemas experimentais associados a este material
     public List<SistemaExperimental> getSistemasAssociados() {
         return new ArrayList<>(sistemasAssociados);
     }
 
-    // Associa este material a um sistema experimental
     public void associarSistema(SistemaExperimental sistema) {
         if (sistema == null) {
             throw new IllegalArgumentException("Sistema experimental não pode ser nulo.");
@@ -44,7 +39,6 @@ public class MaterialLaboratorio {
         this.sistemasAssociados.add(sistema);
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

@@ -11,7 +11,6 @@ public class Relatorio {
     private LocalDate periodoInicio;
     private LocalDate periodoFim;
 
-    // Construtores
     public Relatorio() {
         this.dataGeracao = LocalDateTime.now();
     }
@@ -25,9 +24,6 @@ public class Relatorio {
         this.periodoFim = periodoFim;
     }
 
-    // Métodos
-
-    // Exporta o relatório em formato de texto
     public String exportar() {
         StringBuilder sb = new StringBuilder();
         sb.append("Relatório do aluno\n");
@@ -53,7 +49,6 @@ public class Relatorio {
         return sb.toString();
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

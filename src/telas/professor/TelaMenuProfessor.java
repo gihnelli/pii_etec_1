@@ -81,7 +81,6 @@ public class TelaMenuProfessor extends JFrame {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
-            // Garante que a imagem seja redimensionada proporcionalmente para caber no botão de 45x45
             Image img = iconOriginal.getImage().getScaledInstance(45, 45, Image.SCALE_SMOOTH);
             btn.setIcon(new ImageIcon(img));
         } catch (Exception e) {
@@ -90,7 +89,7 @@ public class TelaMenuProfessor extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0)); // Remove margens que podem causar cortes
+        btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }

@@ -7,8 +7,6 @@ public class AumentaDificuldade {
 
     private AumentaDificuldade(){}
 
-    //Metodos
-    //Calcular o próximo nível de dificuldade
     public static NivelDificuldade calcularProximoNivel(NivelDificuldade nivelAtual, int acertosConsecutivos, int errosConsecutivos) {
         if (nivelAtual == null){
             return NivelDificuldade.FACIL;
@@ -22,7 +20,6 @@ public class AumentaDificuldade {
         }
     }
 
-    //Sobe um nivel de dificuldade
     public static NivelDificuldade subirNivel(NivelDificuldade nivel) {
         return switch (nivel) {
             case FACIL -> NivelDificuldade.MEDIO;
@@ -30,7 +27,6 @@ public class AumentaDificuldade {
             case DIFICIL -> NivelDificuldade.DIFICIL;
         };
     }
-    //Diminui um nivel de dificuldade
     public static NivelDificuldade descerNivel(NivelDificuldade nivel){
         return switch (nivel) {
             case FACIL -> NivelDificuldade.FACIL;
@@ -39,17 +35,14 @@ public class AumentaDificuldade {
         };
     }
 
-    //Verifica se pode aumentar a dificuldade
     public static boolean podeAumentar(NivelDificuldade nivel){
         return nivel != NivelDificuldade.DIFICIL;
     }
 
-    //Verifica se pode diminuir a dificuldade
     public static boolean podeDiminuir(NivelDificuldade nivel){
         return nivel != NivelDificuldade.FACIL;
     }
 
-    //Reinicia a dificuldade para o nível inicial
     public static NivelDificuldade getNivelInicial(){
         return NivelDificuldade.FACIL;
     }

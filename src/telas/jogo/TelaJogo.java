@@ -315,14 +315,14 @@ public class TelaJogo extends JFrame {
             BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
             btnEsq.setBounds(50, y, 230, 110);
             btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
-            btnEsq.setIdPar(pares[idxEsq][1]); // Garantir que o ID do par esteja setado para a ajuda 50/50
+            btnEsq.setIdPar(pares[idxEsq][1]);
             painelConteudo.add(btnEsq);
             botoesEsq.add(btnEsq);
 
             BotaoAssociacao btnDir = new BotaoAssociacao(pares[idxDir][1], null, false);
             btnDir.setBounds(620, y, 230, 110);
             btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, pares[idxDir][1]));
-            btnDir.setIdPar(pares[idxDir][1]); // Garantir que o ID do par esteja setado para a ajuda 50/50
+            btnDir.setIdPar(pares[idxDir][1]);
             painelConteudo.add(btnDir);
             botoesDir.add(btnDir);
 
@@ -464,7 +464,6 @@ public class TelaJogo extends JFrame {
                 }
             }
         } else if (q.getTipo() == TipoQuestao.ASSOCIACAO) {
-            // No caso de associação, o 50/50 resolve 2 pares aleatórios
             List<String> idsDisponiveis = new ArrayList<>();
             for (BotaoAssociacao btn : botoesEsq) {
                 if (!btn.isResolvido()) {

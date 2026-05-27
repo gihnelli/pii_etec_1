@@ -9,10 +9,8 @@ public class SistemaExperimental {
     private String imagem;
     private String descricao;
 
-    // Materiais de laboratório que estão nesse sistema
     private List<MaterialLaboratorio> materiaisNecessarios;
 
-    // Construtores
     public SistemaExperimental() {
         this.materiaisNecessarios = new ArrayList<>();
     }
@@ -25,13 +23,10 @@ public class SistemaExperimental {
         this.materiaisNecessarios = new ArrayList<>();
     }
 
-    // Métodos
-    // Retorna a lista de materiais necessários para esse sistema experimental
     public List<MaterialLaboratorio> getMateriaisNecessarios() {
         return new ArrayList<>(materiaisNecessarios);
     }
 
-    // Adiciona um material à lista de materiais necessários para esse sistema
     public void adicionarMaterial(MaterialLaboratorio material) {
         if (material == null) {
             throw new IllegalArgumentException("Material não pode ser nulo.");
@@ -39,7 +34,6 @@ public class SistemaExperimental {
         this.materiaisNecessarios.add(material);
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

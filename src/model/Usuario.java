@@ -7,10 +7,9 @@ public abstract class Usuario {
     private String email;
     private String senha;
     private TipoUsuario tipo;
- 
-    // Construtores
+
     public Usuario() {}
- 
+
     public Usuario(int id, String nome, String email, String senha, TipoUsuario tipo) {
         this.id = id;
         this.nome = nome;
@@ -19,8 +18,6 @@ public abstract class Usuario {
         this.tipo = tipo;
     }
 
-    // Métodos de comportamento
-    //Verifica a senha
     public boolean autenticar(String senhaInformada) {
         if (senhaInformada == null || senhaInformada.isBlank()) {
             return false;
@@ -28,12 +25,10 @@ public abstract class Usuario {
         return this.senha.equals(senhaInformada);
     }
  
-    //Logout
     public void sair() {
         System.out.println("Usuário " + nome + " saiu do sistema.");
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

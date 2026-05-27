@@ -1,16 +1,20 @@
 package database.DAO;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
 import model.Aluno;
 import model.Professor;
 import model.Usuario;
 import model.tipos.TipoUsuario;
 
 public class UsuarioDAO {
-
-    //Inserir um novo usuário no banco e devolve o id gerado.
     public int inserir(Usuario usuario, String salt) throws SQLException {
         String sql = """
                 INSERT INTO usuario (nome, email, senha, salt, tipo, turma, ra)
@@ -18,7 +22,7 @@ public class UsuarioDAO {
                 """;
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
             ps.setString(3, usuario.getSenha());
@@ -42,13 +46,10 @@ public class UsuarioDAO {
         }
         return -1;
     }
-
-    // READ
-    // Busca qualquer usuário ativo pelo id. Retorna Aluno ou Professor conforme o tipo.
     public Usuario buscarPorId(int id) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id = ? AND ativo = TRUE";
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -59,12 +60,11 @@ public class UsuarioDAO {
         return null;
     }
 
-    // Busca pelo e-mail (usado no login).
     public Usuario buscarPorEmail(String email) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE email = ? AND ativo = TRUE";
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -75,15 +75,13 @@ public class UsuarioDAO {
         }
         return null;
     }
-
-    //Retorna todos os alunos ativos.
     public List<Aluno> listarAlunos() throws SQLException {
         String sql = "SELECT * FROM usuario WHERE tipo = 'ALUNO' AND ativo = TRUE ORDER BY nome";
         List<Aluno> lista = new ArrayList<>();
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 lista.add(mapearAluno(rs));
@@ -92,14 +90,13 @@ public class UsuarioDAO {
         return lista;
     }
 
-    //Retorna todos os professores ativos.
     public List<Professor> listarProfessores() throws SQLException {
         String sql = "SELECT * FROM usuario WHERE tipo = 'PROFESSOR' AND ativo = TRUE ORDER BY nome";
         List<Professor> lista = new ArrayList<>();
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 lista.add(mapearProfessor(rs));
@@ -108,12 +105,11 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // Retorna o salt de um usuário pelo e-mail (necessário para recalcular o hash no login).
     public String buscarSaltPorEmail(String email) throws SQLException {
         String sql = "SELECT salt FROM usuario WHERE email = ? AND ativo = TRUE";
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -125,16 +121,15 @@ public class UsuarioDAO {
         return null;
     }
 
-    // Atualiza nome, e-mail e turma/ra de um usuário existente.
     public boolean atualizar(Usuario usuario) throws SQLException {
         String sql = """
                 UPDATE usuario
-                   SET nome = ?, email = ?, turma = ?, ra = ?
-                 WHERE id = ?
+                SET nome = ?, email = ?, turma = ?, ra = ?
+                WHERE id = ?
                 """;
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
@@ -152,25 +147,22 @@ public class UsuarioDAO {
         }
     }
 
-    // Troca a senha (hash) de um usuário.
     public boolean atualizarSenha(int idUsuario, String novaSenhaHash) throws SQLException {
         String sql = "UPDATE usuario SET senha = ? WHERE id = ?";
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, novaSenhaHash);
             ps.setInt(2, idUsuario);
             return ps.executeUpdate() > 0;
         }
     }
-
-    // Desativa um usuário (soft-delete) sem remover o registro.
     public boolean desativar(int id) throws SQLException {
         String sql = "UPDATE usuario SET ativo = FALSE WHERE id = ?";
 
         try (Connection con = Conexao.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+            PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;

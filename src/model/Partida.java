@@ -15,7 +15,6 @@ public class Partida {
     private boolean finalizada;
     private List<Resposta> respostas;
 
-    // Construtores
     public Partida() {
         this.respostas = new ArrayList<>();
         this.finalizada = false;
@@ -33,15 +32,12 @@ public class Partida {
         this.id = id;
     }
 
-    // Métodos de comportamento
-    // Inicia a partida + registra o horário de início.
     public void iniciar() {
         this.dataHoraInicio = LocalDateTime.now();
         this.finalizada = false;
         System.out.println("Partida iniciada em: " + dataHoraInicio);
     }
 
-    // Finaliza a partida + registra o horário de término + calcula a pontuação final.
     public void finalizar() {
         this.dataHoraFim = LocalDateTime.now();
         this.finalizada = true;
@@ -49,7 +45,6 @@ public class Partida {
         System.out.println("Partida finalizada. Pontuação: " + pontuacao);
     }
 
-    // Calcula a pontuação total com base nas respostas corretas e no nível de dificuldade.
     public int calcularPontuacao() {
         int total = 0;
         for (Resposta resposta : respostas) {
@@ -65,7 +60,6 @@ public class Partida {
         return total;
     }
 
-    //Registra uma resposta dada pelo aluno durante a partida.
     public void adicionarResposta(Resposta resposta) {
         if (resposta == null) {
             throw new IllegalArgumentException("Resposta não pode ser nula.");
@@ -73,12 +67,10 @@ public class Partida {
         respostas.add(resposta);
     }
 
-    //Retorna todas as respostas registradas na partida.
     public List<Resposta> getRespostas() {
         return new ArrayList<>(respostas);
     }
 
-    // Conta o total de respostas corretas na partida.
     public int getTotalAcertos() {
         int acertos = 0;
         for (Resposta r : respostas) {
@@ -87,12 +79,10 @@ public class Partida {
         return acertos;
     }
 
-    // Conta o total de respostas incorretas na partida.
     public int getTotalErros() {
         return respostas.size() - getTotalAcertos();
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

@@ -6,7 +6,6 @@ public class Ajuda {
     private TipoAjuda tipoAjuda;
     private int quantidadeDisponivel;
 
-    // Construtores
     public Ajuda() {}
 
     public Ajuda(int id, TipoAjuda tipoAjuda, int quantidadeDisponivel) {
@@ -14,9 +13,6 @@ public class Ajuda {
         this.tipoAjuda = tipoAjuda;
         this.quantidadeDisponivel = quantidadeDisponivel;
     }
-
-    // Métodos de comportamento
-    // Utiliza uma ajuda durante a partida + reduz quantidade disponível
     public void utilizarNaPartida(Partida partida) {
         if (!verificarDisponibilidade()) {
             throw new IllegalStateException("Ajuda do tipo " + tipoAjuda + " não está mais disponível.");
@@ -25,12 +21,10 @@ public class Ajuda {
         System.out.println("Ajuda utilizada: " + tipoAjuda + " | Restantes: " + quantidadeDisponivel);
     }
 
-    //Verifica se tem ajuda disponível
     public boolean verificarDisponibilidade() {
         return quantidadeDisponivel > 0;
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }

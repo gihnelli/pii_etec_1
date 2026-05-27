@@ -8,17 +8,15 @@ public class Aluno extends Usuario {
  
     private String turma;
     private String ra;
- 
-    // Histórico de partidas jogadas pelo aluno
+
     private List<Partida> historicoPartidas;
 
-    // Construtores
     public Aluno() {
         super();
         this.historicoPartidas = new ArrayList<>();
         setTipo(TipoUsuario.ALUNO);
     }
- 
+
     public Aluno(int id, String nome, String email, String senha, String turma, String ra) {
         super(id, nome, email, senha, TipoUsuario.ALUNO);
         this.turma = turma;
@@ -26,27 +24,22 @@ public class Aluno extends Usuario {
         this.historicoPartidas = new ArrayList<>();
     }
 
-    // Métodos de comportamento
-    //Inicia uma nova partida para o aluno.
     public Partida jogar() {
         Partida novaPartida = new Partida(this);
         historicoPartidas.add(novaPartida);
         return novaPartida;
     }
 
-    // Adiciona uma partida existente ao histórico do aluno.
     public void adicionarPartida(Partida partida) {
         if (partida != null) {
             this.historicoPartidas.add(partida);
         }
     }
- 
-    //Retorna o histórico de partidas do aluno.
+
     public List<Partida> verHistorico() {
         return new ArrayList<>(historicoPartidas);
     }
- 
-    //Calcula o desempenho geral do aluno com base no histórico de partidas.
+
     public Desempenho verDesempenho() {
         int totalAcertos = 0;
         int totalErros = 0;
@@ -65,7 +58,6 @@ public class Aluno extends Usuario {
         return desempenho;
     }
 
-    // Getters e Setters
     public String getTurma() {
         return turma;
     }

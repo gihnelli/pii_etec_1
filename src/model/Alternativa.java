@@ -7,17 +7,16 @@ public class Alternativa {
     private String imagem;
     private boolean estaCorreta;
     private boolean errada;
- 
-    // Construtores
+
     public Alternativa() {}
- 
+
     public Alternativa(int id, String texto, boolean estaCorreta) {
         this.id = id;
         this.texto = texto;
         this.estaCorreta = estaCorreta;
         this.errada = false;
     }
- 
+
     public Alternativa(int id, String texto, String imagem, boolean estaCorreta, boolean errada) {
         this.id = id;
         this.texto = texto;
@@ -26,12 +25,10 @@ public class Alternativa {
         this.errada = errada;
     }
 
-    // Valida se a alternativa é correta ou não.
     public boolean validar() {
         return estaCorreta;
     }
 
-    // Getters e Setters
     public int getId() {
         return id;
     }
