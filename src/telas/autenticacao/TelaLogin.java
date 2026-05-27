@@ -213,7 +213,7 @@ public class TelaLogin extends JFrame {
 
         public PainelFundo() {
             try {
-                imagemFundo = new ImageIcon("imagens/Menu.png").getImage();
+                imagemFundo = new ImageIcon("imagens/login.png").getImage();
             } catch (Exception e) {
                 System.err.println("Erro ao carregar imagem de fundo: " + e.getMessage());
             }
