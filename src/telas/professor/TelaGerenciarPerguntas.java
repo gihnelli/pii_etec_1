@@ -726,7 +726,7 @@ public class TelaGerenciarPerguntas extends JFrame {
     private void carregarPerguntasExemplo() {
         bancoPerguntas.add(new PerguntaCadastro(
                 "Qual a função do Béquer?",
-                Arrays.asList(
+                Arrays.asList(  
                         "Misturar e aquecer líquidos",
                         "Transferir líquidos",
                         "Medir volume exato de líquido",

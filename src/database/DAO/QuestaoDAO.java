@@ -19,10 +19,10 @@ public class QuestaoDAO {
                 INSERT INTO questao (enunciado, tipo, nivel_dificuldade, categoria, imagem_url, id_professor)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
- 
+
         Connection con = Conexao.getConnection();
         con.setAutoCommit(false);
- 
+
         try (PreparedStatement ps = con.prepareStatement(sqlQuestao, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, questao.getEnunciado());
             ps.setString(2, questao.getTipo().name());
@@ -31,18 +31,18 @@ public class QuestaoDAO {
             ps.setString(5, questao.getImagemEnunciado());
             ps.setInt(6, idProfessor);
             ps.executeUpdate();
- 
+
             int idQuestao;
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (!rs.next()) throw new SQLException("Falha ao obter id da questão.");
                 idQuestao = rs.getInt(1);
                 questao.setId(idQuestao);
             }
- 
+
             inserirAlternativas(con, questao.getAlternativas(), idQuestao);
             con.commit();
             return idQuestao;
- 
+
         } catch (SQLException e) {
             con.rollback();
             throw e;
@@ -51,14 +51,14 @@ public class QuestaoDAO {
             con.close();
         }
     }
- 
+
     private void inserirAlternativas(Connection con, List<Alternativa> alternativas, int idQuestao)
             throws SQLException {
         String sql = """
                 INSERT INTO alternativa (id_questao, texto, e_correta, imagem_url)
                 VALUES (?, ?, ?, ?)
                 """;
- 
+
         try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             for (Alternativa alt : alternativas) {
                 ps.setInt(1, idQuestao);

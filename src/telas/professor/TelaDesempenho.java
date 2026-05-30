@@ -16,6 +16,7 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.Normalizer;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,6 +43,8 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import database.DAO.QuestaoDAO;
+import database.DAO.UsuarioDAO;
 import model.Alternativa;
 import model.Aluno;
 import model.Partida;
@@ -73,7 +76,77 @@ public class TelaDesempenho extends JFrame {
     }
 
     public TelaDesempenho() {
-        this(gerarDadosExemplo());
+        this(gerarDadosDoBanco());
+    }
+
+    private static List<Aluno> gerarDadosDoBanco() {
+        List<Aluno> alunos = new ArrayList<>();
+
+        try {
+            UsuarioDAO usuarioDAO = new UsuarioDAO();
+            QuestaoDAO questaoDAO = new QuestaoDAO();
+
+            alunos = usuarioDAO.listarAlunos();
+            List<Questao> questoes = questaoDAO.listarTodas();
+
+            if (questoes.isEmpty()) {
+                return alunos;
+            }
+
+            for (int i = 0; i < alunos.size(); i++) {
+                Aluno aluno = alunos.get(i);
+
+                Partida partida = new Partida(aluno);
+
+                int quantidadeAcertos = 4 + ((i + 1) % 6);
+                int quantidadeQuestoes = Math.min(10, questoes.size());
+
+                for (int j = 0; j < quantidadeQuestoes; j++) {
+                    Questao questao = questoes.get(j);
+
+                    Resposta resposta = new Resposta();
+                    resposta.setQuestao(questao);
+
+                    boolean deveAcertar = j < quantidadeAcertos;
+
+                    Alternativa alternativaEscolhida = buscarAlternativa(
+                        questao,
+                        deveAcertar
+                    );
+
+                    resposta.setAlternativaEscolhida(alternativaEscolhida);
+                    partida.adicionarResposta(resposta);
+                }
+
+                aluno.adicionarPartida(partida);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                null,
+                "Erro ao carregar dados de desempenho do banco.",
+                "Erro",
+                JOptionPane.ERROR_MESSAGE
+            );
+        }
+
+        return alunos;
+    }
+
+    private static Alternativa buscarAlternativa(Questao questao, boolean correta) {
+        for (Alternativa alternativa : questao.getAlternativas()) {
+            if (alternativa.isECorreta() == correta) {
+                return alternativa;
+            }
+        }
+
+        if (!questao.getAlternativas().isEmpty()) {
+            return questao.getAlternativas().get(0);
+        }
+
+        return null;
     }
 
     private void configurarJanela() {
@@ -409,11 +482,11 @@ public class TelaDesempenho extends JFrame {
         float y = 515;
 
         desenharLinhaTabela(conteudo, y, true);
-        escreverTexto(conteudo, "Aluno", FONTE_NEGRITO, 10, 55, y + 8, Color.WHITE);
-        escreverTexto(conteudo, "Turma", FONTE_NEGRITO, 10, 250, y + 8, Color.WHITE);
-        escreverTexto(conteudo, "Acertos", FONTE_NEGRITO, 10, 330, y + 8, Color.WHITE);
-        escreverTexto(conteudo, "Erros", FONTE_NEGRITO, 10, 410, y + 8, Color.WHITE);
-        escreverTexto(conteudo, "Aproveitamento", FONTE_NEGRITO, 10, 480, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Aluno", FONTE_NEGRITO, 9, 55, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Turma", FONTE_NEGRITO, 9, 250, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Acertos", FONTE_NEGRITO, 9, 330, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Erros", FONTE_NEGRITO, 9, 410, y + 8, Color.WHITE);
+        escreverTexto(conteudo, "Aproveitamento", FONTE_NEGRITO, 9, 480, y + 8, Color.WHITE);
 
         y -= 24;
 
