@@ -882,12 +882,9 @@ private void salvarPartidaNoHistoricoAluno() {
 public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
         model.Aluno alunoTeste = new model.Aluno(
-                1,
                 "Demo",
                 "demo@aluno.cps.sp.gov.br",
-                "123",
-                "1A",
-                "0001"
+                "123"
         );
 
         Partida partidaTeste = new Partida(alunoTeste);

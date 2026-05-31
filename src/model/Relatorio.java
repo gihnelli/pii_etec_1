@@ -31,8 +31,6 @@ public class Relatorio {
 
         if (aluno != null) {
             sb.append("Aluno: ").append(aluno.getNome()).append("\n");
-            sb.append("Turma: ").append(aluno.getTurma()).append("\n");
-            sb.append("RA: ").append(aluno.getRa()).append("\n");
         }
 
         if (periodoInicio != null && periodoFim != null) {

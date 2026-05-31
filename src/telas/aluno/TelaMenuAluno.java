@@ -36,12 +36,9 @@ public class TelaMenuAluno extends JFrame {
 
     public TelaMenuAluno() {
         this(new model.Aluno(
-                1,
                 "Aluno Teste",
                 "aluno@aluno.cps.sp.gov.br",
-                "123",
-                "1A",
-                "12345"
+                "123"
         ));
     }
 

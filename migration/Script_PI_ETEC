@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS usuario (
     senha VARCHAR(255) NOT NULL, -- hash SHA-256
     salt VARCHAR(100) NOT NULL,	-- salt único por usuário
     tipo ENUM('ALUNO', 'PROFESSOR') NOT NULL,
-    turma VARCHAR(20) NULL,	-- só para alunos
-    ra VARCHAR(20) NULL, -- só para alunos
     ativo BOOLEAN NOT NULL DEFAULT TRUE,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -163,14 +161,14 @@ INSERT INTO usuario (nome, email, senha, salt, tipo) VALUES
 (
     'Professor Teste',
     'professor@cps.sp.gov.br',
-    'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3',
+    '7716190a3d24c3b8de1a5c118fae4b04dbcb1ee325627b17b0f736bd74eac875',
     'saltProfessorTeste001', -- salt único por usuário
     'PROFESSOR'
 ),
 (
     'Aluno Teste',
     'aluno@aluno.cps.sp.gov.br',
-    'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3',
+    '908ddc2ad5696309cf24fafa1021966c80b040d70083d25b8279d198d7665e0b',
     'saltAlunoTeste002', -- salt único por usuário
     'ALUNO'
 );
@@ -184,8 +182,6 @@ CREATE OR REPLACE VIEW vw_desempenho_alunos AS
         u.id AS id_aluno,
         u.nome AS nome_aluno,
         u.email AS email_aluno,
-        u.turma,
-        u.ra,
         d.total_partidas,
         d.total_acertos,
         d.total_erros,

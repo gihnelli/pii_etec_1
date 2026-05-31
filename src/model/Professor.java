@@ -15,7 +15,7 @@ public class Professor extends Usuario {
     }
 
     public Professor(int id, String nome, String email, String senha) {
-        super(id, nome, email, senha, TipoUsuario.PROFESSOR);
+        super(nome, email, senha, TipoUsuario.PROFESSOR);
         this.alunos = new ArrayList<>();
     }
 
@@ -70,7 +70,6 @@ public class Professor extends Usuario {
     @Override
     public String toString() {
         return "Professor{" +
-                "id=" + getId() +
                 ", nome='" + getNome() + '\'' +
                 ", email='" + getEmail() + '\'' +
                 ", totalAlunos=" + alunos.size() +

@@ -5,9 +5,6 @@ import java.util.List;
 import model.tipos.TipoUsuario;
 
 public class Aluno extends Usuario {
- 
-    private String turma;
-    private String ra;
 
     private List<Partida> historicoPartidas;
 
@@ -17,10 +14,8 @@ public class Aluno extends Usuario {
         setTipo(TipoUsuario.ALUNO);
     }
 
-    public Aluno(int id, String nome, String email, String senha, String turma, String ra) {
-        super(id, nome, email, senha, TipoUsuario.ALUNO);
-        this.turma = turma;
-        this.ra = ra;
+    public Aluno(String nome, String email, String senha) {
+        super(nome, email, senha, TipoUsuario.ALUNO);
         this.historicoPartidas = new ArrayList<>();
     }
 
@@ -58,26 +53,10 @@ public class Aluno extends Usuario {
         return desempenho;
     }
 
-    public String getTurma() {
-        return turma;
-    }
- 
-    public void setTurma(String turma) {
-        this.turma = turma;
-    }
- 
-    public String getRa() {
-        return ra;
-    }
- 
-    public void setRa(String ra) {
-        this.ra = ra;
-    }
- 
     public List<Partida> getHistoricoPartidas() {
         return new ArrayList<>(historicoPartidas);
     }
- 
+
     public void setHistoricoPartidas(List<Partida> historicoPartidas) {
         this.historicoPartidas = historicoPartidas;
     }
@@ -85,11 +64,8 @@ public class Aluno extends Usuario {
     @Override
     public String toString() {
         return "Aluno{" +
-                "id=" + getId() +
                 ", nome='" + getNome() + '\'' +
                 ", email='" + getEmail() + '\'' +
-                ", turma='" + turma + '\'' +
-                ", ra='" + ra + '\'' +
                 '}';
     }
 }

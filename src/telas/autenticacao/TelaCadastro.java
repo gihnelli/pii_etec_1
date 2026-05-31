@@ -21,6 +21,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import database.DAO.UsuarioDAO;
+import model.Aluno;
 import telas.professor.TelaMenuProfessor;
 
 public class TelaCadastro extends JFrame {
@@ -28,6 +30,8 @@ public class TelaCadastro extends JFrame {
     private JTextField campoNome;
     private JTextField campoEmail;
     private JPasswordField campoSenha;
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     public TelaCadastro() {
         configurarJanela();
@@ -168,6 +172,21 @@ public class TelaCadastro extends JFrame {
             );
             return;
         }
+        
+        try {
+            if (usuarioDAO.buscarPorEmail(email) != null) {
+                JOptionPane.showMessageDialog(this, "E-mail já cadastrado. Por favor, use outro e-mail.", "Erro", JOptionPane.ERROR_MESSAGE);
+                return;
+            } else {
+                Aluno novoAluno = new Aluno(nome, email, senha);
+                usuarioDAO.inserir(novoAluno);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao verificar e-mail: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+
 
         JOptionPane.showMessageDialog(this, "Aluno " + nome + " cadastrado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
         voltarAoMenu();

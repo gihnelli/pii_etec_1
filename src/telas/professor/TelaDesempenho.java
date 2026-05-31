@@ -499,7 +499,6 @@ public class TelaDesempenho extends JFrame {
 
             desenharLinhaTabela(conteudo, y, false);
             escreverTexto(conteudo, limitarTexto(aluno.getNome(), 28), FONTE_NORMAL, 9, 55, y + 8, Color.BLACK);
-            escreverTexto(conteudo, aluno.getTurma(), FONTE_NORMAL, 9, 250, y + 8, Color.BLACK);
             escreverTexto(conteudo, String.valueOf(e.totalAcertos), FONTE_NORMAL, 9, 330, y + 8, Color.BLACK);
             escreverTexto(conteudo, String.valueOf(e.totalErros), FONTE_NORMAL, 9, 410, y + 8, Color.BLACK);
             escreverTexto(conteudo, formatarPercentual(e.percentualAcertos), FONTE_NORMAL, 9, 480, y + 8, Color.BLACK);
@@ -515,7 +514,6 @@ public class TelaDesempenho extends JFrame {
 
         escreverTexto(conteudo, "Dados do aluno", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
         escreverTexto(conteudo, "Nome: " + aluno.getNome(), FONTE_NORMAL, 12, 50, 705, Color.BLACK);
-        escreverTexto(conteudo, "Turma: " + aluno.getTurma(), FONTE_NORMAL, 12, 50, 687, Color.BLACK);
         escreverTexto(conteudo, "E-mail: " + aluno.getEmail(), FONTE_NORMAL, 12, 50, 669, Color.BLACK);
 
         escreverTexto(conteudo, "Resumo de desempenho", FONTE_NEGRITO, 15, 50, 630, AZUL_ESCURO);
@@ -1006,42 +1004,6 @@ public class TelaDesempenho extends JFrame {
                 grafico.fillRect(0, 0, getWidth(), getHeight());
             }
         }
-    }
-
-    private static List<Aluno> gerarDadosExemplo() {
-        List<Aluno> alunos = new ArrayList<>();
-        Questao questaoTeste = new Questao();
-
-        for (int i = 1; i <= 13; i++) {
-            Aluno aluno = new Aluno(
-                    i,
-                    "Aluno " + i,
-                    "aluno" + i + "@aluno.cps.sp.gov.br",
-                    "123",
-                    "1º Química",
-                    "000" + i
-            );
-
-            Partida partida = new Partida(aluno);
-
-            int quantidadeAcertos = 4 + (i % 6);
-
-            for (int j = 0; j < 10; j++) {
-                Resposta resposta = new Resposta();
-                resposta.setQuestao(questaoTeste);
-
-                Alternativa alternativa = new Alternativa();
-                alternativa.setECorreta(j < quantidadeAcertos);
-
-                resposta.setAlternativaEscolhida(alternativa);
-                partida.adicionarResposta(resposta);
-            }
-
-            aluno.adicionarPartida(partida);
-            alunos.add(aluno);
-        }
-
-        return alunos;
     }
 
     public static void main(String[] args) {

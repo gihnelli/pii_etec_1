@@ -2,7 +2,6 @@ package model;
 import model.tipos.TipoUsuario;
  
 public abstract class Usuario {
-    private int id;
     private String nome;
     private String email;
     private String senha;
@@ -10,8 +9,7 @@ public abstract class Usuario {
 
     public Usuario() {}
 
-    public Usuario(int id, String nome, String email, String senha, TipoUsuario tipo) {
-        this.id = id;
+    public Usuario(String nome, String email, String senha, TipoUsuario tipo) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
@@ -29,13 +27,6 @@ public abstract class Usuario {
         System.out.println("Usuário " + nome + " saiu do sistema.");
     }
 
-    public int getId() {
-        return id;
-    }
- 
-    public void setId(int id) {
-        this.id = id;
-    }
  
     public String getNome() {
         return nome;
@@ -72,7 +63,6 @@ public abstract class Usuario {
     @Override
     public String toString() {
         return "Usuario{" +
-                "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", email='" + email + '\'' +
                 ", tipo=" + tipo +

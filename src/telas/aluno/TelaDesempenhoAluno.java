@@ -163,8 +163,7 @@ public class TelaDesempenhoAluno extends JFrame {
             JOptionPane.showMessageDialog(
                     this,
                     "Nome: " + this.aluno.getNome()
-                            + "\nE-mail: " + this.aluno.getEmail()
-                            + "\nTurma: " + this.aluno.getTurma(),
+                            + "\nE-mail: " + this.aluno.getEmail(),
                     "Perfil do Aluno",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -291,7 +290,6 @@ public class TelaDesempenhoAluno extends JFrame {
 
         escreverTexto(conteudo, "Dados do aluno", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
         escreverTexto(conteudo, "Nome: " + aluno.getNome(), FONTE_NORMAL, 12, 50, 705, Color.BLACK);
-        escreverTexto(conteudo, "Turma: " + aluno.getTurma(), FONTE_NORMAL, 12, 50, 687, Color.BLACK);
         escreverTexto(conteudo, "E-mail: " + aluno.getEmail(), FONTE_NORMAL, 12, 50, 669, Color.BLACK);
 
         escreverTexto(conteudo, "Resumo de desempenho", FONTE_NEGRITO, 15, 50, 630, AZUL_ESCURO);
@@ -653,12 +651,9 @@ public class TelaDesempenhoAluno extends JFrame {
 
     private static Aluno gerarAlunoExemplo() {
         Aluno aluno = new Aluno(
-                1,
                 "Aluno 1",
                 "aluno1@aluno.cps.sp.gov.br",
-                "123",
-                "1A",
-                "0001"
+                "123"
         );
 
         Questao questaoTeste = new Questao();

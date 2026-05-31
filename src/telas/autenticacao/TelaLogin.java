@@ -14,7 +14,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,14 +23,17 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import database.DAO.UsuarioDAO;
 import telas.aluno.TelaMenuAluno;
 import telas.professor.TelaMenuProfessor;
+import static utilitarios.Criptografia.criptografar;
 
 public class TelaLogin extends JFrame {
 
     private JTextField campoEmail;
     private JPasswordField campoSenha;
-    private JCheckBox caixaLembrarMe;
+
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     public TelaLogin() {
         configurarJanela();
@@ -89,29 +91,25 @@ public class TelaLogin extends JFrame {
         campoSenha.setBounds(42, 230, 326, 45);
         campoSenha.setFont(new Font("Verdana", Font.PLAIN, 15));
         campoSenha.setBackground(new Color(245, 247, 251));
-        ((javax.swing.text.AbstractDocument) campoSenha.getDocument()).setDocumentFilter(new javax.swing.text.DocumentFilter() {
-            @Override
-            public void insertString(FilterBypass fb, int offset, String string, javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
-                if (string.matches("\\d+") && (fb.getDocument().getLength() + string.length()) <= 11) {
-                    super.insertString(fb, offset, string, attr);
-                }
-            }
+        ((javax.swing.text.AbstractDocument) campoSenha.getDocument())
+                .setDocumentFilter(new javax.swing.text.DocumentFilter() {
+                    @Override
+                    public void insertString(FilterBypass fb, int offset, String string,
+                            javax.swing.text.AttributeSet attr) throws javax.swing.text.BadLocationException {
+                        if (string.matches("\\d+") && (fb.getDocument().getLength() + string.length()) <= 11) {
+                            super.insertString(fb, offset, string, attr);
+                        }
+                    }
 
-            @Override
-            public void replace(FilterBypass fb, int offset, int length, String text, javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
-                if (text.matches("\\d*") && (fb.getDocument().getLength() - length + text.length()) <= 11) {
-                    super.replace(fb, offset, length, text, attrs);
-                }
-            }
-        });
+                    @Override
+                    public void replace(FilterBypass fb, int offset, int length, String text,
+                            javax.swing.text.AttributeSet attrs) throws javax.swing.text.BadLocationException {
+                        if (text.matches("\\d*") && (fb.getDocument().getLength() - length + text.length()) <= 11) {
+                            super.replace(fb, offset, length, text, attrs);
+                        }
+                    }
+                });
         painelLogin.add(campoSenha);
-
-        caixaLembrarMe = new JCheckBox("Lembrar-me");
-        caixaLembrarMe.setBounds(42, 290, 130, 25);
-        caixaLembrarMe.setFont(new Font("Verdana", Font.PLAIN, 15));
-        caixaLembrarMe.setBackground(Color.WHITE);
-        caixaLembrarMe.setForeground(new Color(47, 76, 113));
-        painelLogin.add(caixaLembrarMe);
 
         BotaoArredondado botaoEntrar = new BotaoArredondado("Entrar", 15);
         botaoEntrar.setBounds(42, 335, 326, 45);
@@ -223,11 +221,11 @@ public class TelaLogin extends JFrame {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
-            
+
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
+
             if (imagemFundo != null) {
                 int larguraPainel = getWidth();
                 int alturaPainel = getHeight();
@@ -253,7 +251,7 @@ public class TelaLogin extends JFrame {
                 g2.setColor(new Color(223, 239, 252));
                 g2.fillRect(0, 0, getWidth(), getHeight());
             }
-            
+
             g2.dispose();
         }
     }
@@ -267,8 +265,7 @@ public class TelaLogin extends JFrame {
                     this,
                     "Preencha o e-mail institucional e a senha.",
                     "Campos obrigatórios",
-                    JOptionPane.WARNING_MESSAGE
-            );
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
         if (!senhaDigitada.matches("^\\d{11}$")) {
@@ -276,54 +273,49 @@ public class TelaLogin extends JFrame {
                     this,
                     "Senha inválida!\nA senha deve ser o seu CPF (apenas os 11 números, sem caracteres).",
                     "Erro de Autenticação",
-                    JOptionPane.ERROR_MESSAGE
-            );
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        if (ehEmailDeAluno(emailDigitado)) {
+        try {
+            var usuario = usuarioDAO.buscarPorEmail(emailDigitado);
+            if (usuario != null) {
+                String salt = usuarioDAO.buscarSaltPorEmail(emailDigitado);
+                String senhaHashDigitada = criptografar(senhaDigitada, salt);
+                if (!senhaHashDigitada.equals(usuario.getSenha())) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Senha incorreta. Tente novamente.",
+                            "Erro de Autenticação",
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (usuario.getTipo() == model.tipos.TipoUsuario.ALUNO) {
+                        abrirTelaDoAluno();
+                    } else if (usuario.getTipo() == model.tipos.TipoUsuario.PROFESSOR) {
+                        abrirTelaDoProfessor();
+                    }
+                }
+            } else {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "E-mail institucional não encontrado.",
+                        "Erro de Autenticação",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(
                     this,
-                    "Login de aluno identificado com sucesso.",
-                    "Aluno",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            abrirTelaDoAluno();
-
-        } else if (ehEmailDeProfessor(emailDigitado)) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Login de professor identificado com sucesso.",
-                    "Professor",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            abrirTelaDoProfessor();
-
-        } else {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "E-mail institucional inválido.\n\nUse um dos formatos:\n\nAluno: nome@aluno.cps.sp.gov.br\nProfessor: nome@cps.sp.gov.br",
-                    "E-mail inválido",
-                    JOptionPane.ERROR_MESSAGE
-            );
+                    "Ocorreu um erro ao tentar autenticar. Tente novamente mais tarde.",
+                    "Erro de Autenticação",
+                    JOptionPane.ERROR_MESSAGE);
+            System.err.println("Erro ao autenticar: " + e.getMessage());
         }
-    }
-
-    private boolean ehEmailDeAluno(String email) {
-        return email.matches("^[a-zA-Z0-9._%+-]+@aluno\\.cps\\.sp\\.gov\\.br$");
-    }
-
-    private boolean ehEmailDeProfessor(String email) {
-        return email.matches("^[a-zA-Z0-9._%+-]+@cps\\.sp\\.gov\\.br$");
     }
 
     private void abrirTelaDoAluno() {
         String email = campoEmail.getText().trim();
         String nome = email.split("@")[0];
-        // Criando um objeto Aluno real para passar para o menu
-        model.Aluno aluno = new model.Aluno(1, nome, email, "123", "1º Química", "RA12345");
+        model.Aluno aluno = new model.Aluno(nome, email, "123");
         new TelaMenuAluno(aluno).setVisible(true);
         dispose();
     }

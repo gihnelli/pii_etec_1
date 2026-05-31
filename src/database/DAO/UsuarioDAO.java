@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,39 +12,37 @@ import model.Aluno;
 import model.Professor;
 import model.Usuario;
 import model.tipos.TipoUsuario;
+import static utilitarios.Criptografia.criptografar;
+import static utilitarios.Criptografia.gerarSalt;
 
 public class UsuarioDAO {
-    public int inserir(Usuario usuario, String salt) throws SQLException {
+    public int inserir(Usuario usuario) throws SQLException {
         String sql = """
-                INSERT INTO usuario (nome, email, senha, salt, tipo, turma, ra)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO usuario (nome, email, senha, salt, tipo)
+                VALUES (?, ?, ?, ?, ?)
                 """;
+
+        String salt = gerarSalt();
+        String senhaHash = criptografar(usuario.getSenha(), salt);
 
         try (Connection con = Conexao.getConnection();
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
-            ps.setString(3, usuario.getSenha());
+            ps.setString(3, senhaHash);
             ps.setString(4, salt);
             ps.setString(5, usuario.getTipo().name());
-            if (usuario instanceof Aluno aluno) {
-                ps.setString(6, aluno.getTurma());
-                ps.setString(7, aluno.getRa());
-            } else {
-                ps.setNull(6, Types.VARCHAR);
-                ps.setNull(7, Types.VARCHAR);
-            }
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     int idGerado = rs.getInt(1);
-                    usuario.setId(idGerado);
                     return idGerado;
                 }
             }
         }
         return -1;
     }
+
     public Usuario buscarPorId(int id) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id = ? AND ativo = TRUE";
         try (Connection con = Conexao.getConnection();
@@ -134,15 +131,6 @@ public class UsuarioDAO {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
 
-            if (usuario instanceof Aluno aluno) {
-                ps.setString(3, aluno.getTurma());
-                ps.setString(4, aluno.getRa());
-            } else {
-                ps.setNull(3, Types.VARCHAR);
-                ps.setNull(4, Types.VARCHAR);
-            }
-
-            ps.setInt(5, usuario.getId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -179,12 +167,9 @@ public class UsuarioDAO {
 
     private Aluno mapearAluno(ResultSet rs) throws SQLException {
         return new Aluno(
-                rs.getInt("id"),
                 rs.getString("nome"),
                 rs.getString("email"),
-                rs.getString("senha"),
-                rs.getString("turma"),
-                rs.getString("ra")
+                rs.getString("senha")
         );
     }
 
