@@ -1,4 +1,5 @@
 package model;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class Aluno extends Usuario {
 
     public Aluno(String nome, String email, String senha) {
         super(nome, email, senha, TipoUsuario.ALUNO);
+        this.historicoPartidas = new ArrayList<>();
+    }
+
+    public Aluno(int id, String nome, String email, String senha) {
+        super(id, nome, email, senha, TipoUsuario.ALUNO);
         this.historicoPartidas = new ArrayList<>();
     }
 
@@ -38,12 +44,12 @@ public class Aluno extends Usuario {
     public Desempenho verDesempenho() {
         int totalAcertos = 0;
         int totalErros = 0;
- 
+
         for (Partida partida : historicoPartidas) {
             totalAcertos += partida.getTotalAcertos();
             totalErros += partida.getTotalErros();
         }
- 
+
         Desempenho desempenho = new Desempenho();
         desempenho.setTotalPartidas(historicoPartidas.size());
         desempenho.setTotalAcertos(totalAcertos);

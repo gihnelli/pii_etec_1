@@ -16,8 +16,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -36,6 +36,11 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import database.DAO.QuestaoDAO;
+import model.Alternativa;
+import model.Questao;
+import serviços.SessaoUsuario;
+
 public class TelaGerenciarPerguntas extends JFrame {
 
     private final List<PerguntaCadastro> bancoPerguntas = new ArrayList<>();
@@ -50,7 +55,7 @@ public class TelaGerenciarPerguntas extends JFrame {
     private String caminhoImagemEditar = "";
 
     public TelaGerenciarPerguntas() {
-        carregarPerguntasExemplo();
+        carregarPerguntasDoBanco();
         configurarJanela();
         montarTela();
         mostrarTela("VISUALIZAR");
@@ -106,11 +111,10 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private void abrirPerfil() {
         JOptionPane.showMessageDialog(
-            this,
-            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
-            "Perfil do Professor",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+                this,
+                "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
+                "Perfil do Professor",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JButton criarBotaoIconeReal(String caminho) {
@@ -162,7 +166,8 @@ public class TelaGerenciarPerguntas extends JFrame {
         JPanel painelBase = new JPanel(null);
         painelBase.setOpaque(false);
 
-        PainelArredondado painelListaExterna = new PainelArredondado(new Color(245, 245, 250), new Color(42, 82, 145), 1);
+        PainelArredondado painelListaExterna = new PainelArredondado(new Color(245, 245, 250), new Color(42, 82, 145),
+                1);
         painelListaExterna.setLayout(null);
         painelListaExterna.setBounds(12, 8, 900, 562);
         painelBase.add(painelListaExterna);
@@ -267,7 +272,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         JRadioButton[] opcoesCorretas = new JRadioButton[4];
         ButtonGroup grupoCorreta = new ButtonGroup();
 
-        String[] letras = {"a)", "b)", "c)", "d)"};
+        String[] letras = { "a)", "b)", "c)", "d)" };
         int y = 92;
 
         for (int i = 0; i < 4; i++) {
@@ -406,8 +411,7 @@ public class TelaGerenciarPerguntas extends JFrame {
                     alternativas,
                     indiceCorreta,
                     nivel,
-                    caminhoImagemAdicionar
-            );
+                    caminhoImagemAdicionar);
 
             bancoPerguntas.add(novaPergunta);
             indicePerguntaSelecionada = bancoPerguntas.size() - 1;
@@ -450,7 +454,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         ButtonGroup grupoCorreta = new ButtonGroup();
 
         int y = 78;
-        String[] letras = {"a)", "b)", "c)", "d)"};
+        String[] letras = { "a)", "b)", "c)", "d)" };
 
         for (int i = 0; i < 4; i++) {
             JRadioButton radio = new JRadioButton();
@@ -556,7 +560,8 @@ public class TelaGerenciarPerguntas extends JFrame {
         JPanel painelBase = new JPanel(null);
         painelBase.setOpaque(false);
 
-        PainelArredondado painelListaExterna = new PainelArredondado(new Color(245, 245, 250), new Color(42, 82, 145), 1);
+        PainelArredondado painelListaExterna = new PainelArredondado(new Color(245, 245, 250), new Color(42, 82, 145),
+                1);
         painelListaExterna.setLayout(null);
         painelListaExterna.setBounds(0, 0, 902, 320);
         painelBase.add(painelListaExterna);
@@ -643,8 +648,7 @@ public class TelaGerenciarPerguntas extends JFrame {
                     this,
                     "Deseja realmente remover a pergunta selecionada?",
                     "Confirmar remoção",
-                    JOptionPane.YES_NO_OPTION
-            );
+                    JOptionPane.YES_NO_OPTION);
 
             if (resposta == JOptionPane.YES_OPTION) {
                 bancoPerguntas.remove(indicePerguntaSelecionada);
@@ -702,8 +706,7 @@ public class TelaGerenciarPerguntas extends JFrame {
                 this,
                 "Deseja sair da tela de gerenciamento de perguntas?",
                 "Sair",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
@@ -723,84 +726,57 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
     }
 
-    private void carregarPerguntasExemplo() {
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual a função do Béquer?",
-                Arrays.asList(  
-                        "Misturar e aquecer líquidos",
-                        "Transferir líquidos",
-                        "Medir volume exato de líquido",
-                        "Liberar volume controlado"
-                ),
-                0,
-                "Fácil",
-                ""
-        ));
+    private void carregarPerguntasDoBanco() {
+        bancoPerguntas.clear();
 
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual a função do funil?",
-                Arrays.asList(
-                        "Misturar líquidos",
-                        "Aquecimento de soluções",
-                        "Medir soluções",
-                        "Transferir líquidos e auxiliar na filtração"
-                ),
-                3,
-                "Fácil",
-                ""
-        ));
+        try {
+            QuestaoDAO questaoDAO = new QuestaoDAO();
+            int id = SessaoUsuario.getIdUsuario();
+            System.out.println("ID do professor: " + id);
+            List<Questao> questoes = questaoDAO.listarPorProfessor(id);
 
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual material é usado em um sistema de titulação?",
-                Arrays.asList(
-                        "Proveta",
-                        "Bureta",
-                        "Béquer",
-                        "Bastão de vidro"
-                ),
-                1,
-                "Médio",
-                ""
-        ));
+            for (Questao questao : questoes) {
+                bancoPerguntas.add(converterQuestaoParaCadastro(questao));
+            }
 
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual material é usado em um sistema de mistura?",
-                Arrays.asList(
-                        "Pipeta",
-                        "Bureta",
-                        "Béquer",
-                        "Funil"
-                ),
-                2,
-                "Fácil",
-                ""
-        ));
+            if (bancoPerguntas.isEmpty()) {
+                indicePerguntaSelecionada = 0;
+            } else if (indicePerguntaSelecionada >= bancoPerguntas.size()) {
+                indicePerguntaSelecionada = bancoPerguntas.size() - 1;
+            }
+        } catch (SQLException | IllegalStateException erro) {
+            mostrarMensagem("Erro ao carregar perguntas do banco: " + erro.getMessage());
+        }
+    }
 
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual a função do bastão de vidro?",
-                Arrays.asList(
-                        "Aquecimento",
-                        "Titulação",
-                        "Filtração",
-                        "Misturar soluções"
-                ),
-                3,
-                "Fácil",
-                ""
-        ));
+    private PerguntaCadastro converterQuestaoParaCadastro(Questao questao) {
+        List<String> alternativas = new ArrayList<>();
+        int indiceCorreta = 0;
 
-        bancoPerguntas.add(new PerguntaCadastro(
-                "Qual material é usado em um sistema de filtração?",
-                Arrays.asList(
-                        "Funil",
-                        "Pipeta",
-                        "Bastão de vidro",
-                        "Proveta"
-                ),
-                0,
-                "Fácil",
-                ""
-        ));
+        for (Alternativa alternativa : questao.getAlternativas()) {
+            if (alternativas.size() >= 4) {
+                break;
+            }
+
+            alternativas.add(alternativa.getTexto());
+
+            if (alternativa.isECorreta()) {
+                indiceCorreta = alternativas.size() - 1;
+            }
+        }
+
+        while (alternativas.size() < 4) {
+            alternativas.add("");
+        }
+
+        String caminhoImagem = questao.getImagemEnunciado() == null ? "" : questao.getImagemEnunciado();
+
+        return new PerguntaCadastro(
+                questao.getEnunciado(),
+                alternativas,
+                indiceCorreta,
+                questao.getNivelDificuldade().name(),
+                caminhoImagem);
     }
 
     public static void main(String[] args) {
@@ -817,7 +793,8 @@ public class TelaGerenciarPerguntas extends JFrame {
         private String nivel;
         private String caminhoImagem;
 
-        public PerguntaCadastro(String enunciado, List<String> alternativas, int indiceCorreta, String nivel, String caminhoImagem) {
+        public PerguntaCadastro(String enunciado, List<String> alternativas, int indiceCorreta, String nivel,
+                String caminhoImagem) {
             this.enunciado = enunciado;
             this.alternativas = new ArrayList<>(alternativas);
             this.indiceCorreta = indiceCorreta;
@@ -858,7 +835,7 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
 
         public String getResumoRespostaCorreta() {
-            String[] letras = {"a", "b", "c", "d"};
+            String[] letras = { "a", "b", "c", "d" };
             return letras[indiceCorreta] + ") " + alternativas.get(indiceCorreta);
         }
     }
@@ -915,34 +892,34 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
     }
 
-private static class PainelFundoImagem extends JPanel {
+    private static class PainelFundoImagem extends JPanel {
 
-    private Image imagemFundo;
+        private Image imagemFundo;
 
-    public PainelFundoImagem() {
-        carregarImagem();
-    }
+        public PainelFundoImagem() {
+            carregarImagem();
+        }
 
-    private void carregarImagem() {
-        try {
-            File arquivo = new File("imagens/Menu.png");
-            imagemFundo = ImageIO.read(arquivo);
-        } catch (IOException erro) {
-            System.out.println("Erro ao carregar imagem de fundo: " + erro.getMessage());
+        private void carregarImagem() {
+            try {
+                File arquivo = new File("imagens/Menu.png");
+                imagemFundo = ImageIO.read(arquivo);
+            } catch (IOException erro) {
+                System.out.println("Erro ao carregar imagem de fundo: " + erro.getMessage());
+            }
+        }
+
+        @Override
+        protected void paintComponent(Graphics grafico) {
+            super.paintComponent(grafico);
+
+            if (imagemFundo != null) {
+                grafico.drawImage(imagemFundo, 0, 0, getWidth(), getHeight(), this);
+            } else {
+                grafico.setColor(new Color(223, 239, 252));
+                grafico.fillRect(0, 0, getWidth(), getHeight());
+            }
         }
     }
-
-    @Override
-    protected void paintComponent(Graphics grafico) {
-        super.paintComponent(grafico);
-
-        if (imagemFundo != null) {
-            grafico.drawImage(imagemFundo, 0, 0, getWidth(), getHeight(), this);
-        } else {
-            grafico.setColor(new Color(223, 239, 252));
-            grafico.fillRect(0, 0, getWidth(), getHeight());
-        }
-    }
-}
 
 }

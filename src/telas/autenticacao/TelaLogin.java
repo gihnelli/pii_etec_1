@@ -24,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
 import database.DAO.UsuarioDAO;
+import serviços.SessaoUsuario;
 import telas.aluno.TelaMenuAluno;
 import telas.professor.TelaMenuProfessor;
 import static utilitarios.Criptografia.criptografar;
@@ -33,7 +34,7 @@ public class TelaLogin extends JFrame {
     private JTextField campoEmail;
     private JPasswordField campoSenha;
 
-    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     public TelaLogin() {
         configurarJanela();
@@ -289,10 +290,14 @@ public class TelaLogin extends JFrame {
                             "Erro de Autenticação",
                             JOptionPane.ERROR_MESSAGE);
                 } else {
+                    SessaoUsuario.iniciarSessao(usuario);
+
                     if (usuario.getTipo() == model.tipos.TipoUsuario.ALUNO) {
-                        abrirTelaDoAluno();
+                        new TelaMenuAluno().setVisible(true);
+                        dispose();
                     } else if (usuario.getTipo() == model.tipos.TipoUsuario.PROFESSOR) {
-                        abrirTelaDoProfessor();
+                        new TelaMenuProfessor().setVisible(true);
+                        dispose();
                     }
                 }
             } else {
@@ -310,19 +315,6 @@ public class TelaLogin extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             System.err.println("Erro ao autenticar: " + e.getMessage());
         }
-    }
-
-    private void abrirTelaDoAluno() {
-        String email = campoEmail.getText().trim();
-        String nome = email.split("@")[0];
-        model.Aluno aluno = new model.Aluno(nome, email, "123");
-        new TelaMenuAluno(aluno).setVisible(true);
-        dispose();
-    }
-
-    private void abrirTelaDoProfessor() {
-        new TelaMenuProfessor().setVisible(true);
-        dispose();
     }
 
     public static void main(String[] args) {

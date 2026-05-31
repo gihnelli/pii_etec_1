@@ -1,9 +1,10 @@
 package model;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import model.tipos.TipoUsuario;
- 
+
 public class Professor extends Usuario {
 
     private List<Aluno> alunos;
@@ -15,7 +16,7 @@ public class Professor extends Usuario {
     }
 
     public Professor(int id, String nome, String email, String senha) {
-        super(nome, email, senha, TipoUsuario.PROFESSOR);
+        super(id, nome, email, senha, TipoUsuario.PROFESSOR);
         this.alunos = new ArrayList<>();
     }
 

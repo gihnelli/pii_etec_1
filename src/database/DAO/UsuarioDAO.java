@@ -26,7 +26,7 @@ public class UsuarioDAO {
         String senhaHash = criptografar(usuario.getSenha(), salt);
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
             ps.setString(3, senhaHash);
@@ -46,7 +46,7 @@ public class UsuarioDAO {
     public Usuario buscarPorId(int id) throws SQLException {
         String sql = "SELECT * FROM usuario WHERE id = ? AND ativo = TRUE";
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -61,7 +61,7 @@ public class UsuarioDAO {
         String sql = "SELECT * FROM usuario WHERE email = ? AND ativo = TRUE";
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -72,13 +72,14 @@ public class UsuarioDAO {
         }
         return null;
     }
+
     public List<Aluno> listarAlunos() throws SQLException {
         String sql = "SELECT * FROM usuario WHERE tipo = 'ALUNO' AND ativo = TRUE ORDER BY nome";
         List<Aluno> lista = new ArrayList<>();
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 lista.add(mapearAluno(rs));
@@ -92,8 +93,8 @@ public class UsuarioDAO {
         List<Professor> lista = new ArrayList<>();
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 lista.add(mapearProfessor(rs));
@@ -106,7 +107,7 @@ public class UsuarioDAO {
         String sql = "SELECT salt FROM usuario WHERE email = ? AND ativo = TRUE";
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
@@ -126,7 +127,7 @@ public class UsuarioDAO {
                 """;
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
@@ -139,18 +140,19 @@ public class UsuarioDAO {
         String sql = "UPDATE usuario SET senha = ? WHERE id = ?";
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, novaSenhaHash);
             ps.setInt(2, idUsuario);
             return ps.executeUpdate() > 0;
         }
     }
+
     public boolean desativar(int id) throws SQLException {
         String sql = "UPDATE usuario SET ativo = FALSE WHERE id = ?";
 
         try (Connection con = Conexao.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql)) {
+                PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
@@ -167,10 +169,10 @@ public class UsuarioDAO {
 
     private Aluno mapearAluno(ResultSet rs) throws SQLException {
         return new Aluno(
+                rs.getInt("id"),
                 rs.getString("nome"),
                 rs.getString("email"),
-                rs.getString("senha")
-        );
+                rs.getString("senha"));
     }
 
     private Professor mapearProfessor(ResultSet rs) throws SQLException {
@@ -178,7 +180,6 @@ public class UsuarioDAO {
                 rs.getInt("id"),
                 rs.getString("nome"),
                 rs.getString("email"),
-                rs.getString("senha")
-        );
+                rs.getString("senha"));
     }
 }

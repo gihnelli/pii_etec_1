@@ -52,7 +52,7 @@ public class TelaJogo extends JFrame {
     private List<BotaoAlternativa> botoesAlternativas;
     private List<BotaoAssociacao> botoesEsq;
     private List<BotaoAssociacao> botoesDir;
-    
+
     private boolean ajuda5050Usada = false;
     private boolean chanceExtraUsada = false;
     private boolean pularUsada = false;
@@ -124,7 +124,7 @@ public class TelaJogo extends JFrame {
         conteinerCentral.add(painelConteudo);
     }
 
-        private JButton criarBotaoIconeReal(String caminho) {
+    private JButton criarBotaoIconeReal(String caminho) {
         JButton btn = new JButton();
         try {
             ImageIcon iconOriginal = new ImageIcon(caminho);
@@ -136,7 +136,7 @@ public class TelaJogo extends JFrame {
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(new Insets(0, 0, 0, 0)); 
+        btn.setMargin(new Insets(0, 0, 0, 0));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
@@ -145,11 +145,10 @@ public class TelaJogo extends JFrame {
         if (this.partida != null && this.partida.getAluno() != null) {
             model.Aluno aluno = this.partida.getAluno();
             JOptionPane.showMessageDialog(
-                this,
-                "Nome: " + aluno.getNome() + "\nE-mail: " + aluno.getEmail(),
-                "Perfil do Jogador",
-                JOptionPane.INFORMATION_MESSAGE
-            );
+                    this,
+                    "Nome: " + aluno.getNome() + "\nE-mail: " + aluno.getEmail(),
+                    "Perfil do Jogador",
+                    JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Informações do jogador não encontradas.");
         }
@@ -178,7 +177,7 @@ public class TelaJogo extends JFrame {
         botoesAlternativas.clear();
         botoesEsq.clear();
         botoesDir.clear();
-        
+
         chanceExtraAtiva = false;
         paresResolvidos = 0;
         selecionadoEsquerda = null;
@@ -193,101 +192,98 @@ public class TelaJogo extends JFrame {
         painelConteudo.revalidate();
         painelConteudo.repaint();
     }
-        private void montarInterfaceAlternativa(Questao questao) {
-    PainelArredondado painelPergunta = new PainelArredondado(30);
-    painelPergunta.setLayout(null);
-    painelPergunta.setBounds(50, 10, 800, 320);
-    painelPergunta.setBackground(new Color(47, 76, 113));
-    painelConteudo.add(painelPergunta);
 
-    String enunciado = questao.getEnunciado();
-    boolean perguntaLonga = enunciado.length() > 65;
+    private void montarInterfaceAlternativa(Questao questao) {
+        PainelArredondado painelPergunta = new PainelArredondado(30);
+        painelPergunta.setLayout(null);
+        painelPergunta.setBounds(50, 10, 800, 320);
+        painelPergunta.setBackground(new Color(47, 76, 113));
+        painelConteudo.add(painelPergunta);
 
-    JTextPane textoPergunta = new JTextPane();
-    textoPergunta.setText(enunciado);
-    textoPergunta.setBounds(
-            40,
-            perguntaLonga ? 10 : 20,
-            720,
-            perguntaLonga ? 110 : 70
-    );
+        String enunciado = questao.getEnunciado();
+        boolean perguntaLonga = enunciado.length() > 65;
 
-    textoPergunta.setFont(new Font(
-            "Verdana",
-            Font.BOLD,
-            perguntaLonga ? 24 : 28
-    ));
+        JTextPane textoPergunta = new JTextPane();
+        textoPergunta.setText(enunciado);
+        textoPergunta.setBounds(
+                40,
+                perguntaLonga ? 10 : 20,
+                720,
+                perguntaLonga ? 110 : 70);
 
-    textoPergunta.setForeground(Color.WHITE);
-    textoPergunta.setOpaque(false);
-    textoPergunta.setEditable(false);
-    textoPergunta.setFocusable(false);
-    textoPergunta.setBorder(null);
-    textoPergunta.setHighlighter(null);
+        textoPergunta.setFont(new Font(
+                "Verdana",
+                Font.BOLD,
+                perguntaLonga ? 24 : 28));
 
-    StyledDocument documento = textoPergunta.getStyledDocument();
-    SimpleAttributeSet alinhamento = new SimpleAttributeSet();
-    StyleConstants.setAlignment(alinhamento, StyleConstants.ALIGN_CENTER);
-    documento.setParagraphAttributes(0, documento.getLength(), alinhamento, false);
+        textoPergunta.setForeground(Color.WHITE);
+        textoPergunta.setOpaque(false);
+        textoPergunta.setEditable(false);
+        textoPergunta.setFocusable(false);
+        textoPergunta.setBorder(null);
+        textoPergunta.setHighlighter(null);
 
-    painelPergunta.add(textoPergunta);
+        StyledDocument documento = textoPergunta.getStyledDocument();
+        SimpleAttributeSet alinhamento = new SimpleAttributeSet();
+        StyleConstants.setAlignment(alinhamento, StyleConstants.ALIGN_CENTER);
+        documento.setParagraphAttributes(0, documento.getLength(), alinhamento, false);
 
-    labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
-    labelImagemQuestao.setBounds(
-            250,
-            perguntaLonga ? 130 : 95,
-            300,
-            perguntaLonga ? 165 : 205
-    );
+        painelPergunta.add(textoPergunta);
 
-    if (questao.getImagemEnunciado() != null && !questao.getImagemEnunciado().isEmpty()) {
-        try {
-            ImageIcon icon = new ImageIcon(questao.getImagemEnunciado());
+        labelImagemQuestao = new JLabel("", SwingConstants.CENTER);
+        labelImagemQuestao.setBounds(
+                250,
+                perguntaLonga ? 130 : 95,
+                300,
+                perguntaLonga ? 165 : 205);
 
-            int tamanhoImagem = perguntaLonga ? 165 : 200;
+        if (questao.getImagemEnunciado() != null && !questao.getImagemEnunciado().isEmpty()) {
+            try {
+                ImageIcon icon = new ImageIcon(questao.getImagemEnunciado());
 
-            Image img = icon.getImage().getScaledInstance(
-                    tamanhoImagem,
-                    tamanhoImagem,
-                    Image.SCALE_SMOOTH
-            );
+                int tamanhoImagem = perguntaLonga ? 165 : 200;
 
-            labelImagemQuestao.setIcon(new ImageIcon(img));
-        } catch (Exception e) {
-            labelImagemQuestao.setText("🧪");
-            labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, perguntaLonga ? 80 : 100));
-            labelImagemQuestao.setForeground(Color.WHITE);
+                Image img = icon.getImage().getScaledInstance(
+                        tamanhoImagem,
+                        tamanhoImagem,
+                        Image.SCALE_SMOOTH);
+
+                labelImagemQuestao.setIcon(new ImageIcon(img));
+            } catch (Exception e) {
+                labelImagemQuestao.setText("🧪");
+                labelImagemQuestao.setFont(new Font("Verdana", Font.PLAIN, perguntaLonga ? 80 : 100));
+                labelImagemQuestao.setForeground(Color.WHITE);
+            }
+        }
+
+        painelPergunta.add(labelImagemQuestao);
+
+        botoesAlternativas.clear();
+
+        List<Alternativa> alternativas = questao.getAlternativas();
+
+        int y = 350;
+        char letra = 'a';
+
+        for (Alternativa alt : alternativas) {
+            BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto());
+            btn.setBounds(50, y, 800, 48);
+            btn.addActionListener(e -> processarRespostaAlternativa(alt, btn));
+
+            painelConteudo.add(btn);
+            botoesAlternativas.add(btn);
+
+            y += 58;
+            letra++;
         }
     }
 
-    painelPergunta.add(labelImagemQuestao);
-
-    botoesAlternativas.clear();
-
-    List<Alternativa> alternativas = questao.getAlternativas();
-
-    int y = 350;
-    char letra = 'a';
-
-    for (Alternativa alt : alternativas) {
-        BotaoAlternativa btn = new BotaoAlternativa(letra + ") " + alt.getTexto());
-        btn.setBounds(50, y, 800, 48);
-        btn.addActionListener(e -> processarRespostaAlternativa(alt, btn));
-
-        painelConteudo.add(btn);
-        botoesAlternativas.add(btn);
-
-        y += 58;
-        letra++;
-    }
-}
-
-        private void montarInterfaceAssociacao(Questao questao) {
+    private void montarInterfaceAssociacao(Questao questao) {
         PainelArredondado painelInstrucao = new PainelArredondado(20);
         painelInstrucao.setLayout(new BorderLayout());
         painelInstrucao.setBounds(100, 5, 700, 70);
         painelInstrucao.setBackground(new Color(47, 76, 113));
-        
+
         JLabel lblMsg = new JLabel("Conecte o material ao sistema experimental correspondente", SwingConstants.CENTER);
         lblMsg.setFont(new Font("Verdana", Font.BOLD, 18));
         lblMsg.setForeground(Color.WHITE);
@@ -295,15 +291,18 @@ public class TelaJogo extends JFrame {
         painelConteudo.add(painelInstrucao);
 
         String[][] pares = {
-            {"Bureta", "Titulação", "imagens/Bureta.jpg"},
-            {"Condensador", "Destilação", "imagens/BicoDeBunsen.jpg"},
-            {"Funil de Decantação", "Extração", "imagens/FunilDeHasteLonga.jpg"},
-            {"Balão Volumétrico", "Diluição", "imagens/BalãoVolumétrico.jpg"}
+                { "Bureta", "Titulação", "imagens/Bureta.jpg" },
+                { "Condensador", "Destilação", "imagens/BicoDeBunsen.jpg" },
+                { "Funil de Decantação", "Extração", "imagens/FunilDeHasteLonga.jpg" },
+                { "Balão Volumétrico", "Diluição", "imagens/BalãoVolumétrico.jpg" }
         };
 
         List<Integer> ordemEsq = new ArrayList<>();
         List<Integer> ordemDir = new ArrayList<>();
-        for(int i=0; i<4; i++) { ordemEsq.add(i); ordemDir.add(i); }
+        for (int i = 0; i < 4; i++) {
+            ordemEsq.add(i);
+            ordemDir.add(i);
+        }
         Collections.shuffle(ordemEsq);
         Collections.shuffle(ordemDir);
 
@@ -311,7 +310,7 @@ public class TelaJogo extends JFrame {
         for (int i = 0; i < 4; i++) {
             final int idxEsq = ordemEsq.get(i);
             final int idxDir = ordemDir.get(i);
-            
+
             BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
             btnEsq.setBounds(50, y, 230, 110);
             btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
@@ -331,15 +330,18 @@ public class TelaJogo extends JFrame {
     }
 
     private void lidarCliqueAssociacao(BotaoAssociacao btn, boolean esq, String idCorreto) {
-        if (btn.isResolvido()) return;
+        if (btn.isResolvido())
+            return;
 
         if (esq) {
-            if (selecionadoEsquerda != null) selecionadoEsquerda.setSelecionado(false);
+            if (selecionadoEsquerda != null)
+                selecionadoEsquerda.setSelecionado(false);
             selecionadoEsquerda = btn;
             selecionadoEsquerda.setSelecionado(true);
             selecionadoEsquerda.setIdPar(idCorreto);
         } else {
-            if (selecionadoDireita != null) selecionadoDireita.setSelecionado(false);
+            if (selecionadoDireita != null)
+                selecionadoDireita.setSelecionado(false);
             selecionadoDireita = btn;
             selecionadoDireita.setSelecionado(true);
             selecionadoDireita.setIdPar(idCorreto);
@@ -352,18 +354,18 @@ public class TelaJogo extends JFrame {
                 selecionadoEsquerda.setBackground(new Color(46, 204, 113));
                 selecionadoDireita.setBackground(new Color(46, 204, 113));
                 paresResolvidos++;
-                
+
                 if (paresResolvidos == 4) {
-    registrarRespostaAssociacao(true);
+                    registrarRespostaAssociacao(true);
 
-    Timer t = new Timer(800, e -> {
-        indiceQuestaoAtual++;
-        carregarQuestaoAtual();
-    });
+                    Timer t = new Timer(800, e -> {
+                        indiceQuestaoAtual++;
+                        carregarQuestaoAtual();
+                    });
 
-    t.setRepeats(false);
-    t.start();
-}
+                    t.setRepeats(false);
+                    t.start();
+                }
             } else {
                 selecionadoEsquerda.setBackground(new Color(231, 76, 60));
                 selecionadoDireita.setBackground(new Color(231, 76, 60));
@@ -402,13 +404,22 @@ public class TelaJogo extends JFrame {
         dialog.add(titulo);
 
         JButton btn5050 = criarBotaoAjuda("50/50", 50, 85, !ajuda5050Usada);
-        btn5050.addActionListener(e -> { usar5050(); dialog.dispose(); });
-        
+        btn5050.addActionListener(e -> {
+            usar5050();
+            dialog.dispose();
+        });
+
         JButton btnChance = criarBotaoAjuda("Chance Extra", 310, 85, !chanceExtraUsada);
-        btnChance.addActionListener(e -> { usarChanceExtra(); dialog.dispose(); });
+        btnChance.addActionListener(e -> {
+            usarChanceExtra();
+            dialog.dispose();
+        });
 
         JButton btnPular = criarBotaoAjuda("Pular Questão", 180, 245, !pularUsada);
-        btnPular.addActionListener(e -> { usarPular(); dialog.dispose(); });
+        btnPular.addActionListener(e -> {
+            usarPular();
+            dialog.dispose();
+        });
 
         dialog.add(btn5050);
         dialog.add(btnChance);
@@ -435,11 +446,12 @@ public class TelaJogo extends JFrame {
     }
 
     private void usar5050() {
-        if (ajuda5050Usada) return;
+        if (ajuda5050Usada)
+            return;
         ajuda5050Usada = true;
 
         Questao q = questoes.get(indiceQuestaoAtual);
-        
+
         if (q.getTipo() == TipoQuestao.MULTIPLA_ESCOLHA) {
             List<Integer> indicesIncorretos = new ArrayList<>();
             List<Alternativa> alternativas = q.getAlternativas();
@@ -470,15 +482,15 @@ public class TelaJogo extends JFrame {
                     idsDisponiveis.add(btn.getIdPar());
                 }
             }
-            
+
             Collections.shuffle(idsDisponiveis);
             int resolved = 0;
             for (int i = 0; i < idsDisponiveis.size() && resolved < 2; i++) {
                 String id = idsDisponiveis.get(i);
-                
+
                 BotaoAssociacao bEsq = botoesEsq.stream().filter(b -> b.getIdPar().equals(id)).findFirst().orElse(null);
                 BotaoAssociacao bDir = botoesDir.stream().filter(b -> b.getIdPar().equals(id)).findFirst().orElse(null);
-                
+
                 if (bEsq != null && bDir != null) {
                     bEsq.setResolvido(true);
                     bDir.setResolvido(true);
@@ -488,20 +500,20 @@ public class TelaJogo extends JFrame {
                     resolved++;
                 }
             }
-            
+
             if (paresResolvidos == 4) {
-    registrarRespostaAssociacao(true);
+                registrarRespostaAssociacao(true);
 
-    Timer t = new Timer(800, e -> {
-        indiceQuestaoAtual++;
-        carregarQuestaoAtual();
-    });
+                Timer t = new Timer(800, e -> {
+                    indiceQuestaoAtual++;
+                    carregarQuestaoAtual();
+                });
 
-    t.setRepeats(false);
-    t.start();
-}
+                t.setRepeats(false);
+                t.start();
+            }
         }
-        
+
         if (painelConteudo != null) {
             painelConteudo.revalidate();
             painelConteudo.repaint();
@@ -521,94 +533,92 @@ public class TelaJogo extends JFrame {
     }
 
     private void registrarResposta(Questao questao, Alternativa alternativaEscolhida) {
-    if (partida == null || questao == null || alternativaEscolhida == null) {
-        return;
-    }
-
-    Resposta resposta = new Resposta();
-    resposta.setQuestao(questao);
-    resposta.setAlternativaEscolhida(alternativaEscolhida);
-
-    partida.adicionarResposta(resposta);
-}
-
-private void registrarRespostaAssociacao(boolean correta) {
-    Questao questaoAtual = questoes.get(indiceQuestaoAtual);
-
-    Alternativa alternativaResultado = new Alternativa(
-            0,
-            correta ? "Associação concluída" : "Associação incorreta",
-            correta
-    );
-
-    registrarResposta(questaoAtual, alternativaResultado);
-}
-
-private void salvarPartidaNoHistoricoAluno() {
-    if (partida == null || partida.getAluno() == null) {
-        return;
-    }
-
-    try {
-        if (partida.getAluno().getHistoricoPartidas() == null
-                || !partida.getAluno().getHistoricoPartidas().contains(partida)) {
-            partida.getAluno().adicionarPartida(partida);
+        if (partida == null || questao == null || alternativaEscolhida == null) {
+            return;
         }
-    } catch (Exception erro) {
-        System.out.println("Não foi possível salvar a partida no histórico do aluno: " + erro.getMessage());
+
+        Resposta resposta = new Resposta();
+        resposta.setQuestao(questao);
+        resposta.setAlternativaEscolhida(alternativaEscolhida);
+
+        partida.adicionarResposta(resposta);
     }
-}
+
+    private void registrarRespostaAssociacao(boolean correta) {
+        Questao questaoAtual = questoes.get(indiceQuestaoAtual);
+
+        Alternativa alternativaResultado = new Alternativa(
+                0,
+                correta ? "Associação concluída" : "Associação incorreta",
+                correta);
+
+        registrarResposta(questaoAtual, alternativaResultado);
+    }
+
+    private void salvarPartidaNoHistoricoAluno() {
+        if (partida == null || partida.getAluno() == null) {
+            return;
+        }
+
+        try {
+            if (partida.getAluno().getHistoricoPartidas() == null
+                    || !partida.getAluno().getHistoricoPartidas().contains(partida)) {
+                partida.getAluno().adicionarPartida(partida);
+            }
+        } catch (Exception erro) {
+            System.out.println("Não foi possível salvar a partida no histórico do aluno: " + erro.getMessage());
+        }
+    }
+
     private void processarRespostaAlternativa(Alternativa escolhida, BotaoAlternativa btn) {
-    Questao questaoAtual = questoes.get(indiceQuestaoAtual);
+        Questao questaoAtual = questoes.get(indiceQuestaoAtual);
 
-    if (escolhida.isECorreta()) {
-        registrarResposta(questaoAtual, escolhida);
-
-        btn.setBackground(new Color(46, 204, 113));
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Resposta Correta! +10 pontos.",
-                "Sucesso",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        indiceQuestaoAtual++;
-        carregarQuestaoAtual();
-
-    } else {
-        if (chanceExtraAtiva) {
-            btn.setEnabled(false);
-            btn.setBackground(new Color(231, 76, 60));
-            chanceExtraAtiva = false;
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Ops! Resposta errada, mas você tem sua Chance Extra. Tente de novo!",
-                    "Segunda Chance",
-                    JOptionPane.WARNING_MESSAGE
-            );
-
-        } else {
+        if (escolhida.isECorreta()) {
             registrarResposta(questaoAtual, escolhida);
 
-            btn.setBackground(new Color(231, 76, 60));
+            btn.setBackground(new Color(46, 204, 113));
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Incorreto!",
-                    "Fim de Turno",
-                    JOptionPane.ERROR_MESSAGE
-            );
+                    "Resposta Correta! +10 pontos.",
+                    "Sucesso",
+                    JOptionPane.INFORMATION_MESSAGE);
 
             indiceQuestaoAtual++;
             carregarQuestaoAtual();
+
+        } else {
+            if (chanceExtraAtiva) {
+                btn.setEnabled(false);
+                btn.setBackground(new Color(231, 76, 60));
+                chanceExtraAtiva = false;
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Ops! Resposta errada, mas você tem sua Chance Extra. Tente de novo!",
+                        "Segunda Chance",
+                        JOptionPane.WARNING_MESSAGE);
+
+            } else {
+                registrarResposta(questaoAtual, escolhida);
+
+                btn.setBackground(new Color(231, 76, 60));
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Incorreto!",
+                        "Fim de Turno",
+                        JOptionPane.ERROR_MESSAGE);
+
+                indiceQuestaoAtual++;
+                carregarQuestaoAtual();
+            }
         }
     }
-}
 
     private void confirmarSaida() {
-        int opt = JOptionPane.showConfirmDialog(this, "Sair agora interromperá sua partida. Confirmar?", "Sair do Jogo", JOptionPane.YES_NO_OPTION);
+        int opt = JOptionPane.showConfirmDialog(this, "Sair agora interromperá sua partida. Confirmar?", "Sair do Jogo",
+                JOptionPane.YES_NO_OPTION);
         if (opt == JOptionPane.YES_OPTION) {
             new telas.aluno.TelaMenuAluno(this.partida.getAluno()).setVisible(true);
             dispose();
@@ -616,28 +626,32 @@ private void salvarPartidaNoHistoricoAluno() {
     }
 
     private void finalizarPartida() {
-    partida.finalizar();
-    salvarPartidaNoHistoricoAluno();
+        partida.finalizar();
+        salvarPartidaNoHistoricoAluno();
 
-    JOptionPane.showMessageDialog(
-            this,
-            "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(),
-            "Fim de Jogo",
-            JOptionPane.INFORMATION_MESSAGE
-    );
+        JOptionPane.showMessageDialog(
+                this,
+                "Desafio Concluído!\nSua Pontuação Final: " + partida.getPontuacao(),
+                "Fim de Jogo",
+                JOptionPane.INFORMATION_MESSAGE);
 
-    dispose();
+        dispose();
 
-    if (partida != null && partida.getAluno() != null) {
-        new telas.aluno.TelaMenuAluno(partida.getAluno()).setVisible(true);
-    } else {
-        new telas.aluno.TelaMenuAluno().setVisible(true);
+        if (partida != null && partida.getAluno() != null) {
+            new telas.aluno.TelaMenuAluno(partida.getAluno()).setVisible(true);
+        } else {
+            new telas.aluno.TelaMenuAluno().setVisible(true);
+        }
     }
-}
 
     private static class PainelArredondado extends JPanel {
         private int raio;
-        public PainelArredondado(int raio) { this.raio = raio; setOpaque(false); }
+
+        public PainelArredondado(int raio) {
+            this.raio = raio;
+            setOpaque(false);
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
@@ -650,6 +664,7 @@ private void salvarPartidaNoHistoricoAluno() {
 
     private static class BotaoAlternativa extends JButton {
         private float alpha = 1.0f;
+
         public BotaoAlternativa(String texto) {
             super(texto);
             setHorizontalAlignment(SwingConstants.LEFT);
@@ -662,7 +677,12 @@ private void salvarPartidaNoHistoricoAluno() {
             setCursor(new Cursor(Cursor.HAND_CURSOR));
             setBorder(BorderFactory.createEmptyBorder(0, 25, 0, 0));
         }
-        public void setAlpha(float a) { this.alpha = a; repaint(); }
+
+        public void setAlpha(float a) {
+            this.alpha = a;
+            repaint();
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
@@ -693,7 +713,8 @@ private void salvarPartidaNoHistoricoAluno() {
                     ImageIcon icon = new ImageIcon(caminhoImg);
                     Image img = icon.getImage().getScaledInstance(65, 65, Image.SCALE_SMOOTH);
                     add(new JLabel(new ImageIcon(img)), BorderLayout.CENTER);
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
             JLabel lbl = new JLabel("<html><center>" + texto + "</center></html>", SwingConstants.CENTER);
@@ -702,23 +723,40 @@ private void salvarPartidaNoHistoricoAluno() {
             add(lbl, comImagem ? BorderLayout.SOUTH : BorderLayout.CENTER);
         }
 
-        public void setResolvido(boolean v) { this.resolvido = v; setEnabled(!v); }
-        public boolean isResolvido() { return resolvido; }
-        public void setSelecionado(boolean v) { this.selecionado = v; repaint(); }
-        public void setIdPar(String id) { this.idPar = id; }
-        public String getIdPar() { return idPar; }
+        public void setResolvido(boolean v) {
+            this.resolvido = v;
+            setEnabled(!v);
+        }
+
+        public boolean isResolvido() {
+            return resolvido;
+        }
+
+        public void setSelecionado(boolean v) {
+            this.selecionado = v;
+            repaint();
+        }
+
+        public void setIdPar(String id) {
+            this.idPar = id;
+        }
+
+        public String getIdPar() {
+            return idPar;
+        }
 
         @Override
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setColor(getBackground());
-            if (selecionado) g2.setColor(getBackground().darker());
+            if (selecionado)
+                g2.setColor(getBackground().darker());
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 18, 18);
             if (selecionado) {
                 g2.setColor(Color.WHITE);
                 g2.setStroke(new BasicStroke(3));
-                g2.drawRoundRect(2, 2, getWidth()-5, getHeight()-5, 18, 18);
+                g2.drawRoundRect(2, 2, getWidth() - 5, getHeight() - 5, 18, 18);
             }
             super.paintComponent(g);
             g2.dispose();
@@ -727,170 +765,169 @@ private void salvarPartidaNoHistoricoAluno() {
 
     private static class PainelFundo extends JPanel {
         private Image img;
-        public PainelFundo() { try { img = new ImageIcon("imagens/Menu.png").getImage(); } catch(Exception e){} }
+
+        public PainelFundo() {
+            try {
+                img = new ImageIcon("imagens/Menu.png").getImage();
+            } catch (Exception e) {
+            }
+        }
+
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             if (img != null) {
-                double esc = Math.max((double)getWidth()/img.getWidth(null), (double)getHeight()/img.getHeight(null));
-                int nw = (int)(img.getWidth(null)*esc), nh = (int)(img.getHeight(null)*esc);
-                g.drawImage(img, (getWidth()-nw)/2, (getHeight()-nh)/2, nw, nh, null);
+                double esc = Math.max((double) getWidth() / img.getWidth(null),
+                        (double) getHeight() / img.getHeight(null));
+                int nw = (int) (img.getWidth(null) * esc), nh = (int) (img.getHeight(null) * esc);
+                g.drawImage(img, (getWidth() - nw) / 2, (getHeight() - nh) / 2, nw, nh, null);
             }
         }
     }
+
     public static List<Questao> criarQuestoesPadrao() {
-    List<Questao> lista = new ArrayList<>();
+        List<Questao> lista = new ArrayList<>();
 
-    Questao q1 = new Questao(
-            1,
-            "Qual é a principal função do Béquer?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q1.setImagemEnunciado("imagens/Béquer.jpg");
-    q1.adicionarAlternativa(new Alternativa(1, "Misturar e aquecer líquidos", true));
-    q1.adicionarAlternativa(new Alternativa(2, "Medir volume exato de líquido", false));
-    q1.adicionarAlternativa(new Alternativa(3, "Separar líquidos imiscíveis", false));
-    q1.adicionarAlternativa(new Alternativa(4, "Prender tubos de ensaio", false));
-    lista.add(q1);
+        Questao q1 = new Questao(
+                1,
+                "Qual é a principal função do Béquer?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q1.setImagemEnunciado("imagens/Béquer.jpg");
+        q1.adicionarAlternativa(new Alternativa(1, "Misturar e aquecer líquidos", true));
+        q1.adicionarAlternativa(new Alternativa(2, "Medir volume exato de líquido", false));
+        q1.adicionarAlternativa(new Alternativa(3, "Separar líquidos imiscíveis", false));
+        q1.adicionarAlternativa(new Alternativa(4, "Prender tubos de ensaio", false));
+        lista.add(q1);
 
-    Questao q2 = new Questao(
-            2,
-            "Qual instrumento é usado para medir volumes exatos?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q2.setImagemEnunciado("imagens/PipetaVolumétrica.jpg");
-    q2.adicionarAlternativa(new Alternativa(1, "Béquer", false));
-    q2.adicionarAlternativa(new Alternativa(2, "Pipeta volumétrica", true));
-    q2.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
-    q2.adicionarAlternativa(new Alternativa(4, "Bastão de vidro", false));
-    lista.add(q2);
+        Questao q2 = new Questao(
+                2,
+                "Qual instrumento é usado para medir volumes exatos?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q2.setImagemEnunciado("imagens/PipetaVolumétrica.jpg");
+        q2.adicionarAlternativa(new Alternativa(1, "Béquer", false));
+        q2.adicionarAlternativa(new Alternativa(2, "Pipeta volumétrica", true));
+        q2.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
+        q2.adicionarAlternativa(new Alternativa(4, "Bastão de vidro", false));
+        lista.add(q2);
 
-    Questao q3 = new Questao(
-            3,
-            "Qual é a principal função do Bico de Bunsen?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q3.setImagemEnunciado("imagens/BicoDeBunsen.jpg");
-    q3.adicionarAlternativa(new Alternativa(1, "Aquecer substâncias no laboratório", true));
-    q3.adicionarAlternativa(new Alternativa(2, "Filtrar misturas", false));
-    q3.adicionarAlternativa(new Alternativa(3, "Medir volume exato", false));
-    q3.adicionarAlternativa(new Alternativa(4, "Armazenar soluções", false));
-    lista.add(q3);
+        Questao q3 = new Questao(
+                3,
+                "Qual é a principal função do Bico de Bunsen?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q3.setImagemEnunciado("imagens/BicoDeBunsen.jpg");
+        q3.adicionarAlternativa(new Alternativa(1, "Aquecer substâncias no laboratório", true));
+        q3.adicionarAlternativa(new Alternativa(2, "Filtrar misturas", false));
+        q3.adicionarAlternativa(new Alternativa(3, "Medir volume exato", false));
+        q3.adicionarAlternativa(new Alternativa(4, "Armazenar soluções", false));
+        lista.add(q3);
 
-    Questao q4 = new Questao(
-            4,
-            "Qual material é mais usado em uma titulação?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.MEDIO,
-            "Química"
-    );
-    q4.setImagemEnunciado("imagens/Bureta.jpg");
-    q4.adicionarAlternativa(new Alternativa(1, "Bureta", true));
-    q4.adicionarAlternativa(new Alternativa(2, "Vidro relógio", false));
-    q4.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
-    q4.adicionarAlternativa(new Alternativa(4, "Pisseta", false));
-    lista.add(q4);
+        Questao q4 = new Questao(
+                4,
+                "Qual material é mais usado em uma titulação?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química");
+        q4.setImagemEnunciado("imagens/Bureta.jpg");
+        q4.adicionarAlternativa(new Alternativa(1, "Bureta", true));
+        q4.adicionarAlternativa(new Alternativa(2, "Vidro relógio", false));
+        q4.adicionarAlternativa(new Alternativa(3, "Tubo de ensaio", false));
+        q4.adicionarAlternativa(new Alternativa(4, "Pisseta", false));
+        lista.add(q4);
 
-    Questao q5 = new Questao(
-            5,
-            "Qual é a função do Erlenmeyer?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q5.setImagemEnunciado("imagens/Erlenmeyer.jpg");
-    q5.adicionarAlternativa(new Alternativa(1, "Misturar soluções com menor risco de derramamento", true));
-    q5.adicionarAlternativa(new Alternativa(2, "Produzir chama para aquecimento", false));
-    q5.adicionarAlternativa(new Alternativa(3, "Medir volume com alta precisão", false));
-    q5.adicionarAlternativa(new Alternativa(4, "Prender buretas no suporte", false));
-    lista.add(q5);
+        Questao q5 = new Questao(
+                5,
+                "Qual é a função do Erlenmeyer?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q5.setImagemEnunciado("imagens/Erlenmeyer.jpg");
+        q5.adicionarAlternativa(new Alternativa(1, "Misturar soluções com menor risco de derramamento", true));
+        q5.adicionarAlternativa(new Alternativa(2, "Produzir chama para aquecimento", false));
+        q5.adicionarAlternativa(new Alternativa(3, "Medir volume com alta precisão", false));
+        q5.adicionarAlternativa(new Alternativa(4, "Prender buretas no suporte", false));
+        lista.add(q5);
 
-    Questao q6 = new Questao(
-            6,
-            "Qual material auxilia na transferência de líquidos e na filtração?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q6.setImagemEnunciado("imagens/FunilDeHasteLonga.jpg");
-    q6.adicionarAlternativa(new Alternativa(1, "Funil de haste longa", true));
-    q6.adicionarAlternativa(new Alternativa(2, "Balão volumétrico", false));
-    q6.adicionarAlternativa(new Alternativa(3, "Garra", false));
-    q6.adicionarAlternativa(new Alternativa(4, "Tripé", false));
-    lista.add(q6);
+        Questao q6 = new Questao(
+                6,
+                "Qual material auxilia na transferência de líquidos e na filtração?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q6.setImagemEnunciado("imagens/FunilDeHasteLonga.jpg");
+        q6.adicionarAlternativa(new Alternativa(1, "Funil de haste longa", true));
+        q6.adicionarAlternativa(new Alternativa(2, "Balão volumétrico", false));
+        q6.adicionarAlternativa(new Alternativa(3, "Garra", false));
+        q6.adicionarAlternativa(new Alternativa(4, "Tripé", false));
+        lista.add(q6);
 
-    Questao q7 = new Questao(
-            7,
-            "Qual é a função do Bastão de Vidro?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.FACIL,
-            "Química"
-    );
-    q7.setImagemEnunciado("imagens/BastãoDeVidro.jpg");
-    q7.adicionarAlternativa(new Alternativa(1, "Misturar soluções", true));
-    q7.adicionarAlternativa(new Alternativa(2, "Aquecer diretamente líquidos", false));
-    q7.adicionarAlternativa(new Alternativa(3, "Medir massa", false));
-    q7.adicionarAlternativa(new Alternativa(4, "Separar líquidos imiscíveis", false));
-    lista.add(q7);
+        Questao q7 = new Questao(
+                7,
+                "Qual é a função do Bastão de Vidro?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.FACIL,
+                "Química");
+        q7.setImagemEnunciado("imagens/BastãoDeVidro.jpg");
+        q7.adicionarAlternativa(new Alternativa(1, "Misturar soluções", true));
+        q7.adicionarAlternativa(new Alternativa(2, "Aquecer diretamente líquidos", false));
+        q7.adicionarAlternativa(new Alternativa(3, "Medir massa", false));
+        q7.adicionarAlternativa(new Alternativa(4, "Separar líquidos imiscíveis", false));
+        lista.add(q7);
 
-    Questao q8 = new Questao(
-            8,
-            "Qual material é usado para medir volumes aproximados de líquidos?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.MEDIO,
-            "Química"
-    );
-    q8.setImagemEnunciado("imagens/Proveta.jpg");
-    q8.adicionarAlternativa(new Alternativa(1, "Proveta", true));
-    q8.adicionarAlternativa(new Alternativa(2, "Bico de Bunsen", false));
-    q8.adicionarAlternativa(new Alternativa(3, "Vidro relógio", false));
-    q8.adicionarAlternativa(new Alternativa(4, "Suporte universal", false));
-    lista.add(q8);
+        Questao q8 = new Questao(
+                8,
+                "Qual material é usado para medir volumes aproximados de líquidos?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química");
+        q8.setImagemEnunciado("imagens/Proveta.jpg");
+        q8.adicionarAlternativa(new Alternativa(1, "Proveta", true));
+        q8.adicionarAlternativa(new Alternativa(2, "Bico de Bunsen", false));
+        q8.adicionarAlternativa(new Alternativa(3, "Vidro relógio", false));
+        q8.adicionarAlternativa(new Alternativa(4, "Suporte universal", false));
+        lista.add(q8);
 
-    Questao q9 = new Questao(
-            9,
-            "Qual material pode ser usado para evaporar pequenas quantidades de líquido ou cobrir recipientes?",
-            TipoQuestao.MULTIPLA_ESCOLHA,
-            model.tipos.NivelDificuldade.MEDIO,
-            "Química"
-    );
-    q9.setImagemEnunciado("imagens/VidroRelógio.jpg");
-    q9.adicionarAlternativa(new Alternativa(1, "Vidro relógio", true));
-    q9.adicionarAlternativa(new Alternativa(2, "Pipeta Pasteur", false));
-    q9.adicionarAlternativa(new Alternativa(3, "Pisseta", false));
-    q9.adicionarAlternativa(new Alternativa(4, "Garra", false));
-    lista.add(q9);
+        Questao q9 = new Questao(
+                9,
+                "Qual material pode ser usado para evaporar pequenas quantidades de líquido ou cobrir recipientes?",
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                model.tipos.NivelDificuldade.MEDIO,
+                "Química");
+        q9.setImagemEnunciado("imagens/VidroRelógio.jpg");
+        q9.adicionarAlternativa(new Alternativa(1, "Vidro relógio", true));
+        q9.adicionarAlternativa(new Alternativa(2, "Pipeta Pasteur", false));
+        q9.adicionarAlternativa(new Alternativa(3, "Pisseta", false));
+        q9.adicionarAlternativa(new Alternativa(4, "Garra", false));
+        lista.add(q9);
 
-    Questao q10 = new Questao(
-            10,
-            "Combine os materiais aos sistemas experimentais",
-            TipoQuestao.ASSOCIACAO,
-            model.tipos.NivelDificuldade.DIFICIL,
-            "Química"
-    );
-    lista.add(q10);
+        Questao q10 = new Questao(
+                10,
+                "Combine os materiais aos sistemas experimentais",
+                TipoQuestao.ASSOCIACAO,
+                model.tipos.NivelDificuldade.DIFICIL,
+                "Química");
+        lista.add(q10);
 
-    return lista;
-}
+        return lista;
+    }
 
-public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        model.Aluno alunoTeste = new model.Aluno(
-                "Demo",
-                "demo@aluno.cps.sp.gov.br",
-                "123"
-        );
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            model.Aluno alunoTeste = new model.Aluno(
+                    1, 
+                    "Demo",
+                    "demo@aluno.cps.sp.gov.br",
+                    "123");
 
-        Partida partidaTeste = new Partida(alunoTeste);
-        List<Questao> lista = criarQuestoesPadrao();
+            Partida partidaTeste = new Partida(alunoTeste);
+            List<Questao> lista = criarQuestoesPadrao();
 
-        new TelaJogo(partidaTeste, lista).setVisible(true);
-    });
-}
+            new TelaJogo(partidaTeste, lista).setVisible(true);
+        });
+    }
 }
