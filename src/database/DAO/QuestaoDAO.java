@@ -98,6 +98,26 @@ public class QuestaoDAO {
         return null;
     }
 
+    public Questao buscarPorIdIncluindoInativas(int id) throws SQLException {
+        String sql = "SELECT * FROM questao WHERE id = ?";
+
+        try (Connection con = Conexao.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Questao q = mapearQuestao(rs);
+                    q.setAlternativas(buscarAlternativas(con, q.getId()));
+                    return q;
+                }
+            }
+        }
+
+        return null;
+    }
+
     public List<Questao> listarPorNivel(NivelDificuldade nivel) throws SQLException {
         String sql = "SELECT * FROM questao WHERE nivel_dificuldade = ? AND ativa = TRUE ORDER BY RAND()";
         List<Questao> lista = new ArrayList<>();
@@ -131,6 +151,7 @@ public class QuestaoDAO {
                 lista.add(q);
             }
         }
+
         return lista;
     }
 

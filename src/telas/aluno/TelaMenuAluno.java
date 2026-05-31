@@ -11,6 +11,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -21,7 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import database.DAO.QuestaoDAO;
+import model.Aluno;
 import model.Partida;
+import model.Questao;
+import serviços.SessaoUsuario;
 import telas.jogo.TelaJogo;
 
 public class TelaMenuAluno extends JFrame {
@@ -35,11 +41,7 @@ public class TelaMenuAluno extends JFrame {
     }
 
     public TelaMenuAluno() {
-        this(new model.Aluno(
-                "Aluno Teste",
-                "aluno@aluno.cps.sp.gov.br",
-                "123"
-        ));
+        this((Aluno) SessaoUsuario.getUsuarioLogado());
     }
 
     private void configurarJanela() {
@@ -112,8 +114,7 @@ public class TelaMenuAluno extends JFrame {
                     this,
                     "Nome: " + this.aluno.getNome() + "\nE-mail: " + this.aluno.getEmail(),
                     "Perfil do Aluno",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+                    JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
         }
@@ -132,14 +133,40 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaJogo() {
-        Partida partida = new Partida(this.aluno);
+        try {
+            Aluno alunoLogado = (Aluno) SessaoUsuario.getUsuarioLogado();
 
-        new TelaJogo(
-                partida,
-                TelaJogo.criarQuestoesPadrao()
-        ).setVisible(true);
+            QuestaoDAO questaoDAO = new QuestaoDAO();
+            List<Questao> questoes = questaoDAO.listarTodas();
 
-        dispose();
+            if (questoes.isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Não há questões cadastradas para iniciar o jogo.",
+                        "Jogo indisponível",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Partida partida = new Partida(alunoLogado);
+
+            new TelaJogo(partida, questoes).setVisible(true);
+            dispose();
+
+        } catch (SQLException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao carregar questões do banco: " + erro.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+
+        } catch (IllegalStateException | ClassCastException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Não foi possível iniciar o jogo. Faça login novamente.",
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void abrirTelaDesempenho() {
@@ -152,8 +179,7 @@ public class TelaMenuAluno extends JFrame {
                 this,
                 "Deseja sair da conta?",
                 "Sair",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
