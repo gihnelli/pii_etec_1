@@ -39,6 +39,8 @@ import javax.swing.border.EmptyBorder;
 import database.DAO.QuestaoDAO;
 import model.Alternativa;
 import model.Questao;
+import model.tipos.NivelDificuldade;
+import model.tipos.TipoQuestao;
 import serviços.SessaoUsuario;
 
 public class TelaGerenciarPerguntas extends JFrame {
@@ -53,6 +55,13 @@ public class TelaGerenciarPerguntas extends JFrame {
 
     private String caminhoImagemAdicionar = "";
     private String caminhoImagemEditar = "";
+
+    private JTextField campoEnunciadoAdicionar;
+    private JTextField[] camposAlternativasAdicionar;
+    private JRadioButton[] opcoesCorretasAdicionar;
+    private JRadioButton radioFacilAdicionar;
+    private JRadioButton radioMedioAdicionar;
+    private JRadioButton radioDificilAdicionar;
 
     public TelaGerenciarPerguntas() {
         carregarPerguntasDoBanco();
@@ -255,12 +264,12 @@ public class TelaGerenciarPerguntas extends JFrame {
         painelFormulario.setBounds(4, 84, 904, 438);
         painelBase.add(painelFormulario);
 
-        JTextField campoEnunciado = new JTextField();
-        configurarCampoTexto(campoEnunciado);
-        campoEnunciado.setBounds(28, 18, 840, 44);
-        campoEnunciado.setText("");
-        campoEnunciado.setToolTipText("Digite o enunciado");
-        painelFormulario.add(campoEnunciado);
+        campoEnunciadoAdicionar = new JTextField();
+        configurarCampoTexto(campoEnunciadoAdicionar);
+        campoEnunciadoAdicionar.setBounds(28, 18, 840, 44);
+        campoEnunciadoAdicionar.setText("");
+        campoEnunciadoAdicionar.setToolTipText("Digite o enunciado");
+        painelFormulario.add(campoEnunciadoAdicionar);
 
         JLabel textoEnunciado = new JLabel("Enunciado:");
         textoEnunciado.setBounds(38, 26, 120, 26);
@@ -268,8 +277,8 @@ public class TelaGerenciarPerguntas extends JFrame {
         textoEnunciado.setForeground(new Color(170, 170, 185));
         painelFormulario.add(textoEnunciado);
 
-        JTextField[] camposAlternativas = new JTextField[4];
-        JRadioButton[] opcoesCorretas = new JRadioButton[4];
+        camposAlternativasAdicionar = new JTextField[4];
+        opcoesCorretasAdicionar = new JRadioButton[4];
         ButtonGroup grupoCorreta = new ButtonGroup();
 
         String[] letras = { "a)", "b)", "c)", "d)" };
@@ -281,14 +290,14 @@ public class TelaGerenciarPerguntas extends JFrame {
             radio.setOpaque(false);
             radio.setCursor(new Cursor(Cursor.HAND_CURSOR));
             grupoCorreta.add(radio);
-            opcoesCorretas[i] = radio;
+            opcoesCorretasAdicionar[i] = radio;
             painelFormulario.add(radio);
 
             JTextField campoAlternativa = new JTextField();
             configurarCampoTexto(campoAlternativa);
             campoAlternativa.setBounds(66, y, 650, 46);
             campoAlternativa.setText("");
-            camposAlternativas[i] = campoAlternativa;
+            camposAlternativasAdicionar[i] = campoAlternativa;
             painelFormulario.add(campoAlternativa);
 
             JLabel textoLetra = new JLabel(letras[i]);
@@ -300,7 +309,7 @@ public class TelaGerenciarPerguntas extends JFrame {
             y += 59;
         }
 
-        opcoesCorretas[0].setSelected(true);
+        opcoesCorretasAdicionar[0].setSelected(true);
 
         PainelArredondado painelImagem = new PainelArredondado(new Color(232, 232, 236), new Color(232, 232, 236), 0);
         painelImagem.setLayout(null);
@@ -351,18 +360,18 @@ public class TelaGerenciarPerguntas extends JFrame {
         textoNivel.setForeground(new Color(170, 170, 185));
         painelNivel.add(textoNivel);
 
-        JRadioButton radioFacil = criarRadioNivel("Fácil", 200, true);
-        JRadioButton radioMedio = criarRadioNivel("Médio", 300, false);
-        JRadioButton radioDificil = criarRadioNivel("Difícil", 400, false);
+        radioFacilAdicionar = criarRadioNivel("Fácil", 200, true);
+        radioMedioAdicionar = criarRadioNivel("Médio", 300, false);
+        radioDificilAdicionar = criarRadioNivel("Difícil", 400, false);
 
         ButtonGroup grupoNivel = new ButtonGroup();
-        grupoNivel.add(radioFacil);
-        grupoNivel.add(radioMedio);
-        grupoNivel.add(radioDificil);
+        grupoNivel.add(radioFacilAdicionar);
+        grupoNivel.add(radioMedioAdicionar);
+        grupoNivel.add(radioDificilAdicionar);
 
-        painelNivel.add(radioFacil);
-        painelNivel.add(radioMedio);
-        painelNivel.add(radioDificil);
+        painelNivel.add(radioFacilAdicionar);
+        painelNivel.add(radioMedioAdicionar);
+        painelNivel.add(radioDificilAdicionar);
 
         JButton botaoCancelar = criarBotaoAcao("Cancelar", new Color(221, 188, 188), new Color(104, 44, 44));
         botaoCancelar.setBounds(228, 385, 206, 44);
@@ -371,53 +380,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JButton botaoAdicionar = criarBotaoAcao("Adicionar", new Color(176, 215, 172), new Color(44, 103, 48));
         botaoAdicionar.setBounds(468, 385, 206, 44);
-        botaoAdicionar.addActionListener(evento -> {
-            String enunciado = campoEnunciado.getText().trim();
-
-            List<String> alternativas = new ArrayList<>();
-            for (JTextField campo : camposAlternativas) {
-                alternativas.add(campo.getText().trim());
-            }
-
-            if (enunciado.isEmpty()) {
-                mostrarMensagem("Digite o enunciado da pergunta.");
-                return;
-            }
-
-            for (String alternativa : alternativas) {
-                if (alternativa.isEmpty()) {
-                    mostrarMensagem("Preencha todas as alternativas.");
-                    return;
-                }
-            }
-
-            int indiceCorreta = 0;
-            for (int i = 0; i < opcoesCorretas.length; i++) {
-                if (opcoesCorretas[i].isSelected()) {
-                    indiceCorreta = i;
-                    break;
-                }
-            }
-
-            String nivel = "Fácil";
-            if (radioMedio.isSelected()) {
-                nivel = "Médio";
-            } else if (radioDificil.isSelected()) {
-                nivel = "Difícil";
-            }
-
-            PerguntaCadastro novaPergunta = new PerguntaCadastro(
-                    enunciado,
-                    alternativas,
-                    indiceCorreta,
-                    nivel,
-                    caminhoImagemAdicionar);
-
-            bancoPerguntas.add(novaPergunta);
-            indicePerguntaSelecionada = bancoPerguntas.size() - 1;
-            caminhoImagemAdicionar = "";
-            mostrarTela("VISUALIZAR");
-        });
+        botaoAdicionar.addActionListener(evento -> adicionarPergunta());
         painelFormulario.add(botaoAdicionar);
 
         return painelBase;
@@ -438,16 +401,10 @@ public class TelaGerenciarPerguntas extends JFrame {
         painelFormulario.setBounds(4, 84, 904, 380);
         painelBase.add(painelFormulario);
 
-        PainelArredondado campoEnunciado = new PainelArredondado(new Color(235, 235, 239), new Color(235, 235, 239), 0);
-        campoEnunciado.setLayout(null);
-        campoEnunciado.setBounds(30, 18, 842, 46);
-        painelFormulario.add(campoEnunciado);
-
-        JLabel textoEnunciado = new JLabel("Enunciado: " + perguntaSelecionada.getEnunciado());
-        textoEnunciado.setBounds(12, 8, 800, 28);
-        textoEnunciado.setFont(new Font("Verdana", Font.BOLD, 16));
-        textoEnunciado.setForeground(new Color(120, 120, 145));
-        campoEnunciado.add(textoEnunciado);
+        JTextField campoEnunciadoEditar = new JTextField(perguntaSelecionada.getEnunciado());
+        configurarCampoTexto(campoEnunciadoEditar);
+        campoEnunciadoEditar.setBounds(30, 18, 842, 46);
+        painelFormulario.add(campoEnunciadoEditar);
 
         JRadioButton[] radiosCorretos = new JRadioButton[4];
         JTextField[] camposAlternativas = new JTextField[4];
@@ -520,37 +477,11 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JButton botaoSalvar = criarBotaoAcao("Salvar alterações", new Color(176, 215, 172), new Color(44, 103, 48));
         botaoSalvar.setBounds(472, 316, 206, 50);
-        botaoSalvar.addActionListener(evento -> {
-            List<String> novasAlternativas = new ArrayList<>();
-            for (JTextField campo : camposAlternativas) {
-                novasAlternativas.add(campo.getText().trim());
-            }
-
-            for (String alternativa : novasAlternativas) {
-                if (alternativa.isEmpty()) {
-                    mostrarMensagem("Preencha todas as alternativas.");
-                    return;
-                }
-            }
-
-            int novaCorreta = 0;
-            for (int i = 0; i < radiosCorretos.length; i++) {
-                if (radiosCorretos[i].isSelected()) {
-                    novaCorreta = i;
-                    break;
-                }
-            }
-
-            perguntaSelecionada.setAlternativas(novasAlternativas);
-            perguntaSelecionada.setIndiceCorreta(novaCorreta);
-
-            if (!caminhoImagemEditar.isBlank()) {
-                perguntaSelecionada.setCaminhoImagem(caminhoImagemEditar);
-            }
-
-            caminhoImagemEditar = "";
-            mostrarTela("VISUALIZAR");
-        });
+        botaoSalvar.addActionListener(evento -> editarPergunta(
+                perguntaSelecionada,
+                campoEnunciadoEditar,
+                camposAlternativas,
+                radiosCorretos));
         painelFormulario.add(botaoSalvar);
 
         return painelBase;
@@ -770,13 +701,192 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
 
         String caminhoImagem = questao.getImagemEnunciado() == null ? "" : questao.getImagemEnunciado();
+        String categoria = questao.getCategoria() == null ? "Materiais de laboratório" : questao.getCategoria();
 
         return new PerguntaCadastro(
+                questao.getId(),
                 questao.getEnunciado(),
                 alternativas,
                 indiceCorreta,
                 questao.getNivelDificuldade().name(),
+                categoria,
                 caminhoImagem);
+    }
+
+    private void adicionarPergunta() {
+        String enunciado = campoEnunciadoAdicionar.getText().trim();
+
+        List<String> alternativas = obterTextosAlternativas(camposAlternativasAdicionar);
+
+        if (!validarDadosPergunta(enunciado, alternativas)) {
+            return;
+        }
+
+        int indiceCorreta = obterIndiceAlternativaCorreta(opcoesCorretasAdicionar);
+        NivelDificuldade nivel = obterNivelSelecionado();
+
+        try {
+            salvarPerguntaNoBanco(enunciado, alternativas, indiceCorreta, nivel);
+
+            caminhoImagemAdicionar = "";
+            indicePerguntaSelecionada = 0;
+
+            carregarPerguntasDoBanco();
+            mostrarTela("VISUALIZAR");
+        } catch (SQLException | IllegalStateException erro) {
+            mostrarMensagem("Erro ao adicionar pergunta: " + erro.getMessage());
+        }
+    }
+
+    private void salvarPerguntaNoBanco(String enunciado, List<String> alternativas, int indiceCorreta,
+            NivelDificuldade nivel) throws SQLException {
+        Questao questao = new Questao(
+                0,
+                enunciado,
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                nivel,
+                "Materiais de laboratório");
+
+        if (!caminhoImagemAdicionar.isBlank()) {
+            questao.setImagemEnunciado(caminhoImagemAdicionar);
+        }
+
+        for (int i = 0; i < alternativas.size(); i++) {
+            questao.adicionarAlternativa(new Alternativa(
+                    0,
+                    alternativas.get(i),
+                    null,
+                    i == indiceCorreta,
+                    i != indiceCorreta));
+        }
+
+        QuestaoDAO questaoDAO = new QuestaoDAO();
+        questaoDAO.inserir(questao, SessaoUsuario.getIdUsuario());
+    }
+
+    private List<String> obterTextosAlternativas(JTextField[] camposAlternativas) {
+        List<String> alternativas = new ArrayList<>();
+
+        for (JTextField campo : camposAlternativas) {
+            alternativas.add(campo.getText().trim());
+        }
+
+        return alternativas;
+    }
+
+    private boolean validarDadosPergunta(String enunciado, List<String> alternativas) {
+        if (enunciado.isEmpty()) {
+            mostrarMensagem("Digite o enunciado da pergunta.");
+            return false;
+        }
+
+        for (String alternativa : alternativas) {
+            if (alternativa.isEmpty()) {
+                mostrarMensagem("Preencha todas as alternativas.");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private int obterIndiceAlternativaCorreta(JRadioButton[] opcoesCorretas) {
+        for (int i = 0; i < opcoesCorretas.length; i++) {
+            if (opcoesCorretas[i].isSelected()) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    private NivelDificuldade obterNivelSelecionado() {
+        if (radioMedioAdicionar.isSelected()) {
+            return NivelDificuldade.MEDIO;
+        }
+
+        if (radioDificilAdicionar.isSelected()) {
+            return NivelDificuldade.DIFICIL;
+        }
+
+        return NivelDificuldade.FACIL;
+    }
+
+    private void editarPergunta(PerguntaCadastro perguntaSelecionada, JTextField campoEnunciado,
+            JTextField[] camposAlternativas, JRadioButton[] radiosCorretos) {
+        String enunciado = campoEnunciado.getText().trim();
+        List<String> novasAlternativas = obterTextosAlternativas(camposAlternativas);
+
+        if (!validarDadosPergunta(enunciado, novasAlternativas)) {
+            return;
+        }
+
+        int novaCorreta = obterIndiceAlternativaCorreta(radiosCorretos);
+        int idPerguntaEditada = perguntaSelecionada.getId();
+
+        try {
+            salvarEdicaoPerguntaNoBanco(perguntaSelecionada, enunciado, novasAlternativas, novaCorreta);
+            caminhoImagemEditar = "";
+
+            carregarPerguntasDoBanco();
+            selecionarPerguntaPorId(idPerguntaEditada);
+            mostrarTela("VISUALIZAR");
+        } catch (SQLException | IllegalStateException erro) {
+            mostrarMensagem("Erro ao editar pergunta: " + erro.getMessage());
+        }
+    }
+
+    private void salvarEdicaoPerguntaNoBanco(PerguntaCadastro perguntaSelecionada, String enunciado,
+            List<String> alternativas, int indiceCorreta) throws SQLException {
+        Questao questao = new Questao(
+                perguntaSelecionada.getId(),
+                enunciado,
+                TipoQuestao.MULTIPLA_ESCOLHA,
+                converterNivel(perguntaSelecionada.getNivel()),
+                perguntaSelecionada.getCategoria());
+
+        String caminhoImagem = perguntaSelecionada.getCaminhoImagem();
+        if (!caminhoImagemEditar.isBlank()) {
+            caminhoImagem = caminhoImagemEditar;
+        }
+        questao.setImagemEnunciado(caminhoImagem);
+
+        for (int i = 0; i < alternativas.size(); i++) {
+            questao.adicionarAlternativa(new Alternativa(
+                    0,
+                    alternativas.get(i),
+                    i == indiceCorreta));
+        }
+
+        QuestaoDAO questaoDAO = new QuestaoDAO();
+        boolean atualizou = questaoDAO.atualizarComAlternativas(questao);
+
+        if (!atualizou) {
+            throw new SQLException("Nenhuma pergunta foi atualizada.");
+        }
+    }
+
+    private NivelDificuldade converterNivel(String nivel) {
+        if (nivel == null || nivel.isBlank()) {
+            return NivelDificuldade.FACIL;
+        }
+
+        return switch (nivel.toUpperCase()) {
+            case "MEDIO", "MÉDIO" -> NivelDificuldade.MEDIO;
+            case "DIFICIL", "DIFÍCIL" -> NivelDificuldade.DIFICIL;
+            default -> NivelDificuldade.FACIL;
+        };
+    }
+
+    private void selecionarPerguntaPorId(int id) {
+        for (int i = 0; i < bancoPerguntas.size(); i++) {
+            if (bancoPerguntas.get(i).getId() == id) {
+                indicePerguntaSelecionada = i;
+                return;
+            }
+        }
+
+        indicePerguntaSelecionada = 0;
     }
 
     public static void main(String[] args) {
@@ -787,19 +897,27 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private static class PerguntaCadastro {
+        private int id;
         private String enunciado;
         private List<String> alternativas;
         private int indiceCorreta;
         private String nivel;
+        private String categoria;
         private String caminhoImagem;
 
-        public PerguntaCadastro(String enunciado, List<String> alternativas, int indiceCorreta, String nivel,
-                String caminhoImagem) {
+        public PerguntaCadastro(int id, String enunciado, List<String> alternativas, int indiceCorreta,
+                String nivel, String categoria, String caminhoImagem) {
+            this.id = id;
             this.enunciado = enunciado;
             this.alternativas = new ArrayList<>(alternativas);
             this.indiceCorreta = indiceCorreta;
             this.nivel = nivel;
+            this.categoria = categoria;
             this.caminhoImagem = caminhoImagem;
+        }
+
+        public int getId() {
+            return id;
         }
 
         public String getEnunciado() {
@@ -824,6 +942,10 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         public String getNivel() {
             return nivel;
+        }
+
+        public String getCategoria() {
+            return categoria;
         }
 
         public String getCaminhoImagem() {
