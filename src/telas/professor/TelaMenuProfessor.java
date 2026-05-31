@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import serviços.SessaoUsuario;
+
 public class TelaMenuProfessor extends JFrame {
 
     public TelaMenuProfessor() {
@@ -95,12 +97,21 @@ public class TelaMenuProfessor extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(
-            this,
-            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
-            "Perfil do Professor",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+        try {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Nome: " + SessaoUsuario.getNomeUsuario()
+                            + "\nE-mail: " + SessaoUsuario.getEmailUsuario()
+                            + "\nTipo: " + SessaoUsuario.getTipoUsuario(),
+                    "Perfil do Usuário",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Nenhum usuário logado.",
+                    "Perfil do Usuário",
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void abrirCadastrarAluno() {
@@ -123,14 +134,12 @@ public class TelaMenuProfessor extends JFrame {
                 this,
                 "Deseja sair da conta?",
                 "Sair",
-                JOptionPane.YES_NO_OPTION
-        );
+                JOptionPane.YES_NO_OPTION);
 
         if (resposta == JOptionPane.YES_OPTION) {
             dispose();
 
-        
-        new telas.autenticacao.TelaLogin().setVisible(true);
+            new telas.autenticacao.TelaLogin().setVisible(true);
         }
     }
 
@@ -175,7 +184,7 @@ public class TelaMenuProfessor extends JFrame {
         protected void paintComponent(Graphics grafico) {
             super.paintComponent(grafico);
             Graphics2D g2 = (Graphics2D) grafico.create();
-            
+
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -205,7 +214,7 @@ public class TelaMenuProfessor extends JFrame {
                 g2.setColor(new Color(223, 239, 252));
                 g2.fillRect(0, 0, getWidth(), getHeight());
             }
-            
+
             g2.dispose();
         }
     }

@@ -50,6 +50,7 @@ import model.Aluno;
 import model.Partida;
 import model.Questao;
 import model.Resposta;
+import serviços.SessaoUsuario;
 
 public class TelaDesempenho extends JFrame {
 
@@ -301,13 +302,22 @@ public class TelaDesempenho extends JFrame {
     }
 
     private void abrirPerfil() {
+    try {
         JOptionPane.showMessageDialog(
-            this,
-            "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
-            "Perfil do Professor",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+                this,
+                "Nome: " + SessaoUsuario.getNomeUsuario()
+                        + "\nE-mail: " + SessaoUsuario.getEmailUsuario()
+                        + "\nTipo: " + SessaoUsuario.getTipoUsuario(),
+                "Perfil do Usuário",
+                JOptionPane.INFORMATION_MESSAGE);
+    } catch (IllegalStateException erro) {
+        JOptionPane.showMessageDialog(
+                this,
+                "Nenhum usuário logado.",
+                "Perfil do Usuário",
+                JOptionPane.WARNING_MESSAGE);
     }
+}
 
     private JButton criarBotaoIconeReal(String caminho) {
         JButton btn = new JButton();

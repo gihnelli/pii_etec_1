@@ -119,11 +119,21 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void abrirPerfil() {
-        JOptionPane.showMessageDialog(
-                this,
-                "Nome: Professor Teste\nE-mail: professor@cps.sp.gov.br",
-                "Perfil do Professor",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Nome: " + SessaoUsuario.getNomeUsuario()
+                            + "\nE-mail: " + SessaoUsuario.getEmailUsuario()
+                            + "\nTipo: " + SessaoUsuario.getTipoUsuario(),
+                    "Perfil do Usuário",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (IllegalStateException erro) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Nenhum usuário logado.",
+                    "Perfil do Usuário",
+                    JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private JButton criarBotaoIconeReal(String caminho) {
@@ -569,30 +579,7 @@ public class TelaGerenciarPerguntas extends JFrame {
 
         JButton botaoRemover = criarBotaoAcao("Remover", new Color(176, 215, 172), new Color(44, 103, 48));
         botaoRemover.setBounds(468, 255, 206, 50);
-        botaoRemover.addActionListener(evento -> {
-            if (bancoPerguntas.isEmpty()) {
-                mostrarMensagem("Não há perguntas para remover.");
-                return;
-            }
-
-            int resposta = JOptionPane.showConfirmDialog(
-                    this,
-                    "Deseja realmente remover a pergunta selecionada?",
-                    "Confirmar remoção",
-                    JOptionPane.YES_NO_OPTION);
-
-            if (resposta == JOptionPane.YES_OPTION) {
-                bancoPerguntas.remove(indicePerguntaSelecionada);
-
-                if (bancoPerguntas.isEmpty()) {
-                    indicePerguntaSelecionada = 0;
-                } else if (indicePerguntaSelecionada >= bancoPerguntas.size()) {
-                    indicePerguntaSelecionada = bancoPerguntas.size() - 1;
-                }
-
-                mostrarTela("VISUALIZAR");
-            }
-        });
+        botaoRemover.addActionListener(evento -> removerPerguntaSelecionada());
         painelListaExterna.add(botaoRemover);
 
         return painelBase;
@@ -887,6 +874,47 @@ public class TelaGerenciarPerguntas extends JFrame {
         }
 
         indicePerguntaSelecionada = 0;
+    }
+
+    private void removerPerguntaSelecionada() {
+        if (bancoPerguntas.isEmpty()) {
+            mostrarMensagem("Não há perguntas para remover.");
+            return;
+        }
+
+        PerguntaCadastro perguntaSelecionada = bancoPerguntas.get(indicePerguntaSelecionada);
+
+        int resposta = JOptionPane.showConfirmDialog(
+                this,
+                "Deseja realmente remover a pergunta selecionada?",
+                "Confirmar remoção",
+                JOptionPane.YES_NO_OPTION);
+
+        if (resposta != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        try {
+            QuestaoDAO questaoDAO = new QuestaoDAO();
+            boolean removeu = questaoDAO.desativar(perguntaSelecionada.getId());
+
+            if (!removeu) {
+                mostrarMensagem("Nenhuma pergunta foi removida.");
+                return;
+            }
+
+            carregarPerguntasDoBanco();
+
+            if (bancoPerguntas.isEmpty()) {
+                indicePerguntaSelecionada = 0;
+            } else if (indicePerguntaSelecionada >= bancoPerguntas.size()) {
+                indicePerguntaSelecionada = bancoPerguntas.size() - 1;
+            }
+
+            mostrarTela("VISUALIZAR");
+        } catch (SQLException | IllegalStateException erro) {
+            mostrarMensagem("Erro ao remover pergunta: " + erro.getMessage());
+        }
     }
 
     public static void main(String[] args) {
