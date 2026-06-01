@@ -17,9 +17,17 @@ public class QuestaoDAO {
 
     public int inserir(Questao questao, int idProfessor) throws SQLException {
         String sqlQuestao = """
-                INSERT INTO questao (enunciado, tipo, nivel_dificuldade, categoria, imagem_url, id_professor)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """;
+        INSERT INTO questao (
+            enunciado,
+            tipo,
+            nivel_dificuldade,
+            categoria,
+            imagem_url,
+            id_professor,
+            ativa
+        )
+        VALUES (?, ?, ?, ?, ?, ?, TRUE)
+        """;
 
         Connection con = Conexao.getConnection();
         con.setAutoCommit(false);
@@ -154,6 +162,36 @@ public class QuestaoDAO {
 
         return lista;
     }
+
+    public List<Questao> listarPorProfessorETipo(int idProfessor, TipoQuestao tipo) throws SQLException {
+    String sql = """
+            SELECT *
+            FROM questao
+            WHERE id_professor = ?
+            AND tipo = ?
+            AND ativa = TRUE
+            ORDER BY id DESC
+            """;
+
+    List<Questao> lista = new ArrayList<>();
+
+    try (Connection con = Conexao.getConnection();
+        PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, idProfessor);
+        ps.setString(2, tipo.name());
+
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Questao q = mapearQuestao(rs);
+                q.setAlternativas(buscarAlternativas(con, q.getId()));
+                lista.add(q);
+            }
+        }
+    }
+
+    return lista;
+}
 
     public List<Questao> listarPorProfessor(int idProfessor) throws SQLException {
         String sql = "SELECT * FROM questao WHERE id_professor = ? AND ativa = TRUE ORDER BY id DESC";

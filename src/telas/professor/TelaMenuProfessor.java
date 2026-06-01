@@ -63,18 +63,23 @@ public class TelaMenuProfessor extends JFrame {
         titulo.setForeground(new Color(31, 65, 126));
         conteinerCentral.add(titulo);
 
-        BotaoArredondado botaoGerenciarPerguntas = new BotaoArredondado("Gerenciar perguntas");
-        botaoGerenciarPerguntas.setBounds(280, 280, 400, 65);
-        botaoGerenciarPerguntas.addActionListener((ActionEvent evento) -> abrirGerenciarPerguntas());
-        conteinerCentral.add(botaoGerenciarPerguntas);
+        BotaoArredondado botaoGerenciarAlternativas = new BotaoArredondado("<html><center>Gerenciar Perguntas<br>de Alternativa</center></html>");
+        botaoGerenciarAlternativas.setBounds(280, 260, 400, 65);
+        botaoGerenciarAlternativas.addActionListener(evento -> abrirGerenciarPerguntasAlternativa());
+        conteinerCentral.add(botaoGerenciarAlternativas);
 
-        BotaoArredondado botaoRelatorios = new BotaoArredondado("Relatórios");
-        botaoRelatorios.setBounds(280, 365, 400, 65);
+        BotaoArredondado botaoGerenciarAssociacao = new BotaoArredondado("<html><center>Gerenciar Perguntas<br>de Associação</center></html>");
+        botaoGerenciarAssociacao.setBounds(280, 345, 400, 65);
+        botaoGerenciarAssociacao.addActionListener(evento -> abrirGerenciarPerguntasAssociacao());
+        conteinerCentral.add(botaoGerenciarAssociacao);
+
+        BotaoArredondado botaoRelatorios = new BotaoArredondado("Desempenhos e Relatórios");
+        botaoRelatorios.setBounds(280, 430, 400, 65);
         botaoRelatorios.addActionListener((ActionEvent evento) -> abrirRelatorios());
         conteinerCentral.add(botaoRelatorios);
 
         BotaoArredondado botaoCadastrarAluno = new BotaoArredondado("Cadastrar Aluno");
-        botaoCadastrarAluno.setBounds(280, 450, 400, 65);
+        botaoCadastrarAluno.setBounds(280, 515, 400, 65);
         botaoCadastrarAluno.addActionListener((ActionEvent evento) -> abrirCadastrarAluno());
         conteinerCentral.add(botaoCadastrarAluno);
     }
@@ -119,8 +124,13 @@ public class TelaMenuProfessor extends JFrame {
         dispose();
     }
 
-    private void abrirGerenciarPerguntas() {
-        new TelaGerenciarPerguntas().setVisible(true);
+    private void abrirGerenciarPerguntasAlternativa() {
+        new TelaGerenciarPerguntas(model.tipos.TipoQuestao.MULTIPLA_ESCOLHA).setVisible(true);
+        dispose();
+    }
+
+    private void abrirGerenciarPerguntasAssociacao() {
+        new TelaGerenciarPerguntas(model.tipos.TipoQuestao.ASSOCIACAO).setVisible(true);
         dispose();
     }
 

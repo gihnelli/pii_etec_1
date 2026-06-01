@@ -50,8 +50,8 @@ public class RespostaDAO {
     int inserirComConexao(Connection con, int idPartida, Resposta resposta) throws SQLException {
         String sql = """
                 INSERT INTO resposta
-                    (id_partida, id_questao, id_alternativa, correta)
-                VALUES (?, ?, ?, ?)
+                    (id_partida, id_questao, id_alternativa, correta, tempo_resposta)
+                VALUES (?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -65,6 +65,7 @@ public class RespostaDAO {
             }
 
             ps.setBoolean(4, resposta.isCorreta());
+            ps.setInt(5, 0);
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -78,29 +79,29 @@ public class RespostaDAO {
     }
 
     private Resposta mapearResposta(Connection con, ResultSet rs, QuestaoDAO questaoDAO) throws SQLException {
-        Questao questao = questaoDAO.buscarPorIdIncluindoInativas(rs.getInt("id_questao"));
+    Questao questao = questaoDAO.buscarPorIdIncluindoInativas(rs.getInt("id_questao"));
 
-        int idAlternativa = rs.getInt("id_alternativa");
+    int idAlternativa = rs.getInt("id_alternativa");
 
-        if (rs.wasNull()) {
-            idAlternativa = 0;
-        }
-
-        Alternativa alternativa = buscarAlternativaPorId(con, idAlternativa);
-
-        if (alternativa == null) {
-            alternativa = new Alternativa(
-                    0,
-                    "",
-                    rs.getBoolean("correta"));
-        }
-
-        Resposta resposta = new Resposta();
-        resposta.setQuestao(questao);
-        resposta.setAlternativaEscolhida(alternativa);
-
-        return resposta;
+    if (rs.wasNull()) {
+        idAlternativa = 0;
     }
+
+    Alternativa alternativa = buscarAlternativaPorId(con, idAlternativa);
+
+    if (alternativa == null) {
+        alternativa = new Alternativa(
+                0,
+                "",
+                rs.getBoolean("correta"));
+    }
+
+    Resposta resposta = new Resposta();
+    resposta.setQuestao(questao);
+    resposta.setAlternativaEscolhida(alternativa);
+
+    return resposta;
+}
 
     private Alternativa buscarAlternativaPorId(Connection con, int idAlternativa) throws SQLException {
         if (idAlternativa <= 0) {

@@ -18,7 +18,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -293,42 +295,46 @@ public class TelaJogo extends JFrame {
         painelInstrucao.add(lblMsg);
         painelConteudo.add(painelInstrucao);
 
-        String[][] pares = {
-                { "Bureta", "Titulação", "imagens/Bureta.jpg" },
-                { "Condensador", "Destilação", "imagens/BicoDeBunsen.jpg" },
-                { "Funil de Decantação", "Extração", "imagens/FunilDeHasteLonga.jpg" },
-                { "Balão Volumétrico", "Diluição", "imagens/BalãoVolumétrico.jpg" }
-        };
+        List<Alternativa> pares = questao.getAlternativas();
 
-        List<Integer> ordemEsq = new ArrayList<>();
-        List<Integer> ordemDir = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            ordemEsq.add(i);
-            ordemDir.add(i);
-        }
-        Collections.shuffle(ordemEsq);
-        Collections.shuffle(ordemDir);
+List<Integer> ordemEsq = new ArrayList<>();
+List<Integer> ordemDir = new ArrayList<>();
 
-        int y = 90;
-        for (int i = 0; i < 4; i++) {
-            final int idxEsq = ordemEsq.get(i);
-            final int idxDir = ordemDir.get(i);
+for (int i = 0; i < pares.size(); i++) {
+    ordemEsq.add(i);
+    ordemDir.add(i);
+}
 
-            BotaoAssociacao btnEsq = new BotaoAssociacao(pares[idxEsq][0], pares[idxEsq][2], true);
-            btnEsq.setBounds(50, y, 230, 110);
-            btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, pares[idxEsq][1]));
-            btnEsq.setIdPar(pares[idxEsq][1]);
-            painelConteudo.add(btnEsq);
-            botoesEsq.add(btnEsq);
+Collections.shuffle(ordemEsq);
+Collections.shuffle(ordemDir);
 
-            BotaoAssociacao btnDir = new BotaoAssociacao(pares[idxDir][1], null, false);
-            btnDir.setBounds(620, y, 230, 110);
-            btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, pares[idxDir][1]));
-            btnDir.setIdPar(pares[idxDir][1]);
-            painelConteudo.add(btnDir);
-            botoesDir.add(btnDir);
+int y = 90;
 
-            y += 120;
+for (int i = 0; i < pares.size(); i++) {
+    final int idxEsq = ordemEsq.get(i);
+    final int idxDir = ordemDir.get(i);
+
+    Alternativa parEsq = pares.get(idxEsq);
+    Alternativa parDir = pares.get(idxDir);
+
+    String idParEsq = String.valueOf(parEsq.getId());
+    String idParDir = String.valueOf(parDir.getId());
+
+    BotaoAssociacao btnEsq = new BotaoAssociacao("", parEsq.getImagem(), true);
+    btnEsq.setBounds(50, y, 230, 110);
+    btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, idParEsq));
+    btnEsq.setIdPar(idParEsq);
+    painelConteudo.add(btnEsq);
+    botoesEsq.add(btnEsq);
+
+    BotaoAssociacao btnDir = new BotaoAssociacao(parDir.getTexto(), null, false);
+    btnDir.setBounds(620, y, 230, 110);
+    btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, idParDir));
+    btnDir.setIdPar(idParDir);
+    painelConteudo.add(btnDir);
+    botoesDir.add(btnDir);
+
+    y += 120;
         }
     }
 
@@ -719,27 +725,48 @@ public class TelaJogo extends JFrame {
         private String idPar;
 
         public BotaoAssociacao(String texto, String caminhoImg, boolean comImagem) {
-            setLayout(new BorderLayout());
-            setBackground(new Color(130, 150, 220));
-            setFocusPainted(false);
-            setBorderPainted(false);
-            setContentAreaFilled(false);
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
+    setLayout(new BorderLayout());
+    setBackground(new Color(130, 150, 220));
+    setFocusPainted(false);
+    setBorderPainted(false);
+    setContentAreaFilled(false);
+    setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-            if (comImagem && caminhoImg != null) {
-                try {
-                    ImageIcon icon = new ImageIcon(caminhoImg);
-                    Image img = icon.getImage().getScaledInstance(65, 65, Image.SCALE_SMOOTH);
-                    add(new JLabel(new ImageIcon(img)), BorderLayout.CENTER);
-                } catch (Exception e) {
-                }
+    boolean imagemCarregada = false;
+
+    if (comImagem && caminhoImg != null && !caminhoImg.isBlank()) {
+        try {
+            File arquivoImagem = new File(caminhoImg);
+
+            if (!arquivoImagem.exists()) {
+                arquivoImagem = new File(System.getProperty("user.dir"), caminhoImg);
             }
 
-            JLabel lbl = new JLabel("<html><center>" + texto + "</center></html>", SwingConstants.CENTER);
-            lbl.setFont(new Font("Verdana", Font.BOLD, 14));
-            lbl.setForeground(Color.WHITE);
-            add(lbl, comImagem ? BorderLayout.SOUTH : BorderLayout.CENTER);
+            Image imagemOriginal = ImageIO.read(arquivoImagem);
+
+            if (imagemOriginal != null) {
+                Image imagemRedimensionada = imagemOriginal.getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+                JLabel labelImagem = new JLabel(new ImageIcon(imagemRedimensionada), SwingConstants.CENTER);
+                add(labelImagem, BorderLayout.CENTER);
+                imagemCarregada = true;
+            }
+        } catch (Exception erro) {
+            System.out.println("Erro ao carregar imagem da associação: " + caminhoImg);
+            System.out.println(erro.getMessage());
         }
+    }
+
+    String textoFinal = texto;
+
+    if (comImagem && !imagemCarregada) {
+        textoFinal = "[img]";
+    }
+
+    JLabel lbl = new JLabel("<html><center>" + textoFinal + "</center></html>", SwingConstants.CENTER);
+    lbl.setFont(new Font("Verdana", Font.BOLD, 14));
+    lbl.setForeground(Color.WHITE);
+    add(lbl, comImagem && imagemCarregada ? BorderLayout.SOUTH : BorderLayout.CENTER);
+}
 
         public void setResolvido(boolean v) {
             this.resolvido = v;
