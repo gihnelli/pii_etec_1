@@ -61,7 +61,6 @@ CREATE TABLE IF NOT EXISTS questao (
     nivel_dificuldade ENUM('FACIL', 'MEDIO', 'DIFICIL') NOT NULL,
     categoria VARCHAR(80) NULL,
     imagem_url VARCHAR(300) NULL,
-    imagem_blob LONGBLOB NULL,
     id_professor INT NOT NULL,
     ativa BOOLEAN NOT NULL DEFAULT TRUE,
     criada_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -105,8 +104,6 @@ CREATE TABLE IF NOT EXISTS resposta (
     id_questao INT NOT NULL,
     id_alternativa INT NOT NULL, -- alternativa escolhida pelo aluno
     correta BOOLEAN NOT NULL,
-    tempo_resposta INT NOT NULL, -- tempo em segundos
-
     CONSTRAINT pk_resposta PRIMARY KEY (id),
     CONSTRAINT fk_resp_partida FOREIGN KEY (id_partida) REFERENCES partida(id) ON DELETE CASCADE,
     CONSTRAINT fk_resp_questao FOREIGN KEY (id_questao) REFERENCES questao(id) ON DELETE RESTRICT,
@@ -202,8 +199,7 @@ CREATE OR REPLACE VIEW vw_historico_partida AS
         q.enunciado AS pergunta,
         q.nivel_dificuldade,
         a.texto AS alternativa_escolhida,
-        r.correta,
-        r.tempo_resposta
+        r.correta
     FROM resposta r INNER JOIN partida p ON p.id = r.id_partida INNER JOIN usuario u ON u.id = p.id_aluno
     INNER JOIN questao q ON q.id = r.id_questao INNER JOIN alternativa a ON a.id = r.id_alternativa ORDER BY p.id, r.id;
 
