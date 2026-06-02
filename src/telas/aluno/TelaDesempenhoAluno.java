@@ -14,8 +14,10 @@ import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.Normalizer;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,11 +36,10 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-import model.Alternativa;
+import database.DAO.PartidaDAO;
 import model.Aluno;
 import model.Partida;
-import model.Questao;
-import model.Resposta;
+import serviços.SessaoUsuario;
 
 public class TelaDesempenhoAluno extends JFrame {
 
@@ -50,20 +51,54 @@ public class TelaDesempenhoAluno extends JFrame {
     private final Color BRANCO_GELO = new Color(238, 242, 248);
     private final Color CINZA_CLARO = new Color(210, 210, 210);
 
-    private static final PDFont FONTE_NORMAL =
-            new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+    private static final PDFont FONTE_NORMAL = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
 
-    private static final PDFont FONTE_NEGRITO =
-            new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+    private static final PDFont FONTE_NEGRITO = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
 
     public TelaDesempenhoAluno(Aluno aluno) {
-        this.aluno = aluno;
+        this.aluno = carregarAlunoComHistorico(aluno);
         configurarJanela();
         montarTela();
     }
 
     public TelaDesempenhoAluno() {
-        this(gerarAlunoExemplo());
+        this(obterAlunoLogadoDaSessao());
+    }
+
+    private static Aluno obterAlunoLogadoDaSessao() {
+        if (SessaoUsuario.getUsuarioLogado() instanceof Aluno alunoLogado) {
+            return alunoLogado;
+        }
+
+        throw new IllegalStateException("Nenhum aluno logado na sessão.");
+    }
+
+    private Aluno carregarAlunoComHistorico(Aluno alunoRecebido) {
+        Aluno alunoCarregado = alunoRecebido;
+
+        if (alunoCarregado == null || alunoCarregado.getId() <= 0) {
+            alunoCarregado = obterAlunoLogadoDaSessao();
+        }
+
+        try {
+            PartidaDAO partidaDAO = new PartidaDAO();
+            List<Partida> partidas = partidaDAO.listarPorAluno(alunoCarregado);
+            alunoCarregado.setHistoricoPartidas(partidas);
+
+            System.out.println("Partidas carregadas para o aluno "
+                    + alunoCarregado.getId() + ": " + partidas.size());
+
+        } catch (SQLException erro) {
+            erro.printStackTrace();
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Erro ao carregar histórico do aluno: " + erro.getMessage(),
+                    "Erro",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+        return alunoCarregado;
     }
 
     private void configurarJanela() {
@@ -102,8 +137,7 @@ public class TelaDesempenhoAluno extends JFrame {
         GraficoPizza grafico = new GraficoPizza(
                 estatisticas.percentualAcertos,
                 estatisticas.percentualErros,
-                true
-        );
+                true);
         grafico.setBounds(20, 70, 440, 390);
         painelGrafico.add(grafico);
 
@@ -112,13 +146,11 @@ public class TelaDesempenhoAluno extends JFrame {
                         + " respostas | "
                         + estatisticas.totalAcertos + " acertos | "
                         + estatisticas.totalErros + " erros",
-                SwingConstants.CENTER
-        );
+                SwingConstants.CENTER);
         resumo.setBounds(0, 475, 480, 35);
         resumo.setFont(new Font("Verdana", Font.BOLD, 14));
         resumo.setForeground(Color.WHITE);
         painelGrafico.add(resumo);
-
 
         PainelArredondado painelRelatorio = new PainelArredondado(18);
         painelRelatorio.setBounds(535, 420, 420, 115);
@@ -165,8 +197,7 @@ public class TelaDesempenhoAluno extends JFrame {
                     "Nome: " + this.aluno.getNome()
                             + "\nE-mail: " + this.aluno.getEmail(),
                     "Perfil do Aluno",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+                    JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(this, "Informações do aluno não encontradas.");
         }
@@ -224,7 +255,7 @@ public class TelaDesempenhoAluno extends JFrame {
         return estatisticas;
     }
 
-      private File criarPastaRelatorios() {
+    private File criarPastaRelatorios() {
         File pasta = new File("relatorios");
 
         if (!pasta.exists()) {
@@ -233,7 +264,6 @@ public class TelaDesempenhoAluno extends JFrame {
 
         return pasta;
     }
-
 
     private void gerarPdfDoAluno() {
         File arquivo = null;
@@ -260,8 +290,7 @@ public class TelaDesempenhoAluno extends JFrame {
                     this,
                     "PDF gerado com sucesso!\n\nArquivo salvo em:\n" + arquivo.getAbsolutePath(),
                     "PDF gerado",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+                    JOptionPane.INFORMATION_MESSAGE);
 
             try {
                 if (Desktop.isDesktopSupported()) {
@@ -278,8 +307,7 @@ public class TelaDesempenhoAluno extends JFrame {
                     this,
                     "Erro ao gerar PDF:\n" + erro.getMessage(),
                     "Erro",
-                    JOptionPane.ERROR_MESSAGE
-            );
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -294,10 +322,16 @@ public class TelaDesempenhoAluno extends JFrame {
 
         escreverTexto(conteudo, "Resumo de desempenho", FONTE_NEGRITO, 15, 50, 630, AZUL_ESCURO);
         escreverTexto(conteudo, "Partidas: " + estatisticas.totalPartidas, FONTE_NORMAL, 12, 50, 608, Color.BLACK);
-        escreverTexto(conteudo, "Pontuacao total: " + estatisticas.pontuacaoTotal, FONTE_NORMAL, 12, 50, 590, Color.BLACK);
+        escreverTexto(conteudo, "Pontuacao total: " + estatisticas.pontuacaoTotal, FONTE_NORMAL, 12, 50, 590,
+                Color.BLACK);
         escreverTexto(conteudo, "Respostas: " + estatisticas.totalRespostas, FONTE_NORMAL, 12, 50, 572, Color.BLACK);
-        escreverTexto(conteudo, "Acertos: " + estatisticas.totalAcertos + " (" + formatarPercentual(estatisticas.percentualAcertos) + ")", FONTE_NORMAL, 12, 50, 554, Color.BLACK);
-        escreverTexto(conteudo, "Erros: " + estatisticas.totalErros + " (" + formatarPercentual(estatisticas.percentualErros) + ")", FONTE_NORMAL, 12, 50, 536, Color.BLACK);
+        escreverTexto(
+                conteudo, "Acertos: " + estatisticas.totalAcertos + " ("
+                        + formatarPercentual(estatisticas.percentualAcertos) + ")",
+                FONTE_NORMAL, 12, 50, 554, Color.BLACK);
+        escreverTexto(conteudo,
+                "Erros: " + estatisticas.totalErros + " (" + formatarPercentual(estatisticas.percentualErros) + ")",
+                FONTE_NORMAL, 12, 50, 536, Color.BLACK);
 
         desenharBarraDesempenhoPdf(
                 conteudo,
@@ -306,8 +340,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 480,
                 28,
                 estatisticas.percentualAcertos,
-                estatisticas.percentualErros
-        );
+                estatisticas.percentualErros);
 
         escreverTexto(conteudo, "Historico de partidas", FONTE_NEGRITO, 15, 50, 445, AZUL_ESCURO);
 
@@ -347,7 +380,8 @@ public class TelaDesempenhoAluno extends JFrame {
 
                 desenharLinhaTabela(conteudo, y, false);
                 escreverTexto(conteudo, data, FONTE_NORMAL, 9, 55, y + 8, Color.BLACK);
-                escreverTexto(conteudo, String.valueOf(partida.getPontuacao()), FONTE_NORMAL, 9, 200, y + 8, Color.BLACK);
+                escreverTexto(conteudo, String.valueOf(partida.getPontuacao()), FONTE_NORMAL, 9, 200, y + 8,
+                        Color.BLACK);
                 escreverTexto(conteudo, String.valueOf(acertos), FONTE_NORMAL, 9, 300, y + 8, Color.BLACK);
                 escreverTexto(conteudo, String.valueOf(erros), FONTE_NORMAL, 9, 390, y + 8, Color.BLACK);
                 escreverTexto(conteudo, String.valueOf(total), FONTE_NORMAL, 9, 470, y + 8, Color.BLACK);
@@ -361,16 +395,14 @@ public class TelaDesempenhoAluno extends JFrame {
         conteudo.setNonStrokingColor(
                 cor.getRed() / 255f,
                 cor.getGreen() / 255f,
-                cor.getBlue() / 255f
-        );
+                cor.getBlue() / 255f);
     }
 
     private void definirCorContorno(PDPageContentStream conteudo, Color cor) throws IOException {
         conteudo.setStrokingColor(
                 cor.getRed() / 255f,
                 cor.getGreen() / 255f,
-                cor.getBlue() / 255f
-        );
+                cor.getBlue() / 255f);
     }
 
     private void desenharCabecalhoPdf(PDPageContentStream conteudo, String titulo) throws IOException {
@@ -387,8 +419,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 10,
                 40,
                 795,
-                Color.WHITE
-        );
+                Color.WHITE);
     }
 
     private void desenharBarraDesempenhoPdf(
@@ -398,8 +429,7 @@ public class TelaDesempenhoAluno extends JFrame {
             float largura,
             float altura,
             double percentualAcertos,
-            double percentualErros
-    ) throws IOException {
+            double percentualErros) throws IOException {
         float larguraAcertos = (float) (largura * percentualAcertos / 100.0);
         float larguraErros = largura - larguraAcertos;
 
@@ -415,8 +445,10 @@ public class TelaDesempenhoAluno extends JFrame {
         conteudo.addRect(x, y, largura, altura);
         conteudo.stroke();
 
-        escreverTexto(conteudo, "Acertos: " + formatarPercentual(percentualAcertos), FONTE_NEGRITO, 10, x, y - 18, Color.BLACK);
-        escreverTexto(conteudo, "Erros: " + formatarPercentual(percentualErros), FONTE_NEGRITO, 10, x + 180, y - 18, Color.BLACK);
+        escreverTexto(conteudo, "Acertos: " + formatarPercentual(percentualAcertos), FONTE_NEGRITO, 10, x, y - 18,
+                Color.BLACK);
+        escreverTexto(conteudo, "Erros: " + formatarPercentual(percentualErros), FONTE_NEGRITO, 10, x + 180, y - 18,
+                Color.BLACK);
     }
 
     private void desenharLinhaTabela(PDPageContentStream conteudo, float y, boolean cabecalho) throws IOException {
@@ -437,8 +469,7 @@ public class TelaDesempenhoAluno extends JFrame {
             float tamanho,
             float x,
             float y,
-            Color cor
-    ) throws IOException {
+            Color cor) throws IOException {
         conteudo.beginText();
         conteudo.setFont(fonte, tamanho);
         definirCorPreenchimento(conteudo, cor);
@@ -530,8 +561,7 @@ public class TelaDesempenhoAluno extends JFrame {
                     tamanho,
                     90 - (anguloAcertos / 2),
                     "Acertou",
-                    formatarPercentual(percentualAcertos)
-            );
+                    formatarPercentual(percentualAcertos));
 
             desenharTextoDoGrafico(
                     desenho,
@@ -540,8 +570,7 @@ public class TelaDesempenhoAluno extends JFrame {
                     tamanho,
                     90 - anguloAcertos - (anguloErros / 2),
                     "Errou",
-                    formatarPercentual(percentualErros)
-            );
+                    formatarPercentual(percentualErros));
 
             desenho.dispose();
         }
@@ -553,8 +582,7 @@ public class TelaDesempenhoAluno extends JFrame {
                 int tamanho,
                 int angulo,
                 String linha1,
-                String linha2
-        ) {
+                String linha2) {
             double radiano = Math.toRadians(angulo);
             int raio = tamanho / 2 + (grande ? 35 : 20);
 
@@ -628,8 +656,7 @@ public class TelaDesempenhoAluno extends JFrame {
             if (imagemFundo != null && imagemFundo.getWidth(null) > 0) {
                 double escala = Math.max(
                         (double) getWidth() / imagemFundo.getWidth(null),
-                        (double) getHeight() / imagemFundo.getHeight(null)
-                );
+                        (double) getHeight() / imagemFundo.getHeight(null));
 
                 int novaLargura = (int) (imagemFundo.getWidth(null) * escala);
                 int novaAltura = (int) (imagemFundo.getHeight(null) * escala);
@@ -640,8 +667,7 @@ public class TelaDesempenhoAluno extends JFrame {
                         (getHeight() - novaAltura) / 2,
                         novaLargura,
                         novaAltura,
-                        null
-                );
+                        null);
             } else {
                 grafico.setColor(new Color(223, 239, 252));
                 grafico.fillRect(0, 0, getWidth(), getHeight());
@@ -649,31 +675,6 @@ public class TelaDesempenhoAluno extends JFrame {
         }
     }
 
-    private static Aluno gerarAlunoExemplo() {
-        Aluno aluno = new Aluno(
-                "Aluno 1",
-                "aluno1@aluno.cps.sp.gov.br",
-                "123"
-        );
-
-        Questao questaoTeste = new Questao();
-        Partida partida = new Partida(aluno);
-
-        for (int i = 0; i < 10; i++) {
-            Resposta resposta = new Resposta();
-            resposta.setQuestao(questaoTeste);
-
-            Alternativa alternativa = new Alternativa();
-            alternativa.setECorreta(i < 7);
-
-            resposta.setAlternativaEscolhida(alternativa);
-            partida.adicionarResposta(resposta);
-        }
-
-        aluno.adicionarPartida(partida);
-
-        return aluno;
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

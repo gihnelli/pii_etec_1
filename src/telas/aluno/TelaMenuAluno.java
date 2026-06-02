@@ -170,7 +170,7 @@ public class TelaMenuAluno extends JFrame {
     }
 
     private void abrirTelaDesempenho() {
-        new TelaDesempenhoAluno(this.aluno).setVisible(true);
+        new TelaDesempenhoAluno((Aluno) SessaoUsuario.getUsuarioLogado()).setVisible(true);
         dispose();
     }
 

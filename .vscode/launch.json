@@ -6,6 +6,13 @@
       "name": "LabQuest",
       "request": "launch",
       "mainClass": "aplicativo.LabQuest",
+      "projectName": "labquest"
+    },
+    {
+      "type": "java",
+      "name": "LabQuest",
+      "request": "launch",
+      "mainClass": "aplicativo.LabQuest",
       "projectName": "pii-etec"
     }
   ]

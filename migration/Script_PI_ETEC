@@ -161,14 +161,14 @@ INSERT INTO usuario (nome, email, senha, salt, tipo) VALUES
 (
     'Professor Teste',
     'professor@cps.sp.gov.br',
-    '7716190a3d24c3b8de1a5c118fae4b04dbcb1ee325627b17b0f736bd74eac875',
+    'dxYZCj0kw7jeGlwRj65LBNvLHuMlYnsXsPc2vXTqyHU=',
     'saltProfessorTeste001', -- salt único por usuário
     'PROFESSOR'
 ),
 (
     'Aluno Teste',
     'aluno@aluno.cps.sp.gov.br',
-    '908ddc2ad5696309cf24fafa1021966c80b040d70083d25b8279d198d7665e0b',
+    'kI3cKtVpYwnPJPr6ECGWbICwQNcAg9JbgnnRmNdmXgs=',
     'saltAlunoTeste002', -- salt único por usuário
     'ALUNO'
 );
