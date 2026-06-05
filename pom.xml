@@ -4,8 +4,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>labquest</groupId>
-    <artifactId>labquest</artifactId>
+    <groupId>LabTech</groupId>
+    <artifactId>LabTech</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -17,7 +17,7 @@
     <build>
         <sourceDirectory>src</sourceDirectory>
 
-        <finalName>LabQuest</finalName>
+        <finalName>LabTech</finalName>
 
         <plugins>
             <!-- Compilação Java -->
@@ -38,7 +38,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <mainClass>aplicativo.LabQuest</mainClass>
+                    <mainClass>aplicativo.labtech</mainClass>
                 </configuration>
             </plugin>
 
@@ -56,7 +56,7 @@
                         <configuration>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>aplicativo.LabQuest</mainClass>
+                                    <mainClass>aplicativo.labtech</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

@@ -415,7 +415,7 @@ public class TelaDesempenho extends JFrame {
     private void desenharRelatorioTurma(PDPageContentStream conteudo) throws IOException {
         Estatisticas estatisticas = calcularEstatisticasTurma();
 
-        desenharCabecalhoPdf(conteudo, "LabQuest - Relatorio de desempenho da turma");
+        desenharCabecalhoPdf(conteudo, "LabTech - Relatorio de desempenho da turma");
 
         escreverTexto(conteudo, "Resumo geral da turma", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
 
@@ -474,7 +474,7 @@ public class TelaDesempenho extends JFrame {
     private void desenharRelatorioAluno(PDPageContentStream conteudo, Aluno aluno) throws IOException {
         Estatisticas estatisticas = calcularEstatisticasAluno(aluno);
 
-        desenharCabecalhoPdf(conteudo, "LabQuest - Relatorio individual do aluno");
+        desenharCabecalhoPdf(conteudo, "LabTech - Relatorio individual do aluno");
 
         escreverTexto(conteudo, "Dados do aluno", FONTE_NEGRITO, 18, 50, 730, AZUL_ESCURO);
         escreverTexto(conteudo, "Nome: " + aluno.getNome(), FONTE_NORMAL, 12, 50, 705, Color.BLACK);
@@ -559,7 +559,7 @@ public class TelaDesempenho extends JFrame {
         escreverTexto(conteudo, titulo, FONTE_NEGRITO, 18, 40, 810, Color.WHITE);
         escreverTexto(
                 conteudo,
-                "Gerado automaticamente pelo sistema LabQuest",
+                "Gerado automaticamente pelo sistema LabTech",
                 FONTE_NORMAL,
                 10,
                 40,

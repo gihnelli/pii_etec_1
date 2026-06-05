@@ -42,7 +42,7 @@ public class TelaLogin extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("LabQuest - Login");
+        setTitle("LabTech - Login");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -64,7 +64,7 @@ public class TelaLogin extends JFrame {
         painelLogin.setBackground(Color.WHITE);
         conteinerCentral.add(painelLogin);
 
-        JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("LabTech", SwingConstants.CENTER);
         titulo.setBounds(35, 30, 340, 80);
         titulo.setFont(new Font("Verdana", Font.BOLD, 62));
         titulo.setForeground(new Color(47, 76, 113));

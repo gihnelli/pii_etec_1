@@ -86,7 +86,7 @@ public class TelaJogo extends JFrame {
     }
 
     private void configurarJanela() {
-        setTitle("LabQuest - Desafio de Laboratório");
+        setTitle("LabTech - Desafio de Laboratório");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -297,44 +297,44 @@ public class TelaJogo extends JFrame {
 
         List<Alternativa> pares = questao.getAlternativas();
 
-List<Integer> ordemEsq = new ArrayList<>();
-List<Integer> ordemDir = new ArrayList<>();
+        List<Integer> ordemEsq = new ArrayList<>();
+        List<Integer> ordemDir = new ArrayList<>();
 
-for (int i = 0; i < pares.size(); i++) {
-    ordemEsq.add(i);
-    ordemDir.add(i);
-}
+        for (int i = 0; i < pares.size(); i++) {
+            ordemEsq.add(i);
+            ordemDir.add(i);
+        }
 
-Collections.shuffle(ordemEsq);
-Collections.shuffle(ordemDir);
+        Collections.shuffle(ordemEsq);
+        Collections.shuffle(ordemDir);
 
-int y = 90;
+        int y = 90;
 
-for (int i = 0; i < pares.size(); i++) {
-    final int idxEsq = ordemEsq.get(i);
-    final int idxDir = ordemDir.get(i);
+        for (int i = 0; i < pares.size(); i++) {
+            final int idxEsq = ordemEsq.get(i);
+            final int idxDir = ordemDir.get(i);
 
-    Alternativa parEsq = pares.get(idxEsq);
-    Alternativa parDir = pares.get(idxDir);
+            Alternativa parEsq = pares.get(idxEsq);
+            Alternativa parDir = pares.get(idxDir);
 
-    String idParEsq = String.valueOf(parEsq.getId());
-    String idParDir = String.valueOf(parDir.getId());
+            String idParEsq = String.valueOf(parEsq.getId());
+            String idParDir = String.valueOf(parDir.getId());
 
-    BotaoAssociacao btnEsq = new BotaoAssociacao("", parEsq.getImagem(), true);
-    btnEsq.setBounds(50, y, 230, 110);
-    btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, idParEsq));
-    btnEsq.setIdPar(idParEsq);
-    painelConteudo.add(btnEsq);
-    botoesEsq.add(btnEsq);
+            BotaoAssociacao btnEsq = new BotaoAssociacao("", parEsq.getImagem(), true);
+            btnEsq.setBounds(50, y, 230, 110);
+            btnEsq.addActionListener(e -> lidarCliqueAssociacao(btnEsq, true, idParEsq));
+            btnEsq.setIdPar(idParEsq);
+            painelConteudo.add(btnEsq);
+            botoesEsq.add(btnEsq);
 
-    BotaoAssociacao btnDir = new BotaoAssociacao(parDir.getTexto(), null, false);
-    btnDir.setBounds(620, y, 230, 110);
-    btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, idParDir));
-    btnDir.setIdPar(idParDir);
-    painelConteudo.add(btnDir);
-    botoesDir.add(btnDir);
+            BotaoAssociacao btnDir = new BotaoAssociacao(parDir.getTexto(), null, false);
+            btnDir.setBounds(620, y, 230, 110);
+            btnDir.addActionListener(e -> lidarCliqueAssociacao(btnDir, false, idParDir));
+            btnDir.setIdPar(idParDir);
+            painelConteudo.add(btnDir);
+            botoesDir.add(btnDir);
 
-    y += 120;
+            y += 120;
         }
     }
 
@@ -400,7 +400,7 @@ for (int i = 0; i < pares.size(); i++) {
     }
 
     private void mostrarPopUpAjuda() {
-        JDialog dialog = new JDialog(this, "Suporte LabQuest", true);
+        JDialog dialog = new JDialog(this, "Suporte LabTech", true);
         dialog.setSize(600, 480);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(null);
@@ -725,48 +725,48 @@ for (int i = 0; i < pares.size(); i++) {
         private String idPar;
 
         public BotaoAssociacao(String texto, String caminhoImg, boolean comImagem) {
-    setLayout(new BorderLayout());
-    setBackground(new Color(130, 150, 220));
-    setFocusPainted(false);
-    setBorderPainted(false);
-    setContentAreaFilled(false);
-    setCursor(new Cursor(Cursor.HAND_CURSOR));
+            setLayout(new BorderLayout());
+            setBackground(new Color(130, 150, 220));
+            setFocusPainted(false);
+            setBorderPainted(false);
+            setContentAreaFilled(false);
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-    boolean imagemCarregada = false;
+            boolean imagemCarregada = false;
 
-    if (comImagem && caminhoImg != null && !caminhoImg.isBlank()) {
-        try {
-            File arquivoImagem = new File(caminhoImg);
+            if (comImagem && caminhoImg != null && !caminhoImg.isBlank()) {
+                try {
+                    File arquivoImagem = new File(caminhoImg);
 
-            if (!arquivoImagem.exists()) {
-                arquivoImagem = new File(System.getProperty("user.dir"), caminhoImg);
+                    if (!arquivoImagem.exists()) {
+                        arquivoImagem = new File(System.getProperty("user.dir"), caminhoImg);
+                    }
+
+                    Image imagemOriginal = ImageIO.read(arquivoImagem);
+
+                    if (imagemOriginal != null) {
+                        Image imagemRedimensionada = imagemOriginal.getScaledInstance(70, 70, Image.SCALE_SMOOTH);
+                        JLabel labelImagem = new JLabel(new ImageIcon(imagemRedimensionada), SwingConstants.CENTER);
+                        add(labelImagem, BorderLayout.CENTER);
+                        imagemCarregada = true;
+                    }
+                } catch (Exception erro) {
+                    System.out.println("Erro ao carregar imagem da associação: " + caminhoImg);
+                    System.out.println(erro.getMessage());
+                }
             }
 
-            Image imagemOriginal = ImageIO.read(arquivoImagem);
+            String textoFinal = texto;
 
-            if (imagemOriginal != null) {
-                Image imagemRedimensionada = imagemOriginal.getScaledInstance(70, 70, Image.SCALE_SMOOTH);
-                JLabel labelImagem = new JLabel(new ImageIcon(imagemRedimensionada), SwingConstants.CENTER);
-                add(labelImagem, BorderLayout.CENTER);
-                imagemCarregada = true;
+            if (comImagem && !imagemCarregada) {
+                textoFinal = "[img]";
             }
-        } catch (Exception erro) {
-            System.out.println("Erro ao carregar imagem da associação: " + caminhoImg);
-            System.out.println(erro.getMessage());
+
+            JLabel lbl = new JLabel("<html><center>" + textoFinal + "</center></html>", SwingConstants.CENTER);
+            lbl.setFont(new Font("Verdana", Font.BOLD, 14));
+            lbl.setForeground(Color.WHITE);
+            add(lbl, comImagem && imagemCarregada ? BorderLayout.SOUTH : BorderLayout.CENTER);
         }
-    }
-
-    String textoFinal = texto;
-
-    if (comImagem && !imagemCarregada) {
-        textoFinal = "[img]";
-    }
-
-    JLabel lbl = new JLabel("<html><center>" + textoFinal + "</center></html>", SwingConstants.CENTER);
-    lbl.setFont(new Font("Verdana", Font.BOLD, 14));
-    lbl.setForeground(Color.WHITE);
-    add(lbl, comImagem && imagemCarregada ? BorderLayout.SOUTH : BorderLayout.CENTER);
-}
 
         public void setResolvido(boolean v) {
             this.resolvido = v;

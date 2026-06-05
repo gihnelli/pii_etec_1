@@ -71,7 +71,7 @@ public class TelaMenuAluno extends JFrame {
         botaoSair.addActionListener(e -> sairDaConta());
         conteinerCentral.add(botaoSair);
 
-        JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("LabTech", SwingConstants.CENTER);
         titulo.setBounds(80, 100, 800, 120);
         titulo.setFont(new Font("Verdana", Font.BOLD, 110));
         titulo.setForeground(new Color(31, 65, 126));

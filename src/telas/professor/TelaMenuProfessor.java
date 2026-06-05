@@ -57,18 +57,20 @@ public class TelaMenuProfessor extends JFrame {
         botaoSair.addActionListener(e -> sairDaConta());
         conteinerCentral.add(botaoSair);
 
-        JLabel titulo = new JLabel("LabQuest", SwingConstants.CENTER);
+        JLabel titulo = new JLabel("LabTech", SwingConstants.CENTER);
         titulo.setBounds(80, 100, 800, 120);
         titulo.setFont(new Font("Verdana", Font.BOLD, 110));
         titulo.setForeground(new Color(31, 65, 126));
         conteinerCentral.add(titulo);
 
-        BotaoArredondado botaoGerenciarAlternativas = new BotaoArredondado("<html><center>Gerenciar Perguntas<br>de Alternativa</center></html>");
+        BotaoArredondado botaoGerenciarAlternativas = new BotaoArredondado(
+                "<html><center>Gerenciar Perguntas<br>de Alternativa</center></html>");
         botaoGerenciarAlternativas.setBounds(280, 260, 400, 65);
         botaoGerenciarAlternativas.addActionListener(evento -> abrirGerenciarPerguntasAlternativa());
         conteinerCentral.add(botaoGerenciarAlternativas);
 
-        BotaoArredondado botaoGerenciarAssociacao = new BotaoArredondado("<html><center>Gerenciar Perguntas<br>de Associação</center></html>");
+        BotaoArredondado botaoGerenciarAssociacao = new BotaoArredondado(
+                "<html><center>Gerenciar Perguntas<br>de Associação</center></html>");
         botaoGerenciarAssociacao.setBounds(280, 345, 400, 65);
         botaoGerenciarAssociacao.addActionListener(evento -> abrirGerenciarPerguntasAssociacao());
         conteinerCentral.add(botaoGerenciarAssociacao);

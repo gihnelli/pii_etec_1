@@ -3,16 +3,16 @@
   "configurations": [
     {
       "type": "java",
-      "name": "LabQuest",
+      "name": "LabTech",
       "request": "launch",
-      "mainClass": "aplicativo.LabQuest",
-      "projectName": "labquest"
+      "mainClass": "aplicativo.labtech",
+      "projectName": "LabTech"
     },
     {
       "type": "java",
-      "name": "LabQuest",
+      "name": "LabTech",
       "request": "launch",
-      "mainClass": "aplicativo.LabQuest",
+      "mainClass": "aplicativo.labtech",
       "projectName": "pii-etec"
     }
   ]

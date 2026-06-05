@@ -71,8 +71,8 @@ public class TelaGerenciarPerguntas extends JFrame {
     private JRadioButton radioDificilAssociacaoAdicionar;
 
     public TelaGerenciarPerguntas() {
-    this(TipoQuestao.MULTIPLA_ESCOLHA);
-}
+        this(TipoQuestao.MULTIPLA_ESCOLHA);
+    }
 
     public TelaGerenciarPerguntas(TipoQuestao tipoGerenciado) {
         this.tipoGerenciado = tipoGerenciado;
@@ -83,16 +83,16 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void configurarJanela() {
-    if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
-        setTitle("LabQuest - Gerenciar Perguntas de Associação");
-    } else {
-        setTitle("LabQuest - Gerenciar Perguntas de Alternativa");
-    }
+        if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
+            setTitle("LabTech - Gerenciar Perguntas de Associação");
+        } else {
+            setTitle("LabTech - Gerenciar Perguntas de Alternativa");
+        }
 
-    setExtendedState(JFrame.MAXIMIZED_BOTH);
-    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setLocationRelativeTo(null);
-}
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+    }
 
     private void montarTela() {
         PainelFundoImagem painelBase = new PainelFundoImagem();
@@ -283,18 +283,17 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private JPanel criarPainelAdicionar() {
-    if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
-        return criarPainelAdicionarAssociacao();
-    }
+        if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
+            return criarPainelAdicionarAssociacao();
+        }
 
-    JPanel painelBase = new JPanel(null);
-    painelBase.setOpaque(false);
+        JPanel painelBase = new JPanel(null);
+        painelBase.setOpaque(false);
 
-    PainelArredondado painelFormulario = new PainelArredondado(new Color(212, 212, 212), new Color(42, 82, 145), 1);
-    painelFormulario.setLayout(null);
-    painelFormulario.setBounds(4, 84, 904, 438);
-    painelBase.add(painelFormulario);
-
+        PainelArredondado painelFormulario = new PainelArredondado(new Color(212, 212, 212), new Color(42, 82, 145), 1);
+        painelFormulario.setLayout(null);
+        painelFormulario.setBounds(4, 84, 904, 438);
+        painelBase.add(painelFormulario);
 
         campoEnunciadoAdicionar = new JTextField();
         configurarCampoTexto(campoEnunciadoAdicionar);
@@ -419,23 +418,23 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private JPanel criarPainelEditar() {
-    JPanel painelBase = new JPanel(null);
-    painelBase.setOpaque(false);
+        JPanel painelBase = new JPanel(null);
+        painelBase.setOpaque(false);
 
-    if (bancoPerguntas.isEmpty()) {
-        return painelBase;
-    }
+        if (bancoPerguntas.isEmpty()) {
+            return painelBase;
+        }
 
-    PerguntaCadastro perguntaSelecionada = bancoPerguntas.get(indicePerguntaSelecionada);
+        PerguntaCadastro perguntaSelecionada = bancoPerguntas.get(indicePerguntaSelecionada);
 
-    if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
-        return criarPainelEditarAssociacao(perguntaSelecionada);
-    }
+        if (tipoGerenciado == TipoQuestao.ASSOCIACAO) {
+            return criarPainelEditarAssociacao(perguntaSelecionada);
+        }
 
-    PainelArredondado painelFormulario = new PainelArredondado(new Color(212, 212, 212), new Color(42, 82, 145), 1);
-    painelFormulario.setLayout(null);
-    painelFormulario.setBounds(4, 84, 904, 380);
-    painelBase.add(painelFormulario);
+        PainelArredondado painelFormulario = new PainelArredondado(new Color(212, 212, 212), new Color(42, 82, 145), 1);
+        painelFormulario.setLayout(null);
+        painelFormulario.setBounds(4, 84, 904, 380);
+        painelBase.add(painelFormulario);
 
         JTextField campoEnunciadoEditar = new JTextField(perguntaSelecionada.getEnunciado());
         configurarCampoTexto(campoEnunciadoEditar);
@@ -694,46 +693,46 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private PerguntaCadastro converterQuestaoParaCadastro(Questao questao) {
-    List<String> alternativas = new ArrayList<>();
-    List<String> imagensAssociacao = new ArrayList<>();
-    int indiceCorreta = 0;
+        List<String> alternativas = new ArrayList<>();
+        List<String> imagensAssociacao = new ArrayList<>();
+        int indiceCorreta = 0;
 
-    for (Alternativa alternativa : questao.getAlternativas()) {
-        if (alternativas.size() >= 4) {
-            break;
+        for (Alternativa alternativa : questao.getAlternativas()) {
+            if (alternativas.size() >= 4) {
+                break;
+            }
+
+            alternativas.add(alternativa.getTexto());
+
+            String imagem = alternativa.getImagem() == null ? "" : alternativa.getImagem();
+            imagensAssociacao.add(imagem);
+
+            if (alternativa.isECorreta()) {
+                indiceCorreta = alternativas.size() - 1;
+            }
         }
 
-        alternativas.add(alternativa.getTexto());
-
-        String imagem = alternativa.getImagem() == null ? "" : alternativa.getImagem();
-        imagensAssociacao.add(imagem);
-
-        if (alternativa.isECorreta()) {
-            indiceCorreta = alternativas.size() - 1;
+        while (alternativas.size() < 4) {
+            alternativas.add("");
         }
+
+        while (imagensAssociacao.size() < 4) {
+            imagensAssociacao.add("");
+        }
+
+        String caminhoImagem = questao.getImagemEnunciado() == null ? "" : questao.getImagemEnunciado();
+        String categoria = questao.getCategoria() == null ? "Materiais de laboratório" : questao.getCategoria();
+
+        return new PerguntaCadastro(
+                questao.getId(),
+                questao.getEnunciado(),
+                alternativas,
+                imagensAssociacao,
+                indiceCorreta,
+                questao.getNivelDificuldade().name(),
+                categoria,
+                caminhoImagem);
     }
-
-    while (alternativas.size() < 4) {
-        alternativas.add("");
-    }
-
-    while (imagensAssociacao.size() < 4) {
-        imagensAssociacao.add("");
-    }
-
-    String caminhoImagem = questao.getImagemEnunciado() == null ? "" : questao.getImagemEnunciado();
-    String categoria = questao.getCategoria() == null ? "Materiais de laboratório" : questao.getCategoria();
-
-    return new PerguntaCadastro(
-            questao.getId(),
-            questao.getEnunciado(),
-            alternativas,
-            imagensAssociacao,
-            indiceCorreta,
-            questao.getNivelDificuldade().name(),
-            categoria,
-            caminhoImagem);
-}
 
     private void adicionarPergunta() {
         String enunciado = campoEnunciadoAdicionar.getText().trim();
@@ -787,28 +786,28 @@ public class TelaGerenciarPerguntas extends JFrame {
     }
 
     private void salvarAssociacaoNoBanco(String enunciado, List<String> textos, String[] imagens,
-        NivelDificuldade nivel) throws SQLException {
-    Questao questao = new Questao(
-            0,
-            enunciado,
-            TipoQuestao.ASSOCIACAO,
-            nivel,
-            "Materiais de laboratório");
-
-    for (int i = 0; i < textos.size(); i++) {
-        questao.adicionarAlternativa(new Alternativa(
+            NivelDificuldade nivel) throws SQLException {
+        Questao questao = new Questao(
                 0,
-                textos.get(i),
-                imagens[i],
-                true,
-                false));
+                enunciado,
+                TipoQuestao.ASSOCIACAO,
+                nivel,
+                "Materiais de laboratório");
+
+        for (int i = 0; i < textos.size(); i++) {
+            questao.adicionarAlternativa(new Alternativa(
+                    0,
+                    textos.get(i),
+                    imagens[i],
+                    true,
+                    false));
+        }
+
+        QuestaoDAO questaoDAO = new QuestaoDAO();
+        int idGerado = questaoDAO.inserir(questao, SessaoUsuario.getIdUsuario());
+
+        System.out.println("Pergunta de associação salva no banco. ID: " + idGerado);
     }
-
-    QuestaoDAO questaoDAO = new QuestaoDAO();
-    int idGerado = questaoDAO.inserir(questao, SessaoUsuario.getIdUsuario());
-
-    System.out.println("Pergunta de associação salva no banco. ID: " + idGerado);
-}
 
     private List<String> obterTextosAlternativas(JTextField[] camposAlternativas) {
         List<String> alternativas = new ArrayList<>();
@@ -975,7 +974,6 @@ public class TelaGerenciarPerguntas extends JFrame {
             mostrarMensagem("Erro ao remover pergunta: " + erro.getMessage());
         }
     }
-
 
     private JPanel criarPainelAdicionarAssociacao() {
         JPanel painelBase = new JPanel(null);
@@ -1301,7 +1299,6 @@ public class TelaGerenciarPerguntas extends JFrame {
             throw new SQLException("Nenhuma pergunta de associação foi atualizada.");
         }
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
