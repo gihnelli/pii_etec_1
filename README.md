@@ -13,7 +13,7 @@ Projeto acadêmico sem fins lucrativos desenvolvido em parceria com a Etec Júli
 * Perguntas no estilo quiz com graus dificuldade e imagens referentes aos materiais de identificação;
 * Possibilidade de associação entre material, função e sistema experimental;
 * Sistema de pontuação simples por partida;
-* Possibilidade de solicitação de ajudas, como eliminar alternativas e dica textual;
+* Possibilidade de solicitação de ajudas, como eliminar alternativas, chance extra e pular questão;
 * Possibilidade de cadastro de questões pelo professor responsável pela turma;
 * Acesso do professor a relatórios de desempenho.
 
